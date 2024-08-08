@@ -1,5 +1,5 @@
 // Setup
-const KETNER_LAKE_API = 'http://localhost:3000/api/v1/';
+const KETNER_LAKE_API = 'http://localhost:3000/v1/';
 
 const popAccount = document.querySelector( '#account' );
 const popDetails = document.querySelector( '#details' );
