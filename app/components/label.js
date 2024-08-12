@@ -24,7 +24,7 @@ export default class AALabel extends HTMLElement {
           color: var( --label-color, #272727 );
           font-family: 'Source Sans 3', sans-serif;
           font-size: 16px;
-          font-weight: 400;
+          font-weight: var( --label-font-weight, 400 );
           line-height: var( --label-line-height, 16px );
           margin: 0;
           padding: 0;          

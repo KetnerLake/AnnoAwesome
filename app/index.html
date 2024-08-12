@@ -20,27 +20,32 @@
   </head>
   <body>
 
-    <header class="grid">
+    <header style="display: flex; flex-direction: column; gap: 8px;">
 
-      <!-- Controls -->
-      <aa-hbox gap="m">
-        <aa-icon-button icon="list"></aa-icon-button> 
-        <aa-icon-button hidden icon="ios_share"></aa-icon-button> 
-        <aa-icon-button icon="add" id="header_add"></aa-icon-button> 
-      </aa-hbox>
-
-      <!-- Year -->
-      <aa-hbox gap="l">
-        <aa-icon-button icon="arrow_back_ios" size="25"></aa-icon-button> 
-        <aa-label size="xl" text="2024" weight="bold"></aa-label>
-        <aa-icon-button icon="arrow_forward_ios" size="25"></aa-icon-button>         
-      </aa-hbox>
-
-      <!-- Search -->             
-      <aa-hbox gap="m">
-        <aa-search></aa-search>      
-        <aa-icon-button id="header_account" icon="account_circle" size="25"></aa-icon-button>
-      </aa-hbox>
+      <div class="grid">
+        <!-- Controls -->
+        <aa-hbox gap="m" style="align-items: center;">
+          <aa-icon-button icon="calendar_month" size="26"></aa-icon-button>           
+          <aa-icon-button icon="list"></aa-icon-button> 
+          <aa-icon-button icon="add" id="header_add"></aa-icon-button> 
+        </aa-hbox>
+        <div></div>
+        <!-- Search -->             
+        <aa-hbox gap="m" style="justify-self: end;">
+          <aa-search></aa-search>      
+          <aa-icon-button id="header_account" icon="account_circle" size="25"></aa-icon-button>
+        </aa-hbox>
+      </div>
+      <div class="grid">
+        <div></div>          
+        <!-- Year -->
+        <aa-hbox gap="l" style="justify-self: center;">
+          <aa-icon-button icon="arrow_back_ios" size="25"></aa-icon-button> 
+          <aa-label size="xl" text="2024" weight="bold"></aa-label>
+          <aa-icon-button icon="arrow_forward_ios" size="25"></aa-icon-button>         
+        </aa-hbox>      
+        <aa-button label="Today" style="justify-self: end;"></aa-button>
+      </div>
 
     </header>
 
@@ -64,18 +69,26 @@
 
     <!-- Account management -->
     <!-- Popover -->
-    <aa-popover id="account">
+    <aa-popover id="account" hidden>
       <aa-stack>
         <aa-vbox gap="l">
           <aa-vbox>
-            <aa-button label="Create account (free)"></aa-button>
+            <aa-button label="Sign up"></aa-button>
+            <aa-divider></aa-divider>            
+            <aa-hbox style="align-items: center; height: 36px; padding: 0 16px 0 16px;">
+              <aa-label text="Account status" style="flex-grow: 1;"></aa-label>
+              <aa-label text="Basic" style="--label-color: #c7c7c7;"></aa-label>
+            </aa-hbox>
           </aa-vbox>
           <aa-vbox>
-            <aa-input placeholder="Email address"></aa-input>
+            <aa-input id="email" placeholder="Email address"></aa-input>
             <aa-divider></aa-divider>
-            <aa-button label="Sign in"></aa-button>            
+            <aa-input id="password" placeholder="Password" type="password"></aa-input>            
+            <aa-divider></aa-divider>
+            <aa-button id="signin" label="Sign in"></aa-button>            
           </aa-vbox>
-          <aa-label text="Any events created without an account will be deleted when you leave this page. Create a (free) account to save events, and to access them across devices."></aa-label>
+          <aa-label text="Sync across devices, share privately or publicly, add attachments, location lookup, and more..."></aa-label>
+          <!-- <aa-label text="Any events created without an account will be deleted when you leave this page. Create a (free) account to save events, and to access them across devices."></aa-label> -->
         </aa-vbox>
         <aa-vbox>
 

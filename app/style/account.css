@@ -15,8 +15,8 @@
 }
 
 #account aa-stack > aa-vbox > aa-label {
-  background-color: rgba( 255, 0, 0, 0.20 );
-  border: solid 1px red;
+  background-color: #0082ff33;
+  border: solid 1px #0082ff;
   border-radius: 4px;
   padding: 12px;
 }

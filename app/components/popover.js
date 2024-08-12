@@ -12,6 +12,14 @@ export default class AAPopover extends HTMLElement {
           z-index: 100;
         }
 
+        :host( [concealed] ) {
+          visibility: hidden;
+        }
+
+        :host( [hidden] ) {
+          display: none;
+        }
+
         :host( [open] ) {
           display: block;
         }
