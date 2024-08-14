@@ -94,15 +94,17 @@ export default class AAEvent extends HTMLElement {
     // Elements
     this.$button = this.shadowRoot.querySelector( 'button' );
     this.$button.addEventListener( 'click', () => {
-      this.selected = true;
+      this.selected = !this.selected;
+      if( !this.selected ) this.$button.blur();
       this.dispatchEvent( new CustomEvent( 'aa-change', {
+        bubbles: true,
+        composed: true,
+        cancelable: false,
         detail: {
-          helper: this.helper,
-          summary: this.summary,
-          selected: this.selected
+          id: this.selected ? this.data.id : null
         }
-      } ) )
-    } );
+      } ) );
+    } );    
     this.$location = this.shadowRoot.querySelector( 'span[part=location]' );    
     this.$summary = this.shadowRoot.querySelector( 'span[part=summary]' );    
   }

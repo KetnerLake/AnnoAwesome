@@ -1,4 +1,4 @@
-export default class AALabel extends HTMLElement {
+export default class AAMap extends HTMLElement {
   constructor() {
     super();
 
@@ -7,8 +7,7 @@ export default class AALabel extends HTMLElement {
       <style>
         :host {
           box-sizing: border-box;
-          display: flex;
-          flex-direction: row;
+          display: inline-block;
           position: relative;
         }
 
@@ -20,49 +19,13 @@ export default class AALabel extends HTMLElement {
           display: none;
         }
 
-        p {
-          color: var( --label-color, #272727 );
-          cursor: var( --label-cursor, default );
-          font-family: 'Source Sans 3', sans-serif;
-          font-size: 16px;
-          font-weight: var( --label-font-weight, 400 );
-          line-height: var( --label-line-height, 16px );
-          margin: 0;
-          padding: 0;          
-          text-align: var( --label-text-align, left );          
-          text-rendering: optimizeLegibility;
-          width: 100%;
-        }
-
-        :host( [balanced] ) {
-          text-wrap: balance;
-        }
-
-        :host( [size=s] ) p {
-          font-size: 14px;
-          line-height: 14px;          
-        }
-
-        :host( [size=m] ) p {
-          font-size: 17px;
-          line-height: 17px;          
-        }        
-
-        :host( [size=l] ) p {
-          font-size: 23px;
-          line-height: 23px;          
-        }                
-
-        :host( [size=xl] ) p {
-          font-size: 34px;
-          line-height: 34px;
-        }        
-
-        :host( [weight=bold] ) p {
-          font-weight: 600;
+        div {
+          height: 100px; 
+          background-color: #f7f7f7;  
+          width: 100%;        
         }
       </style>
-      <p part="label"></p>
+      <div></div>
     `;
 
     // Private
@@ -73,13 +36,11 @@ export default class AALabel extends HTMLElement {
     this.shadowRoot.appendChild( template.content.cloneNode( true ) );
 
     // Elements
-    this.$label = this.shadowRoot.querySelector( 'p' );
+    this.$map = this.shadowRoot.querySelector( 'div' );
   }
 
    // When attributes change
-  _render() {
-    this.$label.innerText = this.text === null ? '' : this.text;
-  }
+  _render() {;}
 
   // Promote properties
   // Values may be set before module load
@@ -244,4 +205,4 @@ export default class AALabel extends HTMLElement {
   }       
 }
 
-window.customElements.define( 'aa-label', AALabel );
+window.customElements.define( 'aa-map', AAMap );

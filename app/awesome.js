@@ -11,6 +11,7 @@ import AAIconButton from "./components/icon-button.js";
 import AAInput from "./components/input.js";
 import AALabel from "./components/label.js";
 import AALink from "./components/link.js";
+import AAMap from "./components/map.js";
 import AAPopover from "./components/popover.js";
 import AASearch from "./components/search.js";
 import AASlider from "./components/slider.js";

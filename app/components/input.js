@@ -61,9 +61,14 @@ export default class AAInput extends HTMLElement {
         :host( :not( [value] ) ) aa-icon-button {
           display: none;
         }
+
+        :host( :not( [type=password] ) ) aa-icon-button[part=visibility] {
+          display: none;
+        }
       </style>
       <input type="text" />
-      <aa-icon-button filled icon="cancel" size="21" weight="400"></aa-icon-button>
+      <aa-icon-button icon="visibility_off" part="visibility" size="21" weight="400"></aa-icon-button>      
+      <aa-icon-button filled icon="cancel" part="clear" size="21" weight="400"></aa-icon-button>
     `;
 
     // Private
@@ -75,9 +80,13 @@ export default class AAInput extends HTMLElement {
     this.shadowRoot.appendChild( template.content.cloneNode( true ) );
 
     // Elements
-    this.$clear = this.shadowRoot.querySelector( 'aa-icon-button' );
-    this.$clear.addEventListener( this._touch ? 'touchstart' : 'mousedown', () => {
+    this.$clear = this.shadowRoot.querySelector( 'aa-icon-button[part=clear]' );
+    this.$clear.addEventListener( this._touch ? 'touchstart' : 'mousedown', ( evt ) => {
+      evt.preventDefault();
+
       this.value = null
+      
+      this.$input.type = this.type;
       this.$input.focus();
 
       this.dispatchEvent( new CustomEvent( 'aa-change', {
@@ -96,6 +105,15 @@ export default class AAInput extends HTMLElement {
         }
       } ) );
     } );
+    this.$visibility = this.shadowRoot.querySelector( 'aa-icon-button[part=visibility]' );
+    this.$visibility.addEventListener( this._touch ? 'touchstart' : 'mousedown', ( evt ) => {
+      evt.preventDefault();
+
+      this.$input.type = this.$visibility.icon === 'visibility_off' ? 'text' : 'password';
+      this.focus();      
+
+      this.$visibility.icon = this.$visibility.icon === 'visibility_off' ? 'visibility' : 'visibility_off';      
+    } );
   }
 
   blur() {
@@ -110,6 +128,7 @@ export default class AAInput extends HTMLElement {
   _render() {
     this.$input.placeholder = this.placeholder === null ? '' : this.placeholder;
     this.$input.value = this.value === null ? '' : this.value;
+    this.$input.type = this.type === null ? 'text' : this.type;
   }
 
   // Properties set before module loaded
@@ -127,6 +146,7 @@ export default class AAInput extends HTMLElement {
     this._upgrade( 'data' );                      
     this._upgrade( 'hidden' );                      
     this._upgrade( 'placeholder' );                          
+    this._upgrade( 'type' );                              
     this._upgrade( 'value' );                          
     this._render();
   }
@@ -137,6 +157,7 @@ export default class AAInput extends HTMLElement {
       'concealed',
       'hidden',
       'placeholder',
+      'type',
       'value'
     ];
   }
@@ -216,6 +237,22 @@ export default class AAInput extends HTMLElement {
       this.removeAttribute( 'placeholder' );
     }
   }             
+
+  get type() {
+    if( this.hasAttribute( 'type' ) ) {
+      return this.getAttribute( 'type' );
+    }
+
+    return null;
+  }
+
+  set type( value ) {
+    if( value !== null ) {
+      this.setAttribute( 'type', value );
+    } else {
+      this.removeAttribute( 'type' );
+    }
+  }  
 
   get value() {
     if( this.hasAttribute( 'value' ) ) {
