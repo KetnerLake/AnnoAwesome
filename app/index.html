@@ -20,22 +20,29 @@
   </head>
   <body>
 
-    <!-- Left panel -->
-    <article id="panel_left" style="display: none; flex-direction: column; background-color: #f2f2f9; border-right: solid 1px #c6c6c8; width: 285px; padding-top: 60px;">
-      <aa-label size="xl" style="padding-left: 16px;" text="Calendars" weight="bold"></aa-label>
-      <div style="flex-grow: 1; flex-basis: 0; display: flex; flex-direction: column; margin-top: 45px; padding: 0 16px 0 16px;">
-        <div style="background-color: #ffffff; border-radius: 8px; height: 36px; display: flex; flex-direction: row; align-items: center; padding: 0 8px 0 12px; gap: 12px; --icon-color: #0082ff;">
-          <aa-icon filled name="check_circle" size="22" weight="400"></aa-icon>
-          <aa-label text="Calendar" style="flex-grow: 1; flex-basis: 0;"></aa-label>
-          <aa-icon-button icon="info" size="24"></aa-icon-button>
-        </div>
-      </div>
-      <aa-hbox style="align-items: center; height: 50px;">
-        <aa-button label="Add Calendar"></aa-button>
-        <aa-spacer></aa-spacer>
-        <aa-button label="Hide All"></aa-button>
-      </aa-hbox>
-    </article>
+    <!-- Left drawer -->
+    <aa-drawer hidden id="drawer_left" placement="start">
+      <aa-stack id="left_stack" style="display: flex; flex-direction: column; flex-basis: 0; flex-grow: 1;">
+        <aa-vbox style="flex-basis: 0; flex-grow: 1;">
+          <aa-label size="xl" style="padding-left: 16px; padding-top: 60px; margin-bottom: 45px;" text="Calendars" weight="bold"></aa-label>
+          <div style="flex-grow: 1; flex-basis: 0; display: flex; flex-direction: column; padding: 0 16px 0 16px;">
+            <div style="background-color: #ffffff; border-radius: 8px; height: 36px; display: flex; flex-direction: row; align-items: center; padding: 0 8px 0 12px; gap: 12px; --icon-color: #0082ff;">
+              <aa-icon filled name="check_circle" size="22" weight="400"></aa-icon>
+              <aa-label text="Calendar" style="flex-grow: 1; flex-basis: 0;"></aa-label>
+              <aa-icon-button icon="info" size="24"></aa-icon-button>
+            </div>
+          </div>
+          <aa-hbox style="align-items: center; height: 50px;">
+            <aa-button label="Add Calendar"></aa-button>
+            <aa-spacer></aa-spacer>
+            <aa-button label="Hide All"></aa-button>
+          </aa-hbox>
+        </aa-vbox>
+        <aa-vbox style="flex-basis: 0; flex-grow: 1;">
+          <aa-label size="xl" style="padding-left: 16px; padding-top: 60px;" text="Events" weight="bold"></aa-label>
+        </aa-vbox>
+      </aa-stack>
+    </aa-drawer>
 
     <!-- Main -->
     <article style="display: flex; flex-direction: column; flex-basis: 0; flex-grow: 1; min-width: 0;">
@@ -72,10 +79,10 @@
 
     </article>
 
-    <!-- Right panel -->
-    <article id="panel_right" style="display: none; background-color: #f2f2f9; width: 285px; border-left: solid 1px #c6c6c8;">
+    <!-- Right drawer -->
+    <aa-drawer hidden id="drawer_right" placement="end">
       <p>Some content</p>
-    </article>      
+    </aa-drawer>
 
     <!-- Controls -->
     <!-- Calendars -->
@@ -84,14 +91,15 @@
     <!-- Search -->
     <div class="grid" style="position: absolute; left: 16px; right: 16px; top: 16px; z-index: 50;">
       <aa-hbox gap="m" style="align-items: center;">
+        <aa-icon-button id="header_account" icon="account_circle" size="26"></aa-icon-button>        
         <aa-icon-button icon="calendar_month" id="header_calendars" size="26"></aa-icon-button>           
         <aa-icon-button icon="list" id="header_list"></aa-icon-button> 
         <aa-icon-button icon="add" id="header_add"></aa-icon-button> 
         <button id="header_wizard" style="opacity: 0; width: 36px; height: 36px; -webkit-tap-highlight-color: transparent;"></button>
       </aa-hbox>
       <aa-hbox gap="m" style="justify-self: end; grid-column: 3 / 3;">
-        <aa-search></aa-search>      
-        <aa-icon-button id="header_account" icon="account_circle" size="25"></aa-icon-button>
+        <aa-search></aa-search>     
+        <aa-button id="header_cancel" hidden label="Cancel"></aa-button> 
       </aa-hbox>
     </div>    
 

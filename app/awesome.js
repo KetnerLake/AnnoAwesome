@@ -2,6 +2,7 @@ import AAAttachment from "./components/attachment.js";
 import AAButton from "./components/button.js";
 import AACalendar from "./components/calendar.js";
 import AADatePicker from "./components/date-picker.js";
+import AADrawer from "./components/drawer.js";
 import AADivider from "./components/divider.js";
 import AAEvent from "./components/event.js";
 import AAForm from "./components/form.js";

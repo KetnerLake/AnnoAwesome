@@ -17,12 +17,18 @@ const btnHeaderCalendars = document.querySelector( '#header_calendars' );
 const btnHeaderList = document.querySelector( '#header_list' );
 const btnHeaderAdd = document.querySelector( '#header_add' );
 const txtHeaderSearch = document.querySelector( 'aa-search' );
+const btnHeaderCancel = document.querySelector( '#header_cancel' );
 const btnHeaderAccount = document.querySelector( '#header_account' );
 const btnHeaderPrevious = document.querySelector( '#header_previous' );
 const lblHeaderYear = document.querySelector( '#header_year' );
 const btnHeaderNext = document.querySelector( '#header_next' );
 const btnHeaderToday = document.querySelector( '#header_today' );
 const btnHeaderWizard = document.querySelector( '#header_wizard' );
+
+// Drawers
+const pnlLeft = document.querySelector( '#drawer_left' );
+const stkLeft = document.querySelector( '#left_stack' );
+const pnlRight = document.querySelector( '#drawer_right' );
 
 // Year grid
 const calYear = document.querySelector( 'aa-year' );
@@ -103,6 +109,40 @@ btnHeaderAdd.addEventListener( TOUCH, () => {
   txtFormTitle.focus();
 } );
 
+btnHeaderCalendars.addEventListener( TOUCH, () => {
+  txtHeaderSearch.value = null;  
+  btnHeaderCancel.hidden = true;
+  pnlRight.hidden = true;
+
+  if( !pnlLeft.hidden && stkLeft.selectedIndex === 0 ) {
+    pnlLeft.hidden = true;
+    stkLeft.selectedIndex = 0;
+  } else {
+    stkLeft.selectedIndex = 0;    
+    pnlLeft.hidden = false;
+  }
+} );
+
+btnHeaderCancel.addEventListener( TOUCH, () => {
+  txtHeaderSearch.value = null;
+  btnHeaderCancel.hidden = true;
+  pnlRight.hidden = true;
+} );
+
+btnHeaderList.addEventListener( TOUCH, () => {
+  txtHeaderSearch.value = null;
+  btnHeaderCancel.hidden = true;  
+  pnlRight.hidden = true;
+
+  if( !pnlLeft.hidden && stkLeft.selectedIndex === 1 ) {
+    pnlLeft.hidden = true;
+    stkLeft.selectedIndex = 1;
+  } else {
+    stkLeft.selectedIndex = 1;    
+    pnlLeft.hidden = false;
+  }
+} );
+
 btnHeaderNext.addEventListener( TOUCH, () => {
   year = year + 1;
   lblHeaderYear.text = year;
@@ -165,6 +205,10 @@ txtHeaderSearch.addEventListener( 'aa-change', () => {
 
   calYear.data = filtered;
   summarize( filtered.length );
+  
+  pnlLeft.hidden = true;
+  pnlRight.hidden = false;
+  btnHeaderCancel.hidden = false;
 } );
 
 // Account
