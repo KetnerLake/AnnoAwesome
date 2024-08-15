@@ -21,7 +21,7 @@
   <body>
 
     <!-- Left panel -->
-    <article style="display: none; flex-direction: column; background-color: #f2f2f9; border-right: solid 1px #c6c6c8; width: 285px; padding-top: 60px;">
+    <article id="panel_left" style="display: none; flex-direction: column; background-color: #f2f2f9; border-right: solid 1px #c6c6c8; width: 285px; padding-top: 60px;">
       <aa-label size="xl" style="padding-left: 16px;" text="Calendars" weight="bold"></aa-label>
       <div style="flex-grow: 1; flex-basis: 0; display: flex; flex-direction: column; margin-top: 45px; padding: 0 16px 0 16px;">
         <div style="background-color: #ffffff; border-radius: 8px; height: 36px; display: flex; flex-direction: row; align-items: center; padding: 0 8px 0 12px; gap: 12px; --icon-color: #0082ff;">
@@ -41,10 +41,10 @@
     <article style="display: flex; flex-direction: column; flex-basis: 0; flex-grow: 1; min-width: 0;">
 
       <!-- Header -->
+      <!-- Year -->
+      <!-- Today -->
       <header class="grid" style="padding-top: 60px;">
-        <div></div>          
-        <!-- Year -->
-        <aa-hbox gap="l" style="justify-self: center;">
+        <aa-hbox gap="l" style="justify-self: center; grid-column: 2 / 2;">
           <aa-icon-button icon="arrow_back_ios" id="header_previous" size="25"></aa-icon-button> 
           <aa-label id="header_year" size="xl" text="2024" weight="bold"></aa-label>
           <aa-icon-button icon="arrow_forward_ios" id="header_next" size="25"></aa-icon-button>         
@@ -58,6 +58,7 @@
       <!-- Footer -->
       <!-- Attribution -->
       <!-- Event count -->
+      <!-- Scale control -->
       <footer class="grid">
         <aa-hbox>
           <aa-label text="Handcrafted with ❤️ by"></aa-label>
@@ -65,32 +66,36 @@
           <aa-label text="."></aa-label>
         </aa-hbox>
         <aa-label id="footer_count"></aa-label>
+        <aa-rainbow hidden id="footer_wizard" text="Tree wizard!"></aa-rainbow>
         <aa-slider value="50"></aa-slider>
       </footer>        
 
     </article>
 
     <!-- Right panel -->
-    <article style="display: none; background-color: #f2f2f9; width: 285px; border-left: solid 1px #c6c6c8;">
+    <article id="panel_right" style="display: none; background-color: #f2f2f9; width: 285px; border-left: solid 1px #c6c6c8;">
       <p>Some content</p>
     </article>      
 
     <!-- Controls -->
-    <div class="grid" style="position: absolute; left: 16px; right: 16px; top: 16px;">
+    <!-- Calendars -->
+    <!-- List events -->
+    <!-- Add event -->
+    <!-- Search -->
+    <div class="grid" style="position: absolute; left: 16px; right: 16px; top: 16px; z-index: 50;">
       <aa-hbox gap="m" style="align-items: center;">
         <aa-icon-button icon="calendar_month" id="header_calendars" size="26"></aa-icon-button>           
         <aa-icon-button icon="list" id="header_list"></aa-icon-button> 
         <aa-icon-button icon="add" id="header_add"></aa-icon-button> 
+        <button id="header_wizard" style="opacity: 0; width: 36px; height: 36px; -webkit-tap-highlight-color: transparent;"></button>
       </aa-hbox>
-      <div></div>
-      <!-- Search -->             
-      <aa-hbox gap="m" style="justify-self: end;">
+      <aa-hbox gap="m" style="justify-self: end; grid-column: 3 / 3;">
         <aa-search></aa-search>      
         <aa-icon-button id="header_account" icon="account_circle" size="25"></aa-icon-button>
       </aa-hbox>
     </div>    
 
-    <!-- Account management -->
+    <!-- Account -->
     <!-- Popover -->
     <aa-popover id="account" hidden>
       <aa-stack id="account_stack">
@@ -121,7 +126,7 @@
             </button>
           </aa-vbox>
           <aa-vbox>
-            <aa-button label="Just Checking It Out"></aa-button>
+            <aa-button id="account_demo" label="Just Checking It Out"></aa-button>
           </aa-vbox>
           <aa-label size="s" text="Events created without an account will be deleted when you leave this page."></aa-label>
         </aa-vbox>
@@ -136,7 +141,7 @@
     <aa-popover id="details" style="top: 56px; left: 104px;">
       <aa-stack id="details_stack" selected-index="0">
 
-        <!-- Add, update form-->
+        <!-- Form -->
         <aa-form gap="l">
           <aa-hbox style="align-items: center;">
             <aa-button id="form_cancel" label="Cancel"></aa-button>
@@ -163,7 +168,7 @@
           </aa-vbox>
         </aa-form>
 
-        <!-- View details -->
+        <!-- View -->
         <aa-vbox>
           <aa-hbox>
             <aa-label id="view_title" size="m" text="Event Title" weight="bold"></aa-label>

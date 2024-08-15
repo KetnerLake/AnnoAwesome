@@ -13,6 +13,7 @@ import AALabel from "./components/label.js";
 import AALink from "./components/link.js";
 import AAMap from "./components/map.js";
 import AAPopover from "./components/popover.js";
+import AARainbow from "./components/rainbow.js";
 import AASearch from "./components/search.js";
 import AASlider from "./components/slider.js";
 import AASpacer from "./components/spacer.js";

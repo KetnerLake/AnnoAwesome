@@ -5,7 +5,7 @@ const TOUCH = ( 'ontouchstart' in document.documentElement ) ? 'touchstart' : 'c
 // Globals
 let calendars = [];
 let events = [];
-let session = window.localStorage.getItem( 'aa_token' );
+let session = window.localStorage.getItem( 'awesome_token' );
 let year = new Date().getFullYear();
 
 /*
@@ -22,19 +22,22 @@ const btnHeaderPrevious = document.querySelector( '#header_previous' );
 const lblHeaderYear = document.querySelector( '#header_year' );
 const btnHeaderNext = document.querySelector( '#header_next' );
 const btnHeaderToday = document.querySelector( '#header_today' );
+const btnHeaderWizard = document.querySelector( '#header_wizard' );
 
 // Year grid
 const calYear = document.querySelector( 'aa-year' );
 
 // Footer
 const lblFooterCount = document.querySelector( '#footer_count' );
+const lblFooterWizard = document.querySelector( '#footer_wizard' );
 
 // Account
 const dlgAccount = document.querySelector( '#account' );
 const stkAccount = document.querySelector( '#account_stack' );
-const txtAccountEmail = document.querySelector( '#acount_email' );
+const txtAccountEmail = document.querySelector( '#account_email' );
 const txtAccountPassword = document.querySelector( '#account_password' );
 const btnAccountSignIn = document.querySelector( '#account_signin' );
+const btnAccountDemo = document.querySelector( '#account_demo' );
 
 // Details
 const dlgDetails = document.querySelector( '#details' );
@@ -75,6 +78,17 @@ const btnViewDelete = document.querySelector( '#view_delete' );
 /*
 // Events
 */
+
+// Easter
+btnHeaderWizard.addEventListener( TOUCH, () => {
+  lblFooterCount.hidden = true;
+  lblFooterWizard.hidden = false;
+  
+  setTimeout( () => {
+    lblFooterCount.hidden = false;
+    lblFooterWizard.hidden = true;
+  }, 5000 );
+} );
 
 // Header
 btnHeaderAccount.addEventListener( TOUCH, () => {
@@ -154,36 +168,45 @@ txtHeaderSearch.addEventListener( 'aa-change', () => {
 } );
 
 // Account
+btnAccountDemo.addEventListener( TOUCH, () => {
+  dlgAccount.open = false;
+} );
+
 btnAccountSignIn.addEventListener( TOUCH, () => {
-  if( txtEmail.value.trim().length === 0 ) {
-    txtEmail.focus();
+  if( txtAccountEmail.value.trim().length === 0 ) {
+    txtAccountEmail.focus();
     return;
   }
 
-  if( txtPassword.value.trim().length === 0 ) {
-    txtPassword.focus();
+  if( txtAccountPassword.value.trim().length === 0 ) {
+    txtAccountPassword.focus();
     return;
   }
 
   const user = {
-    email: txtEmail.value,
-    password: txtPassword.value
+    email: txtAccountEmail.value,
+    password: txtAccountPassword.value
   };
 
-  fetch( `${KETNER_LAKE_API}/account/login`, {
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    method: 'POST',
-    body: JSON.stringify( user )
-  } )
-  .then( ( response ) => response.text() )
+  accountLogin( user )
   .then( ( data ) => {
-    window.localStorage.setItem( 'aa_token', data.substring( 1, data.length - 1 ) );
     session = data;
-    txtEmail.value = null;
-    txtPassword.value = null;
+    window.localStorage.setItem( 'awesome_token', session );
+
+    txtAccountEmail.value = null;
+    txtAccountPassword.value = null;
     dlgAccount.open = false;
+
+    return browseCalendars();
+  } )
+  .then( ( data ) => {
+    calendars = [... data];    
+    return browseEvents( year );
+  } )
+  .then( ( data ) => {
+    events = data === null ? [] : [... data];
+    calYear.data = events;
+    summarize( events.length );
   } );
 } );
 
@@ -192,27 +215,45 @@ btnFormAdd.addEventListener( TOUCH, () => {
   if( dlgDetails.hasAttribute( 'data-id' ) ) {
     const id = dlgDetails.getAttribute( 'data-id' );
     
-    editEvent( buildEvent( id ) )
-    .then( ( data ) => {
+    if( session === null ) {
+      const update = buildEvent( id );
       const index = events.findIndex( ( value ) => value.id === id );
-      events[index] = data;
+      events[index] = update;
 
       calYear.data = events;
       
-      fillView( data );
-      stkDetails.selectedIndex = 1;
-    } );
+      fillView( update );
+      stkDetails.selectedIndex = 1;      
+    } else {
+      editEvent( buildEvent( id ) )
+      .then( ( data ) => {
+        const index = events.findIndex( ( value ) => value.id === id );
+        events[index] = data;
+  
+        calYear.data = events;
+        
+        fillView( data );
+        stkDetails.selectedIndex = 1;
+      } );
+    }
   } else {
     dlgDetails.open = false;
 
-    addEvent( buildEvent() )
-    .then( ( data ) => {
-      events.push( data );
-
+    if( session === null ) {
+      events.push( buildEvent() );
       calYear.data = events;
       summarize( events.length );
-      resetForm();    
-    } );
+      resetForm();
+    } else {
+      addEvent( buildEvent() )
+      .then( ( data ) => {
+        events.push( data );
+  
+        calYear.data = events;
+        summarize( events.length );
+        resetForm();    
+      } );
+    }
   }
 } );
 
@@ -236,17 +277,29 @@ btnViewDelete.addEventListener( TOUCH, () => {
   if( !response ) return;
 
   const id = dlgDetails.getAttribute( 'data-id' );
-  deleteEvent( id )
-  .then( ( data ) => {
-    const index = events.findIndex( ( value ) => value.id === data.id );
+
+  if( session === null ) {
+    const index = events.findIndex( ( value ) => value.id === id );
     events.splice( index, 1 );
 
     calYear.data = events;
     dlgDetails.open = false;
     dlgDetails.removeAttribute( 'data-id' );
 
-    summarize( events.length );
-  } );
+    summarize( events.length );    
+  } else {
+    deleteEvent( id )
+    .then( ( data ) => {
+      const index = events.findIndex( ( value ) => value.id === data.id );
+      events.splice( index, 1 );
+  
+      calYear.data = events;
+      dlgDetails.open = false;
+      dlgDetails.removeAttribute( 'data-id' );
+  
+      summarize( events.length );
+    } );
+  }
 } );
 
 btnViewEdit.addEventListener( TOUCH, () => {
@@ -260,7 +313,7 @@ btnViewEdit.addEventListener( TOUCH, () => {
   stkDetails.selectedIndex = 0;
 } );
 
-// Setup
+// Calendar
 calYear.addEventListener( 'aa-change', ( evt ) => {
   if( evt.detail.id === null ) {
     dlgDetails.open = false;
@@ -275,12 +328,27 @@ calYear.addEventListener( 'aa-change', ( evt ) => {
   dlgDetails.open = true;
 } );
 
+// Setup
 if( session === null ) {
+  const now = new Date().toISOString();
+  calendars = [{
+    id: self.crypto.randomUUID(),
+    createdAt: now,
+    updatedAt: now,
+    accountId: self.crypto.randomUUID(),
+    name: 'Calendar',
+    color: null,
+    isShared: false,
+    isPublic: false,
+    isActive: true
+  }];
+  events = [];
+  summarize( events.length );
+
   dlgAccount.open = true;
 } else {
   browseCalendars()
   .then( ( data ) => {
-    // TODO: Support multiple calendars
     calendars = [... data];
     return browseEvents( year );
   } )
@@ -305,7 +373,7 @@ function buildEvent( id = null ) {
     endsAt: calFormEnds.value,
     summary: txtFormTitle.value,
     location: txtFormLocation.value,
-    latitide: null,
+    latitude: null,
     longitude: null,
     url: txtFormUrl.value,
     description: txtFormNotes.value    
@@ -431,6 +499,20 @@ function summarize( count = null ) {
 /*
 // BREAD
 */
+
+function accountLogin( user ) {
+  return fetch( `${KETNER_LAKE_API}/account/login`, {
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    method: 'POST',
+    body: JSON.stringify( user )
+  } )
+  .then( ( response ) => response.text() )
+  .then( ( data ) => {
+    return data.substring( 1, data.length - 1 );  
+  } );
+}
 
 function browseCalendars() {
   return fetch( `${KETNER_LAKE_API}/calendar`, {
