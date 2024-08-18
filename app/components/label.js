@@ -31,6 +31,7 @@ export default class AALabel extends HTMLElement {
           padding: 0;          
           text-align: var( --label-text-align, left );          
           text-rendering: optimizeLegibility;
+          text-transform: var( --label-text-transform, none );
           width: 100%;
         }
 

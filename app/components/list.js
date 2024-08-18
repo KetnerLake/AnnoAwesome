@@ -1,4 +1,4 @@
-export default class AADrawer extends HTMLElement {
+export default class AAList extends HTMLElement {
   constructor() {
     super();
 
@@ -6,13 +6,10 @@ export default class AADrawer extends HTMLElement {
     template.innerHTML = /* template */ `
       <style>
         :host {
-          background-color: #f2f2f9;
           box-sizing: border-box;
-          display: flex;
-          flex-direction: column;
-          min-width: 300px;
+          display: inline-block;
+          overflow: auto;
           position: relative;
-          width: 300px;
         }
 
         :host( [concealed] ) {
@@ -21,51 +18,21 @@ export default class AADrawer extends HTMLElement {
 
         :host( [hidden] ) {
           display: none;
-        } 
-
-        :host( [placement=start] ) {
-          border-right: solid 1px #c6c6c8;
         }
-
-        :host( [placement=end] ) {
-          border-left: solid 1px #c6c6c8;
-        }        
       </style>
-      <slot></slot>
+      <div part="list"></div>
     `;
 
     // Private
-    this._data = null;
+    this._data = [];
+    this._label = null;
 
     // Root
     this.attachShadow( {mode: 'open'} );
     this.shadowRoot.appendChild( template.content.cloneNode( true ) );
-  }
 
-  hide() {
-    this.animate( [
-      {minWidth: '285px', width: '285px'},      
-      {minWidth: 0, width: 0}
-    ], {
-      duration: 250,
-      fill: 'forwards'
-    } ).finished.then( () => {
-      this.style.display = 'none';
-      this.hidden = true;
-    } );    
-  }
-
-  show() {
-    this.style.display = 'flex';
-    this.animate( [
-      {minWidth: 0, width: 0},
-      {minWidth: '285px', width: '285px'}
-    ], {
-      duration: 250,
-      fill: 'forwards'
-    } ).finished.then( () => {
-      this.hidden = false
-    } );
+    // Elements
+    this.$list = this.shadowRoot.querySelector( 'div' );
   }
 
    // When attributes change
@@ -86,16 +53,20 @@ export default class AADrawer extends HTMLElement {
     this._upgrade( 'concealed' );  
     this._upgrade( 'data' );      
     this._upgrade( 'hidden' );    
-    this._upgrade( 'placement' );        
+    this._upgrade( 'itemRenderer' );        
+    this._upgrade( 'labelField' );  
+    this._upgrade( 'labelFunction' );          
     this._render();
   }
 
   // Watched attributes
   static get observedAttributes() {
     return [
+      'balanced',
       'concealed',
       'hidden',
-      'placement'
+      'item-renderer',
+      'label-field'      
     ];
   }
 
@@ -109,12 +80,44 @@ export default class AADrawer extends HTMLElement {
   // Not reflected
   // Array, Date, Function, Object, null
   get data() {
-    return this._data;
+    return this._data.length === 0 ? null : this._data;
   }
 
   set data( value ) {
-    this._data = value;
+    this._data = value === null ? [] : [... value];
+    
+    while( this.$list.children.length > this._data.length ) {
+      this.$list.children[0].remove();
+    }
+
+    while( this.$list.children.length < this._data.length ) {
+      const renderer = this.itemRenderer === null ? 'p' : this.itemRenderer;
+      const element = document.createElement( renderer );
+      this.$list.appendChild( element );
+    }
+
+    for( let c = 0; c < this.$list.children.length; c++ ) {
+      if( this.itemRenderer === null ) {
+        if( this.labelField !== null ) {
+          this.$list.children[c].data = this._data[c][this.labelField];
+        } else if( this.labelFunction !== null ) {
+          this.$list.children[c].data = this._label( this._data[c] );
+        } else {
+          this.$list.children[c].data = this._data[c].toString();
+        }
+      } else {
+        this.$list.children[c].data = this._data[c];
+      }
+    }
   }  
+
+  get labelFunction() {
+    return this._label;
+  }
+
+  set labelFunction( func ) {
+    this._label = func;
+  }
 
   // Attributes
   // Reflected
@@ -157,23 +160,39 @@ export default class AADrawer extends HTMLElement {
     } else {
       this.removeAttribute( 'hidden' );
     }
-  }   
-
-  get placement() {
-    if( this.hasAttribute( 'placement' ) ) {
-      return this.getAttribute( 'placement' );
+  }     
+  
+  get itemRenderer() {
+    if( this.hasAttribute( 'item-renderer' ) ) {
+      return this.getAttribute( 'item-renderer' );
     }
 
     return null;
   }
 
-  set placement( value ) {
+  set itemRenderer( value ) {
     if( value !== null ) {
-      this.setAttribute( 'placement', value );
+      this.setAttribute( 'item-renderer', value );
     } else {
-      this.removeAttribute( 'placement' );
+      this.removeAttribute( 'item-renderer' );
     }
   }  
+
+  get labelField() {
+    if( this.hasAttribute( 'label-field' ) ) {
+      return this.getAttribute( 'label-field' );
+    }
+
+    return null;
+  }
+
+  set labelField( value ) {
+    if( value !== null ) {
+      this.setAttribute( 'label-field', value );
+    } else {
+      this.removeAttribute( 'label-field' );
+    }
+  }    
 }
 
-window.customElements.define( 'aa-drawer', AADrawer );
+window.customElements.define( 'aa-list', AAList );

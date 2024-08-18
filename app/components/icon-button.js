@@ -26,6 +26,10 @@ export default class AAIconButton extends HTMLElement {
           --icon-cursor: pointer;
         }
 
+        aa-icon::part( icon ) {
+          transition: color 0.25s linear;
+        }
+
         button {
           align-items: center;
           appearance: none;
@@ -43,6 +47,15 @@ export default class AAIconButton extends HTMLElement {
           width: 36px;
           -webkit-tap-highlight-color: transparent;            
         }
+
+        :host( [disabled] ) aa-icon::part( icon ) {
+          cursor: not-allowed;
+          color: #b0b0b0;
+        }
+
+        :host( [disabled] ) button {
+          cursor: not-allowed;
+        }
       </style>
       <button part="button" type="button">
         <aa-icon></aa-icon>
@@ -57,11 +70,13 @@ export default class AAIconButton extends HTMLElement {
     this.shadowRoot.appendChild( template.content.cloneNode( true ) );
 
     // Elements
+    this.$button = this.shadowRoot.querySelector( 'button' );
     this.$icon = this.shadowRoot.querySelector( 'aa-icon' );
   }
 
   // When things change
   _render() {
+    this.$button.disabled = this.disabled;
     this.$icon.name = this.icon;
     this.$icon.filled = this.filled;
     this.$icon.size = this.size;
@@ -81,6 +96,7 @@ export default class AAIconButton extends HTMLElement {
   connectedCallback() {
     this._upgrade( 'concealed' );                          
     this._upgrade( 'data' );                      
+    this._upgrade( 'disabled' );                          
     this._upgrade( 'filled' );                          
     this._upgrade( 'hidden' );                      
     this._upgrade( 'icon' );                          
@@ -93,6 +109,7 @@ export default class AAIconButton extends HTMLElement {
   static get observedAttributes() {
     return [
       'concealed',
+      'disabled',
       'filled',
       'hidden',
       'icon',
@@ -140,6 +157,26 @@ export default class AAIconButton extends HTMLElement {
       this.removeAttribute( 'concealed' );
     }
   }
+
+  get disabled() {
+    return this.hasAttribute( 'disabled' );
+  }
+
+  set disabled( value ) {
+    if( value !== null ) {
+      if( typeof value === 'boolean' ) {
+        value = value.toString();
+      }
+
+      if( value === 'false' ) {
+        this.removeAttribute( 'disabled' );
+      } else {
+        this.setAttribute( 'disabled', '' );
+      }
+    } else {
+      this.removeAttribute( 'disabled' );
+    }
+  }  
 
   get filled() {
     return this.hasAttribute( 'filled' );

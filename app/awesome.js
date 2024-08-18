@@ -12,6 +12,7 @@ import AAIconButton from "./components/icon-button.js";
 import AAInput from "./components/input.js";
 import AALabel from "./components/label.js";
 import AALink from "./components/link.js";
+import AAList from "./components/list.js";
 import AAMap from "./components/map.js";
 import AAPopover from "./components/popover.js";
 import AARainbow from "./components/rainbow.js";
@@ -22,3 +23,6 @@ import AAStack from "./components/stack.js";
 import AATextarea from "./components/textarea.js";
 import AAVBox from "./components/vbox.js";
 import AAYear from "./components/year.js";
+
+import AACalendarRenderer from "./components/renderers/calendar-renderer.js";
+import AAEventRenderer from "./components/renderers/event-renderer.js";

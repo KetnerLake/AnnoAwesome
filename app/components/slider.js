@@ -24,16 +24,23 @@ export default class AASlider extends HTMLElement {
           display: none;
         }
 
+        aa-icon::part( icon ) {
+          cursor: pointer;
+        }
+
         div[part=bar] {
           background-color: #e9e9e9;          
           border-radius: 5px;
+          cursor: pointer;
           width: 126px;  
         }
 
         div[part=fill] {
           background: #0082ff;           
           border-radius: 5px;          
+          cursor: pointer;
           height: 5px;           
+          transition: background 0.25s linear;
         }
 
         button[part=handle] {
@@ -44,6 +51,7 @@ export default class AASlider extends HTMLElement {
           border-radius: 22px;
           box-shadow: 0 0 5px rgba( 0, 0, 0, 0.50 );
           box-sizing: border-box;
+          cursor: pointer;
           height: 22px;
           margin: 0;
           outline: none;
@@ -51,6 +59,16 @@ export default class AASlider extends HTMLElement {
           position: absolute;
           width: 22px;
           -webkit-tap-highlight-color: transparent;                      
+        }
+
+        :host( [disabled] ) aa-icon::part( icon ),
+        :host( [disabled] ) div[part=bar],
+        :host( [disabled] ) button[part=handle] {
+          cursor: not-allowed;
+        }
+        
+        :host( [disabled] ) div[part=fill] {
+          background: #b0b0b0;
         }
       </style>
       <aa-icon name="remove" size="21" weight="300"></aa-icon>
@@ -150,6 +168,7 @@ export default class AASlider extends HTMLElement {
   connectedCallback() {
     this._upgrade( 'concealed' );    
     this._upgrade( 'data' );
+    this._upgrade( 'disabled' );
     this._upgrade( 'hidden' );
     this._upgrade( 'value' );    
     this._render();
@@ -159,6 +178,7 @@ export default class AASlider extends HTMLElement {
   static get observedAttributes() {
     return [
       'concealed',
+      'disabled',
       'hidden',
       'value'
     ];
@@ -202,7 +222,27 @@ export default class AASlider extends HTMLElement {
     } else {
       this.removeAttribute( 'concealed' );
     }
-  } 
+  }
+  
+  get disabled() {
+    return this.hasAttribute( 'disabled' );
+  }
+
+  set disabled( value ) {
+    if( value !== null ) {
+      if( typeof value === 'boolean' ) {
+        value = value.toString();
+      }
+
+      if( value === 'false' ) {
+        this.removeAttribute( 'disabled' );
+      } else {
+        this.setAttribute( 'disabled', '' );
+      }
+    } else {
+      this.removeAttribute( 'disabled' );
+    }
+  }  
 
   get hidden() {
     return this.hasAttribute( 'hidden' );

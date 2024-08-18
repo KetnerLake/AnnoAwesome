@@ -40,7 +40,7 @@ export default class AAIcon extends HTMLElement {
           line-height: 34px;
         }
       </style>
-      <span></span>
+      <span part="icon"></span>
     `;
 
     // Private

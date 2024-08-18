@@ -1,4 +1,8 @@
-export default class AADrawer extends HTMLElement {
+import AAHBox from "../hbox.js";
+import AALabel from "../label.js";
+import AAVBox from "../vbox.js";
+
+export default class AAEventRenderer extends HTMLElement {
   constructor() {
     super();
 
@@ -6,13 +10,11 @@ export default class AADrawer extends HTMLElement {
     template.innerHTML = /* template */ `
       <style>
         :host {
-          background-color: #f2f2f9;
           box-sizing: border-box;
           display: flex;
           flex-direction: column;
-          min-width: 300px;
+          gap: 4px;
           position: relative;
-          width: 300px;
         }
 
         :host( [concealed] ) {
@@ -21,17 +23,31 @@ export default class AADrawer extends HTMLElement {
 
         :host( [hidden] ) {
           display: none;
-        } 
-
-        :host( [placement=start] ) {
-          border-right: solid 1px #c6c6c8;
         }
 
-        :host( [placement=end] ) {
-          border-left: solid 1px #c6c6c8;
-        }        
+        aa-hbox aa-label:first-of-type {
+          flex-basis: 0;
+          flex-grow: 1;
+        }
+
+        div {
+          background-color: blue;
+          border-radius: 3px;
+          box-sizing: border-box;
+          height: 35px;
+          min-width: 3px;
+          width: 3px;
+        }
       </style>
-      <slot></slot>
+      <aa-label size="m" text="Sat Aug 17" weight="bold"></aa-label>
+      <aa-hbox style="align-items: baseline;">
+        <aa-label part="summary" size="m" weight="bold"></aa-label>
+        <aa-label text="Ends"></aa-label>
+      </aa-hbox>
+      <aa-hbox>
+        <aa-label part="location" style="--label-color: #858585;"></aa-label>
+        <aa-label part="ends" style="--label-color: #858585;" text="Sun Aug 18"></aa-label>
+      </aa-hbox>      
     `;
 
     // Private
@@ -40,36 +56,19 @@ export default class AADrawer extends HTMLElement {
     // Root
     this.attachShadow( {mode: 'open'} );
     this.shadowRoot.appendChild( template.content.cloneNode( true ) );
-  }
 
-  hide() {
-    this.animate( [
-      {minWidth: '285px', width: '285px'},      
-      {minWidth: 0, width: 0}
-    ], {
-      duration: 250,
-      fill: 'forwards'
-    } ).finished.then( () => {
-      this.style.display = 'none';
-      this.hidden = true;
-    } );    
-  }
-
-  show() {
-    this.style.display = 'flex';
-    this.animate( [
-      {minWidth: 0, width: 0},
-      {minWidth: '285px', width: '285px'}
-    ], {
-      duration: 250,
-      fill: 'forwards'
-    } ).finished.then( () => {
-      this.hidden = false
-    } );
+    // Elements
+    this.$summary = this.shadowRoot.querySelector( 'aa-label[part=summary]' );
+    this.$location = this.shadowRoot.querySelector( 'aa-label[part=location]' );
   }
 
    // When attributes change
-  _render() {;}
+  _render() {
+    if( this._data === null ) return;
+
+    this.$summary.text = this._data.summary;
+    this.$location.text = this._data.location;
+  }
 
   // Promote properties
   // Values may be set before module load
@@ -86,7 +85,6 @@ export default class AADrawer extends HTMLElement {
     this._upgrade( 'concealed' );  
     this._upgrade( 'data' );      
     this._upgrade( 'hidden' );    
-    this._upgrade( 'placement' );        
     this._render();
   }
 
@@ -94,8 +92,7 @@ export default class AADrawer extends HTMLElement {
   static get observedAttributes() {
     return [
       'concealed',
-      'hidden',
-      'placement'
+      'hidden'
     ];
   }
 
@@ -114,6 +111,7 @@ export default class AADrawer extends HTMLElement {
 
   set data( value ) {
     this._data = value;
+    this._render();
   }  
 
   // Attributes
@@ -157,23 +155,7 @@ export default class AADrawer extends HTMLElement {
     } else {
       this.removeAttribute( 'hidden' );
     }
-  }   
-
-  get placement() {
-    if( this.hasAttribute( 'placement' ) ) {
-      return this.getAttribute( 'placement' );
-    }
-
-    return null;
-  }
-
-  set placement( value ) {
-    if( value !== null ) {
-      this.setAttribute( 'placement', value );
-    } else {
-      this.removeAttribute( 'placement' );
-    }
-  }  
+  } 
 }
 
-window.customElements.define( 'aa-drawer', AADrawer );
+window.customElements.define( 'aa-event-renderer', AAEventRenderer );

@@ -74,6 +74,12 @@ export default class AASearch extends HTMLElement {
           width: 100%;
           -webkit-tap-highlight-color: transparent;
         }
+
+        :host( [disabled] ) aa-icon::part( icon ),
+        :host( [disabled] ) input,
+        :host( [disabled] ) label {
+          cursor: not-allowed;
+        }
       </style>
       <label>
         <aa-icon name="search" size="21" weight="300"></aa-icon>
@@ -112,6 +118,7 @@ export default class AASearch extends HTMLElement {
 
   // When attributes change
   _render() {
+    this.$input.disabled = this.disabled;
     this.$input.placeholder = this.placeholder === null ? 'Search' : this.placeholder;
     this.$input.value = this.value === null ? '' : this.value;
     this.$clear.hidden = this.value === null ? true : false;
@@ -131,6 +138,7 @@ export default class AASearch extends HTMLElement {
   connectedCallback() {
     this._upgrade( 'concealed' );    
     this._upgrade( 'data' );
+    this._upgrade( 'disabled' );    
     this._upgrade( 'hidden' );
     this._upgrade( 'placeholder' );    
     this._upgrade( 'value' );
@@ -141,6 +149,7 @@ export default class AASearch extends HTMLElement {
   static get observedAttributes() {
     return [
       'concealed',
+      'disabled',
       'hidden',
       'placeholder',
       'value'
@@ -186,6 +195,26 @@ export default class AASearch extends HTMLElement {
       this.removeAttribute( 'concealed' );
     }
   } 
+
+  get disabled() {
+    return this.hasAttribute( 'disabled' );
+  }
+
+  set disabled( value ) {
+    if( value !== null ) {
+      if( typeof value === 'boolean' ) {
+        value = value.toString();
+      }
+
+      if( value === 'false' ) {
+        this.removeAttribute( 'disabled' );
+      } else {
+        this.setAttribute( 'disabled', '' );
+      }
+    } else {
+      this.removeAttribute( 'disabled' );
+    }
+  }   
 
   get hidden() {
     return this.hasAttribute( 'hidden' );

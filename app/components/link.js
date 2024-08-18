@@ -32,6 +32,11 @@ export default class AALink extends HTMLElement {
           text-align: var( --link-text-align, left );          
           text-decoration: none;
           text-rendering: optimizeLegibility;
+          transition: color 0.25s linear;
+        }
+
+        :host( [disabled] ) a {
+          color: #aaaaaa;          
         }
 
         :host( [inline] ) a {
@@ -92,6 +97,7 @@ export default class AALink extends HTMLElement {
   connectedCallback() {
     this._upgrade( 'concealed' );  
     this._upgrade( 'data' );      
+    this._upgrade( 'disabled' );
     this._upgrade( 'hidden' );    
     this._upgrade( 'href' );      
     this._upgrade( 'inline' );            
@@ -106,6 +112,7 @@ export default class AALink extends HTMLElement {
   static get observedAttributes() {
     return [
       'concealed',
+      'disabled',
       'hidden',
       'href',
       'inline',
@@ -155,6 +162,26 @@ export default class AALink extends HTMLElement {
       this.removeAttribute( 'concealed' );
     }
   }
+
+  get disabled() {
+    return this.hasAttribute( 'disabled' );
+  }
+
+  set disabled( value ) {
+    if( value !== null ) {
+      if( typeof value === 'boolean' ) {
+        value = value.toString();
+      }
+
+      if( value === 'false' ) {
+        this.removeAttribute( 'disabled' );
+      } else {
+        this.setAttribute( 'disabled', '' );
+      }
+    } else {
+      this.removeAttribute( 'disabled' );
+    }
+  }  
 
   get hidden() {
     return this.hasAttribute( 'hidden' );

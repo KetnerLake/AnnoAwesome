@@ -1,4 +1,8 @@
-export default class AADrawer extends HTMLElement {
+import AACheckbox from "../checkbox.js";
+import AAIconButton from "../icon-button.js";
+import AALabel from "../label.js";
+
+export default class AACalendarRenderer extends HTMLElement {
   constructor() {
     super();
 
@@ -6,13 +10,15 @@ export default class AADrawer extends HTMLElement {
     template.innerHTML = /* template */ `
       <style>
         :host {
-          background-color: #f2f2f9;
+          align-items: center;
           box-sizing: border-box;
           display: flex;
-          flex-direction: column;
-          min-width: 300px;
+          flex-direction: row;
+          gap: 12px;
+          height: 36px;
+          min-height: 36px;
+          padding: 0 8px 0 12px;
           position: relative;
-          width: 300px;
         }
 
         :host( [concealed] ) {
@@ -21,17 +27,20 @@ export default class AADrawer extends HTMLElement {
 
         :host( [hidden] ) {
           display: none;
-        } 
-
-        :host( [placement=start] ) {
-          border-right: solid 1px #c6c6c8;
         }
 
-        :host( [placement=end] ) {
-          border-left: solid 1px #c6c6c8;
-        }        
+        aa-icon-button {
+          --icon-color: #0082ff;
+        }
+
+        aa-label {
+          flex-basis: 0;
+          flex-grow: 1;
+        }
       </style>
-      <slot></slot>
+      <aa-checkbox></aa-checkbox>
+      <aa-label part="label" size="m"></aa-label>
+      <aa-icon-button icon="info" part="info" size="24"></aa-icon-button>
     `;
 
     // Private
@@ -40,36 +49,19 @@ export default class AADrawer extends HTMLElement {
     // Root
     this.attachShadow( {mode: 'open'} );
     this.shadowRoot.appendChild( template.content.cloneNode( true ) );
-  }
 
-  hide() {
-    this.animate( [
-      {minWidth: '285px', width: '285px'},      
-      {minWidth: 0, width: 0}
-    ], {
-      duration: 250,
-      fill: 'forwards'
-    } ).finished.then( () => {
-      this.style.display = 'none';
-      this.hidden = true;
-    } );    
-  }
-
-  show() {
-    this.style.display = 'flex';
-    this.animate( [
-      {minWidth: 0, width: 0},
-      {minWidth: '285px', width: '285px'}
-    ], {
-      duration: 250,
-      fill: 'forwards'
-    } ).finished.then( () => {
-      this.hidden = false
-    } );
+    // Elements
+    this.$checkbox = this.shadowRoot.querySelector( 'aa-checkbox' );
+    this.$label = this.shadowRoot.querySelector( 'aa-label' );
   }
 
    // When attributes change
-  _render() {;}
+  _render() {
+    if( this._data === null ) return;
+
+    this.$checkbox.checked = this._data.isActive;
+    this.$label.text = this._data.name;
+  }
 
   // Promote properties
   // Values may be set before module load
@@ -86,7 +78,6 @@ export default class AADrawer extends HTMLElement {
     this._upgrade( 'concealed' );  
     this._upgrade( 'data' );      
     this._upgrade( 'hidden' );    
-    this._upgrade( 'placement' );        
     this._render();
   }
 
@@ -94,8 +85,7 @@ export default class AADrawer extends HTMLElement {
   static get observedAttributes() {
     return [
       'concealed',
-      'hidden',
-      'placement'
+      'hidden'
     ];
   }
 
@@ -114,6 +104,7 @@ export default class AADrawer extends HTMLElement {
 
   set data( value ) {
     this._data = value;
+    this._render();
   }  
 
   // Attributes
@@ -157,23 +148,7 @@ export default class AADrawer extends HTMLElement {
     } else {
       this.removeAttribute( 'hidden' );
     }
-  }   
-
-  get placement() {
-    if( this.hasAttribute( 'placement' ) ) {
-      return this.getAttribute( 'placement' );
-    }
-
-    return null;
-  }
-
-  set placement( value ) {
-    if( value !== null ) {
-      this.setAttribute( 'placement', value );
-    } else {
-      this.removeAttribute( 'placement' );
-    }
-  }  
+  } 
 }
 
-window.customElements.define( 'aa-drawer', AADrawer );
+window.customElements.define( 'aa-calendar-renderer', AACalendarRenderer );

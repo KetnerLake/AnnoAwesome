@@ -24,14 +24,13 @@
     <aa-drawer hidden id="drawer_left" placement="start">
       <aa-stack id="left_stack" style="display: flex; flex-direction: column; flex-basis: 0; flex-grow: 1;">
         <aa-vbox style="flex-basis: 0; flex-grow: 1;">
-          <aa-label size="xl" style="padding-left: 16px; padding-top: 60px; margin-bottom: 45px;" text="Calendars" weight="bold"></aa-label>
-          <div style="flex-grow: 1; flex-basis: 0; display: flex; flex-direction: column; padding: 0 16px 0 16px;">
-            <div style="background-color: #ffffff; border-radius: 8px; height: 36px; display: flex; flex-direction: row; align-items: center; padding: 0 8px 0 12px; gap: 12px; --icon-color: #0082ff;">
-              <aa-icon filled name="check_circle" size="22" weight="400"></aa-icon>
-              <aa-label text="Calendar" style="flex-grow: 1; flex-basis: 0;"></aa-label>
-              <aa-icon-button icon="info" size="24"></aa-icon-button>
+          <aa-label size="xl" style="padding-left: 16px; padding-top: 60px; margin-bottom: 22px;" text="Calendars" weight="bold"></aa-label>
+          <aa-vbox style="flex-basis: 0; flex-grow: 1; margin-bottom: 16px;">
+            <aa-label text="My Awesome" size="s" style="--label-color: #868686; --label-text-transform: uppercase; margin: 0 16px 9px 28px;"></aa-label>          
+            <div style="background-color: #ffffff; border-radius: 8px; margin: 0 16px 0 16px;">
+              <aa-list id="drawer_calendars" item-renderer="aa-calendar-renderer" style="display: block;"></aa-list>
             </div>
-          </div>
+          </aa-vbox>
           <aa-hbox style="align-items: center; height: 50px;">
             <aa-button label="Add Calendar"></aa-button>
             <aa-spacer></aa-spacer>
@@ -40,6 +39,7 @@
         </aa-vbox>
         <aa-vbox style="flex-basis: 0; flex-grow: 1;">
           <aa-label size="xl" style="padding-left: 16px; padding-top: 60px;" text="Events" weight="bold"></aa-label>
+          <aa-list id="drawer_events" item-renderer="aa-event-renderer" style="flex-basis: 0; flex-grow: 1;"></aa-list>          
         </aa-vbox>
       </aa-stack>
     </aa-drawer>
@@ -68,13 +68,13 @@
       <!-- Scale control -->
       <footer class="grid">
         <aa-hbox>
-          <aa-label text="Handcrafted with ❤️ by"></aa-label>
-          <aa-link href="https://kevinhoyt.com" label="Kevin Hoyt"></aa-link>
+          <aa-label text="Handcrafted with ❤️ at"></aa-label>
+          <aa-link id="footer_link" href="https://ketnerlake.com" label="Ketner Lake"></aa-link>
           <aa-label text="."></aa-label>
         </aa-hbox>
         <aa-label id="footer_count"></aa-label>
         <aa-rainbow hidden id="footer_wizard" text="Tree wizard!"></aa-rainbow>
-        <aa-slider value="50"></aa-slider>
+        <aa-slider id="footer_scale" value="50"></aa-slider>
       </footer>        
 
     </article>
@@ -97,7 +97,7 @@
         <aa-icon-button icon="add" id="header_add"></aa-icon-button> 
         <button id="header_wizard" style="opacity: 0; width: 36px; height: 36px; -webkit-tap-highlight-color: transparent;"></button>
       </aa-hbox>
-      <aa-hbox gap="m" style="justify-self: end; grid-column: 3 / 3;">
+      <aa-hbox style="justify-self: end; grid-column: 3 / 3;">
         <aa-search></aa-search>     
         <aa-button id="header_cancel" hidden label="Cancel"></aa-button> 
       </aa-hbox>
@@ -116,13 +116,11 @@
             <aa-button id="account_signin" label="Sign in"></aa-button>            
           </aa-vbox>
           <aa-vbox>
-            <aa-button label="Sign up"></aa-button>
-            <aa-divider></aa-divider>
             <aa-hbox style="padding: 0 16px 0 16px; height: 36px; align-items: center;">
               <aa-label text="Account Status" style="flex-grow: 1;"></aa-label>
               <aa-label style="--label-color: #9e9e9e;" text="Free"></aa-label>
             </aa-hbox>
-            <button style="appearance: none; background: none; border: none; cursor: pointer; display: flex; flex-direction: row; gap: 16px; margin: 0; padding: 16px; background-color: #0082ff; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px;" type="button">
+            <button id="account_signup" style="appearance: none; background: none; border: none; cursor: pointer; display: flex; flex-direction: row; gap: 16px; margin: 0; padding: 16px; background-color: #0082ff; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px;" type="button">
               <img src="./img/trident.svg" height="32" width="32" />  
               <span style="display: flex; flex-direction: column;">
                 <span style="display: flex; flex-direction: row; align-items: center; gap: 4px;">
@@ -136,7 +134,6 @@
           <aa-vbox>
             <aa-button id="account_demo" label="Just Checking It Out"></aa-button>
           </aa-vbox>
-          <aa-label size="s" text="Events created without an account will be deleted when you leave this page."></aa-label>
         </aa-vbox>
         <aa-vbox>
 
@@ -146,7 +143,7 @@
 
     <!-- Details -->
     <!-- Popover -->
-    <aa-popover id="details" style="top: 56px; left: 104px;">
+    <aa-popover id="details" style="top: 50%; left: 50%; transform: translate( -50%, -50% );">
       <aa-stack id="details_stack" selected-index="0">
 
         <!-- Form -->
