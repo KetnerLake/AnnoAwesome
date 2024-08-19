@@ -45,18 +45,22 @@
     </aa-drawer>
 
     <!-- Main -->
-    <article style="display: flex; flex-direction: column; flex-basis: 0; flex-grow: 1; min-width: 0;">
+    <main class="vbox" style="flex-basis: 0; flex-grow: 1; min-width: 0;">
 
       <!-- Header -->
       <!-- Year -->
       <!-- Today -->
       <header class="grid" style="padding-top: 60px;">
-        <aa-hbox gap="l" style="justify-self: center; grid-column: 2 / 2;">
-          <aa-icon-button icon="arrow_back_ios" id="header_previous" size="25"></aa-icon-button> 
-          <aa-label id="header_year" size="xl" text="2024" weight="bold"></aa-label>
-          <aa-icon-button icon="arrow_forward_ios" id="header_next" size="25"></aa-icon-button>         
-        </aa-hbox>      
-        <aa-button id="header_today" label="Today" style="justify-self: end;"></aa-button>
+        <div class="hbox" style="align-items: center; gap: 16px; grid-column: 2 / 2; justify-self: center;">
+          <button class="icon" id="header_previous" type="button">
+            <img src="./img/chevron-left.svg" />
+          </button>                          
+          <p id="header_year" style="font-size: 34px; font-weight: 600;">2024</p>
+          <button class="icon" id="header_next" type="button">
+            <img src="./img/chevron-right.svg" />
+          </button>                                    
+        </div>      
+        <button id="header_today" style="grid-column: 3 / 3; justify-self: end;" type="button">Today</button>
       </header>
   
       <!-- Calendar grid -->
@@ -67,17 +71,14 @@
       <!-- Event count -->
       <!-- Scale control -->
       <footer class="grid">
-        <aa-hbox>
-          <aa-label text="Handcrafted with ❤️ at"></aa-label>
-          <aa-link id="footer_link" href="https://ketnerlake.com" label="Ketner Lake"></aa-link>
-          <aa-label text="."></aa-label>
-        </aa-hbox>
-        <aa-label id="footer_count"></aa-label>
+        <p>Handcrafted with ❤️ at <a href="https://ketnerlake.com" target="blank">Ketner Lake</a>.</p>
+        <p id="footer_count" style="text-align: center;"></p>
         <aa-rainbow hidden id="footer_wizard" text="Tree wizard!"></aa-rainbow>
-        <aa-slider id="footer_scale" value="50"></aa-slider>
+        <input max="100" min="1" type="range" value="50" />
+        <!-- <aa-slider id="footer_scale" style="justify-self: end;" value="50"></aa-slider> -->
       </footer>        
 
-    </article>
+    </main>
 
     <!-- Right drawer -->
     <aa-drawer hidden id="drawer_right" placement="end">
@@ -85,31 +86,50 @@
     </aa-drawer>
 
     <!-- Controls -->
+    <!-- Account -->
+    <!-- Share (pending) -->          
     <!-- Calendars -->
     <!-- List events -->
     <!-- Add event -->
     <!-- Search -->
     <div class="grid" style="position: absolute; left: 16px; right: 16px; top: 16px; z-index: 50;">
       <aa-hbox gap="m" style="align-items: center;">
-        <aa-icon-button id="header_account" icon="account_circle" size="26"></aa-icon-button>        
-        <aa-icon-button icon="calendar_month" id="header_calendars" size="26"></aa-icon-button>           
-        <aa-icon-button icon="list" id="header_list"></aa-icon-button> 
-        <aa-icon-button icon="add" id="header_add"></aa-icon-button> 
-        <button id="header_wizard" style="opacity: 0; width: 36px; height: 36px; -webkit-tap-highlight-color: transparent;"></button>
+        <button class="icon" id="header_account" type="button">
+          <img src="./img/account.svg" />
+        </button>
+        <button class="hidden icon" id="header_share" type="button">
+          <img src="./img/share.svg" />
+        </button>                        
+        <button class="icon" id="header_calendars" type="button">
+          <img src="./img/calendar.svg" />
+        </button>        
+        <button class="icon" id="header_list" type="button">
+          <img src="./img/list.svg" />
+        </button>                
+        <button class="icon" id="header_add" type="button">
+          <img src="./img/add.svg" />
+        </button>                
+        <button class="icon" id="header_wizard"></button>
       </aa-hbox>
       <aa-hbox style="justify-self: end; grid-column: 3 / 3;">
-        <aa-search></aa-search>     
-        <aa-button id="header_cancel" hidden label="Cancel"></aa-button> 
+        <label id="header_search">
+          <img class="icon" src="./img/search.svg" />
+          <input id="header_search_input" placeholder="Search" type="search" />
+          <button class="icon" type="button">
+            <img src="./img/close.svg" />
+          </button>
+        </label>
+        <button class="hidden" id="header_cancel">Cancel</button> 
       </aa-hbox>
     </div>    
 
     <!-- Account -->
     <!-- Popover -->
-    <aa-popover id="account" hidden>
+    <dialog id="account" style="padding: 0; border: none; border-radius: 8px; width: 300px;  background-color: #f5f5f5;">
       <aa-stack id="account_stack">
         <aa-vbox gap="l">
           <aa-vbox>
-            <aa-input id="account_email" placeholder="Email address"></aa-input>
+            <aa-input autofocus id="account_email" placeholder="Email address"></aa-input>
             <aa-divider></aa-divider>
             <aa-input id="account_password" placeholder="Password" type="password"></aa-input>            
             <aa-divider></aa-divider>
@@ -139,11 +159,11 @@
 
         </aa-vbox>
       </aa-stack>
-    </aa-popover>
+    </dialog>
 
     <!-- Details -->
     <!-- Popover -->
-    <aa-popover id="details" style="top: 50%; left: 50%; transform: translate( -50%, -50% );">
+    <dialog id="details" style="padding: 0; border: none; border-radius: 8px; background-color: #f5f5f5;">
       <aa-stack id="details_stack" selected-index="0">
 
         <!-- Form -->
@@ -208,7 +228,7 @@
         </aa-vbox>
 
       </aa-stack>        
-    </aa-popover>    
+    </dialog>    
 
     <!-- Components -->
     <script src="./awesome.js" type="module"></script>

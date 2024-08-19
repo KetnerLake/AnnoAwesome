@@ -1,8 +1,10 @@
+/*
 @import url( "./style/account.css" );
 @import url( "./style/detail.css" );
 @import url( "./style/footer.css" );
 @import url( "./style/form.css" );
 @import url( "./style/header.css" );
+*/
 
 html {
   height: 100%;
@@ -10,7 +12,7 @@ html {
 
 body {
   background-color: #f7f7f7;
-  color: #000000;
+  color: #272727;
   display: flex;
   flex-direction: row;
   font-family: 'Source Sans 3', sans-serif;
@@ -20,9 +22,203 @@ body {
   padding: 0;
 }
 
+a {
+  color: #0082ff;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.25s linear;  
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  appearance: none;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  box-sizing: border-box;
+  color: #0082ff;          
+  cursor: pointer;
+  display: inline;
+  font-size: 17px;          
+  height: 36px;
+  line-height: 36px;
+  margin: 0;
+  outline: none;
+  padding: 0 16px 0 16px;
+  text-rendering: optimizeLegibility;
+  transition: color 0.25s linear;
+  -webkit-tap-highlight-color: transparent;            
+}
+
+button.icon {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  padding: 0;
+  width: 36px;
+}
+
+button.icon img {
+  filter: 
+    invert( 31% ) 
+    sepia( 49% ) 
+    saturate( 3696% ) 
+    hue-rotate( 198deg ) 
+    brightness( 106% ) 
+    contrast( 103% );  
+  height: 20px;
+  transition: filter 0.25s linear;
+  width: 20px;
+}
+
+button[disabled] {
+  color: #aaaaaa;
+  cursor: not-allowed;            
+}
+
+button[disabled].icon img {
+  filter: 
+    invert( 86% ) 
+    sepia( 7% ) 
+    saturate( 7% ) 
+    hue-rotate( 321deg ) 
+    brightness( 79% ) 
+    contrast( 100% );
+}
+
+footer {
+  align-items: center;
+  border-top: solid 1px #c7c7c7;  
+  height: 50px;
+  margin: 0;
+  padding: 0 16px 0 16px;
+}
+
+header { 
+  margin: 0;
+  padding: 8px 16px 8px 16px;
+}
+
+img.icon {
+  filter: 
+    invert( 31% ) 
+    sepia( 49% ) 
+    saturate( 3696% ) 
+    hue-rotate( 198deg ) 
+    brightness( 106% ) 
+    contrast( 103% );  
+  height: 20px;
+  transition: filter 0.25s linear;
+  width: 20px;
+}
+
+input[type=search] {
+  appearance: none;
+  background: none;
+  border: none;
+  color: #272727;
+  flex-basis: 0;
+  flex-grow: 1;
+  font-size: 16px;
+  height: 36px;
+  line-height: 36px;
+  margin: 0;
+  outline: none;
+  padding: 0;
+  text-rendering: optimizeLegibility;
+  width: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+input[type=search]::placeholder {
+  color: #828282;
+  opacity: 1.0;
+}
+
+input[type=search]:not( [value] ) ~ button {
+  display: none;
+}
+
+label {
+  align-items: center;
+  background-color: #e9e9e9;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: row;
+  min-width: 200px;
+}
+
+label > img.icon {
+  cursor: text;
+  filter: 
+    invert( 55% ) 
+    sepia( 1% ) 
+    saturate( 0% ) 
+    hue-rotate( 157deg ) 
+    brightness( 92% ) 
+    contrast( 91% );  
+  height: 16px;
+  margin: 0 12px 0 12px;
+  width: 16px;
+}
+
+label button img {
+  filter: 
+    invert( 55% ) 
+    sepia( 1% ) 
+    saturate( 0% ) 
+    hue-rotate( 157deg ) 
+    brightness( 92% ) 
+    contrast( 91% ) !important;  
+  height: 16px !important;
+  width: 16px !important;  
+}
+
+p {
+  box-sizing: border-box;
+  cursor: default;
+  display: inline;
+  font-size: 16px;
+  line-height: 16px;
+  margin: 0;
+  padding: 0;          
+  text-align: left;          
+  text-rendering: optimizeLegibility;
+  text-transform: none;
+}
+
+dialog {
+  border: none;
+  box-shadow:
+    0 0 40px -10px rgba( 0, 0, 0, 0.30 ),
+    0 0 25px -15px rgba( 0, 0, 0, 0.20 );
+}
+
+dialog::backdrop {
+  opacity: 0;
+}
+
 .grid {
   display: grid; 
   grid-template-columns: 1fr 1fr 1fr; 
   grid-template-rows: 1fr; 
   gap: 0px 0px;  
+}
+
+.hbox {
+  display: flex;
+  flex-direction: row;
+}
+
+.vbox {
+  display: flex;
+  flex-direction: column;
+}
+
+.concealed {
+  visibility: hidden;
+}
+
+.hidden {
+  display: none !important;
 }

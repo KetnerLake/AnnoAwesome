@@ -126,6 +126,7 @@ export default class AAInput extends HTMLElement {
 
   // When things change
   _render() {
+    this.$input.autofocus = this.autofocus;
     this.$input.placeholder = this.placeholder === null ? '' : this.placeholder;
     this.$input.value = this.value === null ? '' : this.value;
     this.$input.type = this.type === null ? 'text' : this.type;
@@ -142,6 +143,7 @@ export default class AAInput extends HTMLElement {
 
   // Setup
   connectedCallback() {
+    this._upgrade( 'autofocus' );                          
     this._upgrade( 'concealed' );                          
     this._upgrade( 'data' );                      
     this._upgrade( 'hidden' );                      
@@ -154,6 +156,7 @@ export default class AAInput extends HTMLElement {
   // Watched attributes
   static get observedAttributes() {
     return [
+      'autofocus',
       'concealed',
       'hidden',
       'placeholder',
@@ -182,6 +185,26 @@ export default class AAInput extends HTMLElement {
   // Attributes
   // Reflected
   // Boolean, Number, String, null
+  get autofocus() {
+    return this.hasAttribute( 'autofocus' );
+  }
+
+  set autofocus( value ) {
+    if( value !== null ) {
+      if( typeof value === 'boolean' ) {
+        value = value.toString();
+      }
+
+      if( value === 'false' ) {
+        this.removeAttribute( 'autofocus' );
+      } else {
+        this.setAttribute( 'autofocus', '' );
+      }
+    } else {
+      this.removeAttribute( 'autofocus' );
+    }
+  }
+
   get concealed() {
     return this.hasAttribute( 'concealed' );
   }

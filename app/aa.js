@@ -16,7 +16,7 @@ let year = new Date().getFullYear();
 const btnHeaderCalendars = document.querySelector( '#header_calendars' );
 const btnHeaderList = document.querySelector( '#header_list' );
 const btnHeaderAdd = document.querySelector( '#header_add' );
-const txtHeaderSearch = document.querySelector( 'aa-search' );
+const txtHeaderSearch = document.querySelector( '#header_search_input' );
 const btnHeaderCancel = document.querySelector( '#header_cancel' );
 const btnHeaderAccount = document.querySelector( '#header_account' );
 const btnHeaderPrevious = document.querySelector( '#header_previous' );
@@ -103,8 +103,9 @@ btnHeaderWizard.addEventListener( TOUCH, () => {
 
 // Header
 btnHeaderAccount.addEventListener( TOUCH, () => {
-  blocker( !dlgAccount.open );
-  dlgAccount.open = !dlgAccount.open;
+  blocker( true );
+  dlgAccount.showModal();
+  txtAccountEmail.focus();
 } );
 
 btnHeaderAdd.addEventListener( TOUCH, () => {
@@ -112,7 +113,8 @@ btnHeaderAdd.addEventListener( TOUCH, () => {
   resetForm();
   blocker( true );
   dlgDetails.removeAttribute( 'data-id' );
-  dlgDetails.open = true;
+  // dlgDetails.open = true;
+  dlgDetails.showModal();
   txtFormTitle.focus();
 } );
 
@@ -226,7 +228,7 @@ txtHeaderSearch.addEventListener( 'aa-change', () => {
 // Account
 btnAccountDemo.addEventListener( TOUCH, () => {
   blocker( false )
-  dlgAccount.open = false;
+  dlgAccount.close();
 } );
 
 btnAccountSignIn.addEventListener( TOUCH, () => {
@@ -253,7 +255,8 @@ btnAccountSignIn.addEventListener( TOUCH, () => {
     txtAccountEmail.value = null;
     txtAccountPassword.value = null;
     blocker( false );
-    dlgAccount.open = false;
+    dlgAccount.close();
+    // dlgAccount.open = false;
 
     return browseCalendars();
   } )
@@ -296,7 +299,8 @@ btnFormAdd.addEventListener( TOUCH, () => {
     }
   } else {
     blocker( false );
-    dlgDetails.open = false;
+    dlgDetails.close();
+    // dlgDetails.open = false;
 
     if( session === null ) {
       events.push( buildEvent() );
@@ -321,7 +325,8 @@ btnFormCancel.addEventListener( TOUCH, () => {
     stkDetails.selectedIndex = 1;
   } else {
     blocker( false );
-    dlgDetails.open = false;
+    // dlgDetails.open = false;
+    dlgDetails.close();
   }
 
   resetForm();
@@ -344,7 +349,8 @@ btnViewDelete.addEventListener( TOUCH, () => {
 
     calYear.data = events;
     blocker( false );
-    dlgDetails.open = false;
+    dlgDetails.close();
+    // dlgDetails.open = false;
     dlgDetails.removeAttribute( 'data-id' );
 
     summarize( events.length );    
@@ -356,7 +362,8 @@ btnViewDelete.addEventListener( TOUCH, () => {
   
       calYear.data = events;
       blocker( false );
-      dlgDetails.open = false;
+      dlgDetails.close();
+      // dlgDetails.open = false;
       dlgDetails.removeAttribute( 'data-id' );
   
       summarize( events.length );
@@ -377,11 +384,13 @@ btnViewEdit.addEventListener( TOUCH, () => {
 
 // Calendar
 calYear.addEventListener( 'aa-change', ( evt ) => {
+  /*
   if( evt.detail.id === null ) {
     blocker( false );
-    dlgDetails.open = false;
+    dlgDetails.close();
     return;
   }
+  */
 
   const event = events.filter( ( value ) => value.id === evt.detail.id )[0];
   fillView( event );  
@@ -389,7 +398,8 @@ calYear.addEventListener( 'aa-change', ( evt ) => {
   stkDetails.selectedIndex = 1;
   blocker( true );
   dlgDetails.setAttribute( 'data-id', event.id );
-  dlgDetails.open = true;
+  // dlgDetails.open = true;
+  dlgDetails.showModal();
 } );
 
 /*
@@ -570,10 +580,10 @@ function resetForm() {
 
 function summarize( count = null ) {
   if( count === null ) {
-    lblFooterCount.hidden = true;
+    lblFooterCount.classList.add( 'hidden' );
   } else {
-    lblFooterCount.text = `${count} event${count !== 1 ? 's' : ''}`;  
-    lblFooterCount.hidden = false;
+    lblFooterCount.innerText = `${count} event${count !== 1 ? 's' : ''}`;  
+    lblFooterCount.classList.remove( 'hidden' );
   }
 }
 
