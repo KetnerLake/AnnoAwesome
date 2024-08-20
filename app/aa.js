@@ -16,7 +16,8 @@ let year = new Date().getFullYear();
 const btnHeaderCalendars = document.querySelector( '#header_calendars' );
 const btnHeaderList = document.querySelector( '#header_list' );
 const btnHeaderAdd = document.querySelector( '#header_add' );
-const txtHeaderSearch = document.querySelector( '#header_search_input' );
+const txtHeaderSearch = document.querySelector( '#header_search' );
+const btnHeaderClear = document.querySelector( '#header_clear' );
 const btnHeaderCancel = document.querySelector( '#header_cancel' );
 const btnHeaderAccount = document.querySelector( '#header_account' );
 const btnHeaderPrevious = document.querySelector( '#header_previous' );
@@ -36,7 +37,7 @@ const pnlRight = document.querySelector( '#drawer_right' );
 const calYear = document.querySelector( 'aa-year' );
 
 // Footer
-const lblFooterLink = document.querySelector( '#footer_link' );
+const lnkFooterLink = document.querySelector( '#footer_link' );
 const lblFooterCount = document.querySelector( '#footer_count' );
 const lblFooterWizard = document.querySelector( '#footer_wizard' );
 const sldFooterScale = document.querySelector( '#footer_scale' );
@@ -133,9 +134,14 @@ btnHeaderCalendars.addEventListener( TOUCH, () => {
 } );
 
 btnHeaderCancel.addEventListener( TOUCH, () => {
-  txtHeaderSearch.value = null;
-  btnHeaderCancel.hidden = true;
+  txtHeaderSearch.value = '';
+  btnHeaderCancel.classList.add( 'hidden' );
   pnlRight.hidden = true;
+} );
+
+btnHeaderClear.addEventListener( TOUCH, () => {
+  txtHeaderSearch.value = '';
+  txtHeaderSearch.focus();
 } );
 
 btnHeaderList.addEventListener( TOUCH, () => {
@@ -195,8 +201,8 @@ btnHeaderPrevious.addEventListener( TOUCH, () => {
   } );
 } );
 
-txtHeaderSearch.addEventListener( 'aa-change', () => {
-  if( txtHeaderSearch.value === null ) {
+txtHeaderSearch.addEventListener( 'keyup', () => {
+  if( txtHeaderSearch.value.trim().length === 0 ) {
     calYear.data = events;
     summarize( events.length );
     return;
@@ -222,7 +228,7 @@ txtHeaderSearch.addEventListener( 'aa-change', () => {
   
   pnlLeft.hidden = true;
   pnlRight.hidden = false;
-  btnHeaderCancel.hidden = false;
+  btnHeaderCancel.classList.remove( 'hidden' );
 } );
 
 // Account
@@ -442,6 +448,8 @@ if( session === null ) {
 */
 
 function blocker( disabled = true ) {
+  lnkFooterLink.classList.add( 'disabled' );
+
   btnHeaderAccount.disabled = disabled;
   btnHeaderCalendars.disabled = disabled;  
   btnHeaderList.disabled = disabled;  
@@ -450,7 +458,6 @@ function blocker( disabled = true ) {
   btnHeaderNext.disabled = disabled;  
   txtHeaderSearch.disabled = disabled;
   btnHeaderToday.disabled = disabled;
-  lblFooterLink.disabled = disabled;
   sldFooterScale.disabled = disabled;
 }
 

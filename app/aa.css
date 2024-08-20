@@ -30,6 +30,10 @@ a {
   -webkit-tap-highlight-color: transparent;
 }
 
+a.disabled {
+  color: #aaaaaa;
+}
+
 button {
   appearance: none;
   background: none;
@@ -39,7 +43,7 @@ button {
   color: #0082ff;          
   cursor: pointer;
   display: inline;
-  font-size: 17px;          
+  font-size: 16px;          
   height: 36px;
   line-height: 36px;
   margin: 0;
@@ -135,8 +139,13 @@ input[type=search]::placeholder {
   opacity: 1.0;
 }
 
-input[type=search]:not( [value] ) ~ button {
+input[type=search]:placeholder-shown ~ button {
   display: none;
+}
+
+input[type=range] {
+  justify-self: end;
+  width: 200px;
 }
 
 label {

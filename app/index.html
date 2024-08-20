@@ -55,7 +55,7 @@
           <button class="icon" id="header_previous" type="button">
             <img src="./img/chevron-left.svg" />
           </button>                          
-          <p id="header_year" style="font-size: 34px; font-weight: 600;">2024</p>
+          <p id="header_year" style="font-size: 32px; font-weight: 600;">2024</p>
           <button class="icon" id="header_next" type="button">
             <img src="./img/chevron-right.svg" />
           </button>                                    
@@ -71,10 +71,10 @@
       <!-- Event count -->
       <!-- Scale control -->
       <footer class="grid">
-        <p>Handcrafted with ❤️ at <a href="https://ketnerlake.com" target="blank">Ketner Lake</a>.</p>
+        <p>Handcrafted with ❤️ at <a href="https://ketnerlake.com" id="footer_link" target="_blank">Ketner Lake</a>.</p>
         <p id="footer_count" style="text-align: center;"></p>
         <aa-rainbow hidden id="footer_wizard" text="Tree wizard!"></aa-rainbow>
-        <input max="100" min="1" type="range" value="50" />
+        <input id="footer_scale" max="100" min="1" type="range" value="50" />
         <!-- <aa-slider id="footer_scale" style="justify-self: end;" value="50"></aa-slider> -->
       </footer>        
 
@@ -93,7 +93,7 @@
     <!-- Add event -->
     <!-- Search -->
     <div class="grid" style="position: absolute; left: 16px; right: 16px; top: 16px; z-index: 50;">
-      <aa-hbox gap="m" style="align-items: center;">
+      <div class="hbox" style="align-items: center; gap: 8px;">
         <button class="icon" id="header_account" type="button">
           <img src="./img/account.svg" />
         </button>
@@ -109,18 +109,18 @@
         <button class="icon" id="header_add" type="button">
           <img src="./img/add.svg" />
         </button>                
-        <button class="icon" id="header_wizard"></button>
-      </aa-hbox>
-      <aa-hbox style="justify-self: end; grid-column: 3 / 3;">
-        <label id="header_search">
+        <button class="icon" id="header_wizard" type="button"></button>
+      </div>
+      <div class="hbox" style="justify-self: end; grid-column: 3 / 3;">
+        <label>
           <img class="icon" src="./img/search.svg" />
-          <input id="header_search_input" placeholder="Search" type="search" />
-          <button class="icon" type="button">
+          <input id="header_search" placeholder="Search" type="search" />
+          <button class="icon" id="header_clear" type="button">
             <img src="./img/close.svg" />
           </button>
         </label>
         <button class="hidden" id="header_cancel">Cancel</button> 
-      </aa-hbox>
+      </div>
     </div>    
 
     <!-- Account -->
