@@ -33,6 +33,7 @@ export default class AAEvent extends HTMLElement {
           cursor: pointer;
           display: flex;
           flex-direction: column;                    
+          font-family: 'IBM Plex Sans', sans-serif;
           height: 100%;
           /* min-height: var( --event-duration, 35px ); */
           margin: 0;
@@ -46,7 +47,7 @@ export default class AAEvent extends HTMLElement {
           box-sizing: border-box;
           /* color: #ff8c00; */
           color: var( --event-inactive-color );
-          font-size: 13px;
+          font-size: 14px;
           margin: 0;
           min-width: 0;
           overflow: hidden;
@@ -54,6 +55,10 @@ export default class AAEvent extends HTMLElement {
           text-overflow: ellipsis;
           text-rendering: optimizeLegibility;
           white-space: nowrap;
+        }
+
+        span[part=location] {
+          margin-top: -2px;
         }
 
         span[part=summary] {

@@ -25,8 +25,8 @@ export default class AATextarea extends HTMLElement {
           border: none;
           box-sizing: border-box;
           color: #272727;
-          font-family: 'Source Sans 3', sans-serif;  
-          font-size: 17px;
+          font-family: 'IBM Plex Sans', sans-serif;  
+          font-size: 16px;
           height: 36px;
           line-height: 36px;
           margin: 0;

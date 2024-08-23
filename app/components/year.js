@@ -12,6 +12,7 @@ export default class AAYear extends HTMLElement {
           background-color: #ffffff;          
           box-sizing: border-box;
           display: block;
+          overflow: auto;
           position: relative;
         }
 
@@ -47,8 +48,8 @@ export default class AAYear extends HTMLElement {
           color: #272727;
           cursor: default;
           display: inline-block;
-          font-family: 'Source Sans 3', sans-serif;
-          font-size: 17px;
+          font-family: 'IBM Plex Sans', sans-serif;
+          font-size: 16px;
           font-weight: 400;
           height: 36px;
           line-height: 36px;

@@ -10,10 +10,14 @@ export default class AAEventRenderer extends HTMLElement {
     template.innerHTML = /* template */ `
       <style>
         :host {
+          align-items: center;
+          border-bottom: solid 1px #bebec3;
           box-sizing: border-box;
           display: flex;
-          flex-direction: column;
-          gap: 4px;
+          flex-direction: row;
+          gap: 8px;
+          margin: 0 0 0 16px;
+          padding: 8px 16px 8px 0;
           position: relative;
         }
 
@@ -25,32 +29,101 @@ export default class AAEventRenderer extends HTMLElement {
           display: none;
         }
 
-        aa-hbox aa-label:first-of-type {
+        aa-hbox[part=first] {
+          align-items: baseline;
+        }
+
+        aa-hbox[part=first],
+        aa-hbox[part=second] {
+          flex-basis: 0;
+          flex-grow: 1;
+        }
+
+        aa-hbox[part=second] {
+          margin: 4px 0 0 0;
+        }
+
+        aa-vbox[part=calendar] {
+          background: #ffffff, #f443364d;
+          border-radius: 4px;
+          height: 36px;
+          width: 36px;
+        }
+
+        aa-vbox[part=details] {
+          flex-basis: 0;
+          flex-grow: 1;
+        }
+
+        aa-label[part=date] {
+          --label-color: #B71C1C;          
+        }
+
+        aa-label[part=month] {
+          --label-color: #B71C1C;
+          --label-text-transform: uppercase;
+        }
+
+        aa-label[part=ends] {
+          --label-color: #8a8b8e;
+        }
+
+        aa-label[part=location] {
+          flex-basis: 0;
+          flex-grow: 1;
+          --label-color: #8a8b8e;
+        }
+
+        aa-label[part=summary] {
           flex-basis: 0;
           flex-grow: 1;
         }
 
         div {
-          background-color: blue;
-          border-radius: 3px;
-          box-sizing: border-box;
-          height: 35px;
-          min-width: 3px;
-          width: 3px;
+          background: #ffffff;
+          border-radius: 4px;
+        }
+
+        :host( [outdated] ) aa-label[part=summary],
+        :host( [outdated] ) aa-label[part=location],
+        :host( [outdated] ) aa-label[part=label],
+        :host( [outdated] ) aa-label[part=ends] {
+          --label-color: #a9a9b0;
         }
       </style>
-      <aa-label size="m" text="Sat Aug 17" weight="bold"></aa-label>
-      <aa-hbox style="align-items: baseline;">
-        <aa-label part="summary" size="m" weight="bold"></aa-label>
-        <aa-label text="Ends"></aa-label>
-      </aa-hbox>
-      <aa-hbox>
-        <aa-label part="location" style="--label-color: #858585;"></aa-label>
-        <aa-label part="ends" style="--label-color: #858585;" text="Sun Aug 18"></aa-label>
-      </aa-hbox>      
+      <div>
+        <aa-vbox centered justified part="calendar">
+          <aa-label part="date" text="6" weight="bold"></aa-label>
+          <aa-label part="month" size="xs" text="Jan"></aa-label>
+        </aa-vbox>
+      </div>
+      <aa-vbox part="details">
+        <aa-hbox part="first">
+          <aa-label part="summary" weight="bold"></aa-label>
+          <aa-label part="label" size="s" text="Ends"></aa-label>
+        </aa-hbox>
+        <aa-hbox part="second">
+          <aa-label part="location" size="s"></aa-label>
+          <aa-label part="ends" size="s" text="Fri Aug 23"></aa-label>
+        </aa-hbox>        
+      </aa-vbox>
     `;
 
     // Private
+    this._colors = [
+      {activeBackgroundColor: '#F44336', activeColor: '#ffffff', inactiveColor: '#B71C1C'},
+      {activeBackgroundColor: '#E91E63', activeColor: '#ffffff', inactiveColor: '#880E4F'},      
+      {activeBackgroundColor: '#9C27B0', activeColor: '#ffffff', inactiveColor: '#4A148C'},            
+      {activeBackgroundColor: '#3F51B5', activeColor: '#ffffff', inactiveColor: '#1A237E'},                  
+      {activeBackgroundColor: '#2196F3', activeColor: '#ffffff', inactiveColor: '#0D47A1'},                        
+      {activeBackgroundColor: '#00BCD4', activeColor: '#ffffff', inactiveColor: '#006064'},                              
+      {activeBackgroundColor: '#009688', activeColor: '#ffffff', inactiveColor: '#004D40'},                                    
+      {activeBackgroundColor: '#4CAF50', activeColor: '#ffffff', inactiveColor: '#1B5E20'},                                          
+      {activeBackgroundColor: '#8BC34A', activeColor: '#ffffff', inactiveColor: '#33691E'},                                                
+      {activeBackgroundColor: '#CDDC39', activeColor: '#ffffff', inactiveColor: '#827717'},  
+      {activeBackgroundColor: '#FF5722', activeColor: '#ffffff', inactiveColor: '#BF360C'},                                                                  
+      {activeBackgroundColor: '#795548', activeColor: '#ffffff', inactiveColor: '#3E2723'}                                                                             
+    ];    
     this._data = null;
 
     // Root
@@ -58,16 +131,53 @@ export default class AAEventRenderer extends HTMLElement {
     this.shadowRoot.appendChild( template.content.cloneNode( true ) );
 
     // Elements
-    this.$summary = this.shadowRoot.querySelector( 'aa-label[part=summary]' );
+    this.$calendar = this.shadowRoot.querySelector( 'aa-vbox[part=calendar]' );
+    this.$date = this.shadowRoot.querySelector( 'aa-label[part=date]' );
+    this.$ends = this.shadowRoot.querySelector( 'aa-label[part=ends]' );
+    this.$label = this.shadowRoot.querySelector( 'aa-label[part=label]' );
     this.$location = this.shadowRoot.querySelector( 'aa-label[part=location]' );
+    this.$month = this.shadowRoot.querySelector( 'aa-label[part=month]' );
+    this.$summary = this.shadowRoot.querySelector( 'aa-label[part=summary]' );
   }
 
    // When attributes change
   _render() {
     if( this._data === null ) return;
 
+    let parts = this._data.startsAt.split( '-' );
+    const starts = new Date(
+      parseInt( parts[0] ),
+      parseInt( parts[1] ) - 1,
+      parseInt( parts[2] )
+    );    
+
+    let formatted = new Intl.DateTimeFormat( navigator.language, {
+      month: 'short'
+    } ).format( starts );        
+
+    this.$calendar.style.setProperty( 'background', this._colors[starts.getMonth()].activeBackgroundColor + '4d' );    
+    this.$date.style.setProperty( '--label-color', this._colors[starts.getMonth()].inactiveColor );        
+    this.$date.text = starts.getDate();
+    this.$month.style.setProperty( '--label-color', this._colors[starts.getMonth()].inactiveColor );            
+    this.$month.text = formatted;
+    
+    parts = this._data.endsAt.split( '-' );
+    const ends = new Date(
+      parseInt( parts[0] ),
+      parseInt( parts[1] ) - 1,
+      parseInt( parts[2] )
+    );
+
     this.$summary.text = this._data.summary;
+    this.$label.hidden = starts.getDate() === ends.getDate() ? true : false;
     this.$location.text = this._data.location;
+
+    formatted = new Intl.DateTimeFormat( navigator.language, {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric'
+    } ).format( ends );        
+    this.$ends.text = formatted;
   }
 
   // Promote properties
@@ -85,6 +195,7 @@ export default class AAEventRenderer extends HTMLElement {
     this._upgrade( 'concealed' );  
     this._upgrade( 'data' );      
     this._upgrade( 'hidden' );    
+    this._upgrade( 'outdated' );          
     this._render();
   }
 
@@ -92,7 +203,8 @@ export default class AAEventRenderer extends HTMLElement {
   static get observedAttributes() {
     return [
       'concealed',
-      'hidden'
+      'hidden',
+      'outdated'
     ];
   }
 
@@ -111,6 +223,15 @@ export default class AAEventRenderer extends HTMLElement {
 
   set data( value ) {
     this._data = value;
+
+    const parts = this._data.endsAt.split( '-' );
+    const ends = new Date(
+      parseInt( parts[0] ),
+      parseInt( parts[1] ) - 1,
+      parseInt( parts[2] )
+    );    
+    this.outdated = ends.getTime() < Date.now() ? true : false;    
+
     this._render();
   }  
 
@@ -156,6 +277,26 @@ export default class AAEventRenderer extends HTMLElement {
       this.removeAttribute( 'hidden' );
     }
   } 
+
+  get outdated() {
+    return this.hasAttribute( 'outdated' );
+  }
+
+  set outdated( value ) {
+    if( value !== null ) {
+      if( typeof value === 'boolean' ) {
+        value = value.toString();
+      }
+
+      if( value === 'false' ) {
+        this.removeAttribute( 'outdated' );
+      } else {
+        this.setAttribute( 'outdated', '' );
+      }
+    } else {
+      this.removeAttribute( 'outdated' );
+    }
+  }  
 }
 
 window.customElements.define( 'aa-event-renderer', AAEventRenderer );

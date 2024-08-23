@@ -40,7 +40,7 @@ export default class AARainbow extends HTMLElement {
           background-clip: text;
           color: transparent;
           cursor: default;
-          font-family: 'Source Sans 3', sans-serif;
+          font-family: 'IBM Plex Sans', sans-serif;
           font-size: 16px;
           font-weight: 600;
           line-height: 16px;

@@ -7,7 +7,7 @@ export default class AAIcon extends HTMLElement {
       <style>
         :host {
           box-sizing: border-box;
-          display: block;
+          display: inline;
           position: relative;
         } 
 
@@ -19,28 +19,48 @@ export default class AAIcon extends HTMLElement {
           display: none;
         } 
 
-        span {
+        img {
           box-sizing: border-box;
-          color: var( --icon-color, #828282 );
           cursor: var( --icon-cursor, default );
-          direction: ltr;
-          display: inline-block;
-          font-family: 'Material Symbols Outlined';
-          font-style: normal;
-          font-weight: normal;    
-          letter-spacing: normal;
-          text-rendering: optimizeLegibility;
-          text-transform: none;
-          white-space: nowrap;
-          word-wrap: normal;
+          display: block;
+          filter: var( --icon-color, 
+            invert( 31% ) 
+            sepia( 49% ) 
+            saturate( 3696% ) 
+            hue-rotate( 198deg ) 
+            brightness( 106% ) 
+            contrast( 103% )
+          );            
+          height: 20px;
+          width: 20px;          
         }
 
-        :host( :not( [size] ) ) span {
-          font-size: 34px;
-          line-height: 34px;
+        :host( [inverted] ) img {
+          filter: 
+            invert( 100% ) 
+            sepia( 36% ) 
+            saturate( 0% ) 
+            hue-rotate( 249deg ) 
+            brightness( 114% ) 
+            contrast( 100% );                    
         }
+
+        :host( [size=s] ) img {
+          height: 16px;
+          width: 16px;
+        }
+
+        :host( [disabled] ) img {
+          filter: 
+            invert( 86% ) 
+            sepia( 7% ) 
+            saturate( 7% ) 
+            hue-rotate( 321deg ) 
+            brightness( 79% ) 
+            contrast( 100% );          
+        }        
       </style>
-      <span part="icon"></span>
+      <img part="icon" />
     `;
 
     // Private
@@ -51,40 +71,12 @@ export default class AAIcon extends HTMLElement {
     this.shadowRoot.appendChild( template.content.cloneNode( true ) );
 
     // Elements
-    this.$icon = this.shadowRoot.querySelector( 'span' );
+    this.$icon = this.shadowRoot.querySelector( 'img' );
   }
 
   // When things change
   _render() {
-    this.$icon.innerText = this.name === null ? '' : this.name;
-
-    const variation = [];
-
-    if( this.filled ) {
-      variation.push( '\'FILL\' 1' );
-    } else {
-      variation.push( '\'FILL\' 0' );
-    }
-
-    if( this.size === null ) {
-      variation.push( '\'opsz\' 34' );
-    } else {
-      variation.push( `'opsz' ${this.size}` );
-      
-      this.$icon.style.fontSize = `${this.size}px`;
-      this.$icon.style.lineHeight = `${this.size}px`;
-      this.style.height = `${this.size}px`;
-    }
-
-    variation.push( '\'GRAD\' 0' );
-
-    if( this.weight === null ) {
-      variation.push( '\'wght\' 200' );
-    } else {
-      variation.push( `'wght' ${this.weight}` );
-    }
-
-    this.$icon.style.fontVariationSettings = variation.toString();    
+    this.$icon.src = this.src === null ? '' : this.src;
   }
 
   // Properties set before module loaded
@@ -100,11 +92,11 @@ export default class AAIcon extends HTMLElement {
   connectedCallback() {
     this._upgrade( 'concealed' );                          
     this._upgrade( 'data' );                      
-    this._upgrade( 'filled' );                          
+    this._upgrade( 'disabled' );                          
     this._upgrade( 'hidden' );                      
-    this._upgrade( 'name' );                          
-    this._upgrade( 'size' );                              
-    this._upgrade( 'weight' );                          
+    this._upgrade( 'inverted' );                          
+    this._upgrade( 'size' );                        
+    this._upgrade( 'src' );                                    
     this._render();
   }
 
@@ -112,11 +104,11 @@ export default class AAIcon extends HTMLElement {
   static get observedAttributes() {
     return [
       'concealed',
-      'filled',
+      'disabled',
       'hidden',
-      'name',
+      'inverted',      
       'size',
-      'weight'
+      'src'
     ];
   }
 
@@ -160,23 +152,23 @@ export default class AAIcon extends HTMLElement {
     }
   }
 
-  get filled() {
-    return this.hasAttribute( 'filled' );
+  get disabled() {
+    return this.hasAttribute( 'disabled' );
   }
 
-  set filled( value ) {
+  set disabled( value ) {
     if( value !== null ) {
       if( typeof value === 'boolean' ) {
         value = value.toString();
       }
 
       if( value === 'false' ) {
-        this.removeAttribute( 'filled' );
+        this.removeAttribute( 'disabled' );
       } else {
-        this.setAttribute( 'filled', '' );
+        this.setAttribute( 'disabled', '' );
       }
     } else {
-      this.removeAttribute( 'filled' );
+      this.removeAttribute( 'disabled' );
     }
   }
 
@@ -200,19 +192,23 @@ export default class AAIcon extends HTMLElement {
     }
   }   
 
-  get name() {
-    if( this.hasAttribute( 'name' ) ) {
-      return this.getAttribute( 'name' );
-    }
-
-    return null;
+  get inverted() {
+    return this.hasAttribute( 'inverted' );
   }
 
-  set name( value ) {
+  set inverted( value ) {
     if( value !== null ) {
-      this.setAttribute( 'name', value );
+      if( typeof value === 'boolean' ) {
+        value = value.toString();
+      }
+
+      if( value === 'false' ) {
+        this.removeAttribute( 'inverted' );
+      } else {
+        this.setAttribute( 'inverted', '' );
+      }
     } else {
-      this.removeAttribute( 'name' );
+      this.removeAttribute( 'inverted' );
     }
   }  
   
@@ -231,20 +227,20 @@ export default class AAIcon extends HTMLElement {
       this.removeAttribute( 'size' );
     }
   }  
-  
-  get weight() {
-    if( this.hasAttribute( 'weight' ) ) {
-      return parseInt( this.getAttribute( 'weight' ) );
+
+  get src() {
+    if( this.hasAttribute( 'src' ) ) {
+      return this.getAttribute( 'src' );
     }
 
     return null;
   }
 
-  set weight( value ) {
+  set src( value ) {
     if( value !== null ) {
-      this.setAttribute( 'weight', value );
+      this.setAttribute( 'src', value );
     } else {
-      this.removeAttribute( 'weight' );
+      this.removeAttribute( 'src' );
     }
   }  
 }

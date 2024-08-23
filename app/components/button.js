@@ -7,7 +7,7 @@ export default class AAButton extends HTMLElement {
       <style>
         :host {
           box-sizing: border-box;
-          display: block;
+          display: inline;
           position: relative;
         } 
 
@@ -20,26 +20,24 @@ export default class AAButton extends HTMLElement {
         } 
 
         button {
-          align-items: center;
           appearance: none;
           background: none;
           border: none;
           border-radius: 4px;
           box-sizing: border-box;
-          color: #0082ff;          
+          color: var( --button-color, #0082ff );          
           cursor: pointer;
           display: block;
-          font-family: 'Source Sans 3', sans-serif;    
-          font-size: 17px;          
+          font-family: 'IBM Plex Sans', sans-serif;    
+          font-size: 16px;          
           font-weight: 400;
           height: 36px;
-          justify-content: center;
-          line-height: 34px;
+          line-height: 36px;
           margin: 0;
           outline: none;
-          padding: 0 16px 0 16px;
+          padding: var( --button-padding, 0 16px 0 16px );
+          text-align: var( --button-text-align, center );
           text-rendering: optimizeLegibility;
-          transition: color 0.25s linear;
           width: 100%;
           -webkit-tap-highlight-color: transparent;            
         }

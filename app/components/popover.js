@@ -9,6 +9,7 @@ export default class AAPopover extends HTMLElement {
           box-sizing: border-box;
           display: none;
           position: absolute;
+          width: 300px;
           z-index: 100;
         }
 
@@ -26,7 +27,7 @@ export default class AAPopover extends HTMLElement {
 
         div {
           border: none;
-          border-radius: 8px;
+          border-radius: 4px;
           box-shadow:
             0 0 40px -10px rgba( 0, 0, 0, 0.30 ),
             0 0 25px -15px rgba( 0, 0, 0, 0.20 );

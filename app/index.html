@@ -9,13 +9,7 @@
     <title>Anno Awesome</title>
 
     <link href="./img/trident.svg" rel="icon" type="image/svg+xml" />
-
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />        
-
-    <link href="aa.css" rel="stylesheet" />
+    <link href="awesome.css" rel="stylesheet" />
 
   </head>
   <body>
@@ -24,7 +18,7 @@
     <aa-drawer hidden id="drawer_left" placement="start">
       <aa-stack id="left_stack" style="display: flex; flex-direction: column; flex-basis: 0; flex-grow: 1;">
         <aa-vbox style="flex-basis: 0; flex-grow: 1;">
-          <aa-label size="xl" style="padding-left: 16px; padding-top: 60px; margin-bottom: 22px;" text="Calendars" weight="bold"></aa-label>
+          <aa-label size="xl" style="padding-left: 16px; padding-top: 62px; margin-bottom: 20px;" text="Calendars" weight="bold"></aa-label>
           <aa-vbox style="flex-basis: 0; flex-grow: 1; margin-bottom: 16px;">
             <aa-label text="My Awesome" size="s" style="--label-color: #868686; --label-text-transform: uppercase; margin: 0 16px 9px 28px;"></aa-label>          
             <div style="background-color: #ffffff; border-radius: 8px; margin: 0 16px 0 16px;">
@@ -38,51 +32,50 @@
           </aa-hbox>
         </aa-vbox>
         <aa-vbox style="flex-basis: 0; flex-grow: 1;">
-          <aa-label size="xl" style="padding-left: 16px; padding-top: 60px;" text="Events" weight="bold"></aa-label>
-          <aa-list id="drawer_events" item-renderer="aa-event-renderer" style="flex-basis: 0; flex-grow: 1;"></aa-list>          
+          <aa-label size="xl" style="padding-left: 16px; padding-top: 62px; padding-bottom: 45px;" text="Events" weight="bold"></aa-label>
+          <aa-list id="drawer_events" item-renderer="aa-event-renderer" style="border-top: solid 1px #c7c7c7; flex-basis: 0; flex-grow: 1;"></aa-list>          
         </aa-vbox>
       </aa-stack>
     </aa-drawer>
 
     <!-- Main -->
-    <main class="vbox" style="flex-basis: 0; flex-grow: 1; min-width: 0;">
+    <aa-vbox style="flex-basis: 0; flex-grow: 1; min-width: 0;">
 
       <!-- Header -->
       <!-- Year -->
       <!-- Today -->
-      <header class="grid" style="padding-top: 60px;">
-        <div class="hbox" style="align-items: center; gap: 16px; grid-column: 2 / 2; justify-self: center;">
-          <button class="icon" id="header_previous" type="button">
-            <img src="./img/chevron-left.svg" />
-          </button>                          
-          <p id="header_year" style="font-size: 32px; font-weight: 600;">2024</p>
-          <button class="icon" id="header_next" type="button">
-            <img src="./img/chevron-right.svg" />
-          </button>                                    
-        </div>      
-        <button id="header_today" style="grid-column: 3 / 3; justify-self: end;" type="button">Today</button>
+      <header class="grid" style="margin: 0; padding: 60px 16px 8px 16px;">
+        <aa-hbox centered gap="l" justified style="grid-column: 2 / 2;">
+          <aa-icon-button id="header_previous" src="./img/chevron-left.svg"></aa-icon-button>
+          <aa-label id="header_year" size="xl" weight="bold"></aa-label>
+          <aa-icon-button id="header_next" src="./img/chevron-right.svg"></aa-icon-button>          
+        </aa-hbox>      
+        <aa-button id="header_today" label="Today" style="grid-column: 3 / 3; justify-self: end; --button-padding: 0;"></aa-button>
       </header>
   
       <!-- Calendar grid -->
-      <aa-year style="flex-grow: 1; flex-basis: 0; overflow: auto;"></aa-year>      
+      <aa-year style="flex-grow: 1; flex-basis: 0;"></aa-year>      
   
       <!-- Footer -->
       <!-- Attribution -->
       <!-- Event count -->
       <!-- Scale control -->
       <footer class="grid">
-        <p>Handcrafted with ❤️ at <a href="https://ketnerlake.com" id="footer_link" target="_blank">Ketner Lake</a>.</p>
-        <p id="footer_count" style="text-align: center;"></p>
+        <aa-hbox style="align-items: baseline;">
+          <aa-label text="Handcrafted with ❤️ at"></aa-label>
+          <aa-link href="https://ketnerlake.com" id="footer_link" label="Ketner Lake" style="margin: 0 0 0 4px" target="_blank"></aa-link>
+          <aa-label text="."></aa-label>
+        </aa-hbox>
+        <aa-label id="footer_count" style="--label-text-align: center;"></aa-label>
         <aa-rainbow hidden id="footer_wizard" text="Tree wizard!"></aa-rainbow>
         <input id="footer_scale" max="100" min="1" type="range" value="50" />
-        <!-- <aa-slider id="footer_scale" style="justify-self: end;" value="50"></aa-slider> -->
       </footer>        
 
-    </main>
+    </aa-vbox>
 
     <!-- Right drawer -->
-    <aa-drawer hidden id="drawer_right" placement="end">
-      <p>Some content</p>
+    <aa-drawer hidden id="drawer_right" placement="end" style="background-color: #f7f7f7; padding-top: 68px;">
+      <aa-list id="drawer_search" item-renderer="aa-event-renderer" style="background-color: #f2f2f9; border-top: solid 1px #c7c7c7; flex-basis: 0; flex-grow: 1;"></aa-list>          
     </aa-drawer>
 
     <!-- Controls -->
@@ -93,148 +86,126 @@
     <!-- Add event -->
     <!-- Search -->
     <div class="grid" style="position: absolute; left: 16px; right: 16px; top: 16px; z-index: 50;">
-      <div class="hbox" style="align-items: center; gap: 8px;">
-        <button class="icon" id="header_account" type="button">
-          <img src="./img/account.svg" />
-        </button>
-        <button class="hidden icon" id="header_share" type="button">
-          <img src="./img/share.svg" />
-        </button>                        
-        <button class="icon" id="header_calendars" type="button">
-          <img src="./img/calendar.svg" />
-        </button>        
-        <button class="icon" id="header_list" type="button">
-          <img src="./img/list.svg" />
-        </button>                
-        <button class="icon" id="header_add" type="button">
-          <img src="./img/add.svg" />
-        </button>                
-        <button class="icon" id="header_wizard" type="button"></button>
-      </div>
-      <div class="hbox" style="justify-self: end; grid-column: 3 / 3;">
-        <label>
-          <img class="icon" src="./img/search.svg" />
-          <input id="header_search" placeholder="Search" type="search" />
-          <button class="icon" id="header_clear" type="button">
-            <img src="./img/close.svg" />
-          </button>
-        </label>
-        <button class="hidden" id="header_cancel">Cancel</button> 
-      </div>
+      <aa-hbox centered gap="m">
+        <aa-icon-button id="header_account" src="./img/account.svg"></aa-icon-button>
+        <aa-icon-button hidden id="header_share" src="./img/share.svg"></aa-icon-button>
+        <aa-icon-button id="header_calendars" src="./img/calendar.svg"></aa-icon-button>
+        <aa-icon-button id="header_list" src="./img/list.svg"></aa-icon-button>                        
+        <aa-icon-button id="header_add" src="./img/add.svg"></aa-icon-button>                                
+        <aa-icon-button id="header_wizard"></aa-icon-button>                                        
+      </aa-hbox>
+      <aa-hbox gap="l" style="justify-self: end; grid-column: 3 / 3;">
+        <aa-search id="header_search"></aa-search>
+        <aa-button hidden id="header_cancel" label="Cancel" style="--button-padding: 0;"></aa-button> 
+      </aa-hbox>
     </div>    
 
     <!-- Account -->
-    <!-- Popover -->
-    <dialog id="account" style="padding: 0; border: none; border-radius: 8px; width: 300px;  background-color: #f5f5f5;">
-      <aa-stack id="account_stack">
-        <aa-vbox gap="l">
-          <aa-vbox>
-            <aa-input autofocus id="account_email" placeholder="Email address"></aa-input>
-            <aa-divider></aa-divider>
-            <aa-input id="account_password" placeholder="Password" type="password"></aa-input>            
-            <aa-divider></aa-divider>
-            <aa-button id="account_signin" label="Sign in"></aa-button>            
-          </aa-vbox>
-          <aa-vbox>
-            <aa-hbox style="padding: 0 16px 0 16px; height: 36px; align-items: center;">
-              <aa-label text="Account Status" style="flex-grow: 1;"></aa-label>
-              <aa-label style="--label-color: #9e9e9e;" text="Free"></aa-label>
-            </aa-hbox>
-            <button id="account_signup" style="appearance: none; background: none; border: none; cursor: pointer; display: flex; flex-direction: row; gap: 16px; margin: 0; padding: 16px; background-color: #0082ff; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px;" type="button">
-              <img src="./img/trident.svg" height="32" width="32" />  
-              <span style="display: flex; flex-direction: column;">
-                <span style="display: flex; flex-direction: row; align-items: center; gap: 4px;">
-                  <aa-label style="--label-color: #ffffff; --label-cursor: pointer; --label-line-height: 21px;" text="Get More Awesome" weight="bold"></aa-label>                                    
-                  <aa-icon filled name="arrow_right_alt" size="16" style="--icon-color: #ffffff;" weight="400"></aa-icon>
-                </span>
-                <aa-label balanced style="--label-color: #ffffff; --label-cursor: pointer; --label-line-height: 21px;" text="Sync across devices, share privately or publicly, add attachments, location lookup, and more..."></aa-label>                        
-              </span>            
-            </button>
-          </aa-vbox>
-          <aa-vbox>
-            <aa-button id="account_demo" label="Just Checking It Out"></aa-button>
-          </aa-vbox>
-        </aa-vbox>
-        <aa-vbox>
-
-        </aa-vbox>
-      </aa-stack>
+    <dialog class="popover transparent" id="account">
+      <aa-vbox gap="l">
+        <aa-section>
+          <aa-input autofocus id="account_email" placeholder="Email address"></aa-input>
+          <aa-divider></aa-divider>
+          <aa-input id="account_password" placeholder="Password" type="password"></aa-input>
+          <aa-divider></aa-divider>
+          <aa-button id="account_signin" label="Sign in"></aa-button>
+        </aa-section>
+        <aa-section>
+          <aa-hbox centered style="height: 36px; padding: 0 16px 0 16px;">
+            <aa-label style="flex-basis: 0; flex-grow: 1;" text="Account status"></aa-label>
+            <aa-label style="--label-color: #9e9e9e;" text="Free"></aa-label>
+          </aa-hbox>
+          <button id="account_signup" type="button">
+            <img src="./img/trident.svg" height="32" width="32" />  
+            <aa-vbox>
+              <aa-hbox gap="s">
+                <aa-label inverted style="--label-cursor: pointer;" text="Get more awesome" weight="bold"></aa-label>
+                <aa-icon inverted src="./img/arrow-right.svg" style="--icon-cursor: pointer;"></aa-icon>
+              </aa-hbox>
+              <aa-label balanced inverted style="--label-cursor: pointer; --label-line-height: 21px" text="Sync across devices, share privately or publicly, add attachments, location lookup, and more..."></aa-label>
+            </aa-vbox>
+          </button>
+        </aa-section>
+        <aa-section>
+          <aa-button id="account_demo" label="Just checking it out" style="--button-text-align: center;"></aa-button>
+        </aa-section>
+      </aa-vbox>
     </dialog>
 
     <!-- Details -->
-    <!-- Popover -->
-    <dialog id="details" style="padding: 0; border: none; border-radius: 8px; background-color: #f5f5f5;">
-      <aa-stack id="details_stack" selected-index="0">
+    <!-- Placement strategy? style="margin-left: 16px; margin-top: 70px;" -->
+    <dialog class="popover transparent" id="details">
+      <aa-stack id="details_stack">
 
         <!-- Form -->
-        <aa-form gap="l">
-          <aa-hbox style="align-items: center;">
-            <aa-button id="form_cancel" label="Cancel"></aa-button>
-            <aa-label id="form_label" size="m" text="New Event" weight="bold"></aa-label>
-            <aa-button disabled id="form_add" label="Add"></aa-button>
-          </aa-hbox>      
-          <aa-vbox>
+        <aa-vbox class="form" gap="l">
+          <div class="grid">
+            <aa-button id="form_cancel" label="Cancel" style="justify-self: start; --button-padding: 0;"></aa-button>
+            <aa-label id="form_label" text="New Event" style="justify-self: center; --label-line-height: 36px;" weight="bold"></aa-label>
+            <aa-button disabled id="form_add" label="Add" style="justify-self: end; --button-padding: 0;"></aa-button>
+          </div>                  
+          <aa-section>
             <aa-input id="form_title" placeholder="Title"></aa-input>
             <aa-divider></aa-divider>
             <aa-input id="form_location" placeholder="Location"></aa-input>        
-          </aa-vbox>
-          <aa-vbox>
+          </aa-section>
+          <aa-section>
             <aa-date-picker id="form_starts" label="Starts"></aa-date-picker>
             <aa-divider></aa-divider>
             <aa-date-picker id="form_ends" label="Ends"></aa-date-picker>
-          </aa-vbox>
-          <aa-vbox>
+          </aa-section>
+          <aa-section>
             <aa-attachment></aa-attachment>
-          </aa-vbox>
-          <aa-vbox>
+          </aa-section>
+          <aa-section>
             <aa-input id="form_url" placeholder="URL"></aa-input>
             <aa-divider></aa-divider>
             <aa-textarea id="form_notes" placeholder="Notes"></aa-textarea>
-          </aa-vbox>
-        </aa-form>
+          </aa-section>
+        </aa-vbox>
 
         <!-- View -->
         <aa-vbox>
-          <aa-hbox>
-            <aa-label id="view_title" size="m" text="Event Title" weight="bold"></aa-label>
-            <aa-button id="view_edit" label="Edit"></aa-button>
+          <aa-hbox centered style="padding: 8px 16px 0 16px;">
+            <aa-label id="view_title" style="flex-basis: 0; flex-grow: 1;" text="Event Title" weight="bold"></aa-label>            
+            <aa-button id="view_edit" label="Edit" style="justify-self: flex-end; --button-padding: 0;"></aa-button>
           </aa-hbox>
-          <aa-link id="view_location_link" label="Location" size="m"></aa-link>
-          <aa-label id="view_location_label" label="Location" size="m"></aa-label>          
+          <aa-link id="view_location_link" label="Location" style="margin: 0 0 0 16px;"></aa-link>
+          <aa-label id="view_location_label" label="Location" style="margin: 0 0 0 16px;"></aa-label>          
           <aa-spacer size="m"></aa-spacer>
-          <aa-hbox>
-            <aa-label id="view_start_label" text="from" style="flex-grow: 0; margin: 0 4px 0 0;"></aa-label>
-            <aa-label id="view_start" size="m" text="Monday, Jul 21 - 29, 2024"></aa-label>          
+          <aa-hbox gap="s" style="margin: 0 0 0 16px;">
+            <aa-label id="view_start_label" text="from" style="--label-color: #8e8e8e;"></aa-label>
+            <aa-label id="view_start" style="--label-color: #8e8e8e;" text="Monday, Jul 21 - 29, 2024"></aa-label>          
           </aa-hbox>
-          <aa-hbox id="view_end_box" style="margin-top: 4px;">
-            <aa-label text="to" style="flex-grow: 0; margin: 0 4px 0 0;"></aa-label>            
-            <aa-label id="view_end" size="m" text="Monday, Jul 21 - 29, 2024"></aa-label>                      
+          <aa-hbox gap="s" id="view_end_box" style="margin: 8px 0 0 16px;">
+            <aa-label text="to" style="--label-color: #8e8e8e;"></aa-label>            
+            <aa-label id="view_end" style="--label-color: #8e8e8e;" text="Monday, Jul 21 - 29, 2024"></aa-label>                      
           </aa-hbox>
           <aa-spacer size="m"></aa-spacer>
           <aa-divider></aa-divider>
-          <aa-vbox id="view_url_box">
-            <aa-label id="view_url_label" size="m" text="URL"></aa-label>
-            <aa-link id="view_url_link" href="https://kevinhoyt.com" label="https://kevinhoyt.com" size="m"></aa-link>
+          <aa-vbox gap="m" id="view_url_box" style="margin: 8px 0 8px 16px;">
+            <aa-label id="view_url_label" text="URL"></aa-label>
+            <aa-link id="view_url_link" href="https://kevinhoyt.com" label="https://kevinhoyt.com"></aa-link>
           </aa-vbox>
           <aa-divider id="view_url_divider"></aa-divider>
-          <aa-vbox id="view_notes_box">
-            <aa-label id="view_notes" size="m" text="Notes"></aa-label>
-            <aa-label id="view_description" size="m" text="Some notes here."></aa-label>
+          <aa-vbox gap="m" id="view_notes_box" style="margin: 8px 0 8px 16px;">
+            <aa-label id="view_notes" text="Notes"></aa-label>
+            <aa-label id="view_description" style="--label-color: #8e8e8e;" text="Some notes here."></aa-label>
           </aa-vbox>
           <aa-divider id="view_notes_divider"></aa-divider>
           <aa-map id="view_map" style="border-radius: 4px; margin: 16px;"></aa-map>
-          <aa-divider id="view_map_divider"></aa-divider>          
-          <aa-button id="view_delete" label="Delete Event" style="margin-top: 8px;"></aa-button>
+          <aa-divider hidden id="view_map_divider"></aa-divider>          
+          <aa-button id="view_delete" label="Delete Event" style="margin: 4px 0 4px 0; --button-color: red;"></aa-button>
         </aa-vbox>
 
       </aa-stack>        
     </dialog>    
 
     <!-- Components -->
-    <script src="./awesome.js" type="module"></script>
+    <script src="./components.js" type="module"></script>
 
     <!-- Application -->
-    <script src="./aa.js"></script>
+    <script src="./awesome.js"></script>
 
   </body>
 </html>

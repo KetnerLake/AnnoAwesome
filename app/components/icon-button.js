@@ -9,7 +9,7 @@ export default class AAIconButton extends HTMLElement {
       <style>
         :host {
           box-sizing: border-box;
-          display: block;
+          display: inline;
           position: relative;
         } 
 
@@ -22,12 +22,7 @@ export default class AAIconButton extends HTMLElement {
         } 
 
         aa-icon {
-          --icon-color: var( --icon-button-color, #0082ff );
           --icon-cursor: pointer;
-        }
-
-        aa-icon::part( icon ) {
-          transition: color 0.25s linear;
         }
 
         button {
@@ -48,9 +43,8 @@ export default class AAIconButton extends HTMLElement {
           -webkit-tap-highlight-color: transparent;            
         }
 
-        :host( [disabled] ) aa-icon::part( icon ) {
-          cursor: not-allowed;
-          color: #b0b0b0;
+        :host( [disabled] ) aa-icon {
+          --icon-cursor: not-allowed;
         }
 
         :host( [disabled] ) button {
@@ -58,7 +52,7 @@ export default class AAIconButton extends HTMLElement {
         }
       </style>
       <button part="button" type="button">
-        <aa-icon></aa-icon>
+        <aa-icon part="icon"></aa-icon>
       </button>
     `;
 
@@ -77,10 +71,11 @@ export default class AAIconButton extends HTMLElement {
   // When things change
   _render() {
     this.$button.disabled = this.disabled;
-    this.$icon.name = this.icon;
-    this.$icon.filled = this.filled;
+    this.$icon.disabled = this.disabled;
+    this.$icon.flat = this.flat;
+    // this.$icon.inverted = this.inverted;
+    this.$icon.src = this.src;
     this.$icon.size = this.size;
-    this.$icon.weight = this.weight;
   }
 
   // Properties set before module loaded
@@ -97,11 +92,11 @@ export default class AAIconButton extends HTMLElement {
     this._upgrade( 'concealed' );                          
     this._upgrade( 'data' );                      
     this._upgrade( 'disabled' );                          
-    this._upgrade( 'filled' );                          
+    this._upgrade( 'flat' );                          
     this._upgrade( 'hidden' );                      
-    this._upgrade( 'icon' );                          
+    this._upgrade( 'inverted' );                          
     this._upgrade( 'size' );                              
-    this._upgrade( 'weight' );                          
+    this._upgrade( 'src' );                              
     this._render();
   }
 
@@ -110,11 +105,11 @@ export default class AAIconButton extends HTMLElement {
     return [
       'concealed',
       'disabled',
-      'filled',
+      'flat',
       'hidden',
-      'icon',
+      'inverted',
       'size',
-      'weight'
+      'src'      
     ];
   }
 
@@ -178,25 +173,25 @@ export default class AAIconButton extends HTMLElement {
     }
   }  
 
-  get filled() {
-    return this.hasAttribute( 'filled' );
+  get flat() {
+    return this.hasAttribute( 'flat' );
   }
 
-  set filled( value ) {
+  set flat( value ) {
     if( value !== null ) {
       if( typeof value === 'boolean' ) {
         value = value.toString();
       }
 
       if( value === 'false' ) {
-        this.removeAttribute( 'filled' );
+        this.removeAttribute( 'flat' );
       } else {
-        this.setAttribute( 'filled', '' );
+        this.setAttribute( 'flat', '' );
       }
     } else {
-      this.removeAttribute( 'filled' );
+      this.removeAttribute( 'flat' );
     }
-  }
+  }    
 
   get hidden() {
     return this.hasAttribute( 'hidden' );
@@ -218,19 +213,23 @@ export default class AAIconButton extends HTMLElement {
     }
   }   
 
-  get icon() {
-    if( this.hasAttribute( 'icon' ) ) {
-      return this.getAttribute( 'icon' );
-    }
-
-    return null;
+  get inverted() {
+    return this.hasAttribute( 'inverted' );
   }
 
-  set icon( value ) {
+  set inverted( value ) {
     if( value !== null ) {
-      this.setAttribute( 'icon', value );
+      if( typeof value === 'boolean' ) {
+        value = value.toString();
+      }
+
+      if( value === 'false' ) {
+        this.removeAttribute( 'inverted' );
+      } else {
+        this.setAttribute( 'inverted', '' );
+      }
     } else {
-      this.removeAttribute( 'icon' );
+      this.removeAttribute( 'inverted' );
     }
   }  
   
@@ -249,20 +248,20 @@ export default class AAIconButton extends HTMLElement {
       this.removeAttribute( 'size' );
     }
   }  
-  
-  get weight() {
-    if( this.hasAttribute( 'weight' ) ) {
-      return parseInt( this.getAttribute( 'weight' ) );
+
+  get src() {
+    if( this.hasAttribute( 'src' ) ) {
+      return this.getAttribute( 'src' );
     }
 
     return null;
   }
 
-  set weight( value ) {
+  set src( value ) {
     if( value !== null ) {
-      this.setAttribute( 'weight', value );
+      this.setAttribute( 'src', value );
     } else {
-      this.removeAttribute( 'weight' );
+      this.removeAttribute( 'src' );
     }
   }  
 }

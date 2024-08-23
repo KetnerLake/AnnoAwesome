@@ -26,8 +26,8 @@ export default class AAAttachment extends HTMLElement {
           box-sizing: border-box;
           color: #272727;
           cursor: pointer;
-          font-family: 'Source Sans 3', sans-serif;  
-          font-size: 17px;          
+          font-family: 'IBM Plex Sans', sans-serif;  
+          font-size: 16px;          
           height: 36px;
           line-height: 36px;
           margin: 0;
@@ -38,7 +38,7 @@ export default class AAAttachment extends HTMLElement {
           -webkit-tap-highlight-color: transparent;            
         }
       </style>
-      <button type="button">Add attachment...</button>
+      <button type="button"></button>
     `;
 
     // Private
@@ -47,10 +47,15 @@ export default class AAAttachment extends HTMLElement {
     // Root
     this.attachShadow( {mode: 'open'} );
     this.shadowRoot.appendChild( template.content.cloneNode( true ) );
+
+    // Elements
+    this.$button = this.shadowRoot.querySelector( 'button' );
   }
 
   // When things change
-  _render() {;}
+  _render() {
+    this.$button.innerText = this.label === null ? 'Add attachment...' : this.label;
+  }
 
   // Properties set before module loaded
   _upgrade( property ) {
@@ -66,6 +71,7 @@ export default class AAAttachment extends HTMLElement {
     this._upgrade( 'concealed' );                          
     this._upgrade( 'data' );                      
     this._upgrade( 'hidden' );                      
+    this._upgrade( 'label' );                      
     this._render();
   }
 
@@ -73,7 +79,8 @@ export default class AAAttachment extends HTMLElement {
   static get observedAttributes() {
     return [
       'concealed',
-      'hidden'
+      'hidden',
+      'label'
     ];
   }
 
@@ -134,6 +141,22 @@ export default class AAAttachment extends HTMLElement {
       }
     } else {
       this.removeAttribute( 'hidden' );
+    }
+  }   
+
+  get label() {
+    if( this.hasAttribute( 'label' ) ) {
+      return this.getAttribute( 'label' );
+    }
+
+    return null;
+  }
+
+  set label( value ) {
+    if( value !== null ) {
+      this.setAttribute( 'label', value );
+    } else {
+      this.removeAttribute( 'label' );
     }
   }   
 }

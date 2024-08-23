@@ -10,7 +10,7 @@ export default class AASearch extends HTMLElement {
       <style>
         :host {
           box-sizing: border-box;
-          display: inline-block;
+          display: inline;
           min-width: 200px;
           position: relative;
           width: 200px;
@@ -25,16 +25,25 @@ export default class AASearch extends HTMLElement {
         }
 
         aa-icon {
-          padding: 0 8px 0 8px;          
+          padding: 0 12px 0 12px;
+          --icon-color:             
+            invert( 55% ) 
+            sepia( 1% ) 
+            saturate( 0% ) 
+            hue-rotate( 157deg ) 
+            brightness( 92% ) 
+            contrast( 91% );            
           --icon-cursor: text;
         }
 
-        aa-icon-button {
-          --icon-button-color: #828282;
-        }
-
-        aa-icon-button::part( button ) {        
-          height: 34px;
+        aa-icon-button::part( icon ) {
+          --icon-color:             
+            invert( 55% ) 
+            sepia( 1% ) 
+            saturate( 0% ) 
+            hue-rotate( 157deg ) 
+            brightness( 92% ) 
+            contrast( 91% );
         }
 
         input {
@@ -42,54 +51,61 @@ export default class AASearch extends HTMLElement {
           background: none;
           border: none;
           box-sizing: border-box;
+          color: #272727;          
           flex-basis: 0;
           flex-grow: 1;
-          font-family: 'Source Sans 3', sans-serif;
-          font-size: 17px;
-          height: 34px;
-          line-height: 34px;          
+          font-family: 'IBM Plex Sans', sans-serif;
+          font-size: 16px;
+          height: 36px;
+          line-height: 36px;          
           margin: 0;
-          min-width: 0;
           outline: none;
           padding: 0;
           text-rendering: optimizeLegibility;
+          width: 0;
           -webkit-tap-highlight-color: transparent;
         }
 
         input::placeholder {
           color: #828282;
-          font-family: 'Source Sans 3', sans-serif;          
+          font-family: 'IBM Plex Sans', sans-serif;          
           opacity: 1.0;
         }
+
+        input:placeholder-shown ~ aa-icon-button {
+          display: none;
+        }        
 
         label {
           align-items: center;
           background-color: #e9e9e9;
           border: solid 1px transparent;
-          border-radius: 8px;
+          border-radius: 4px;
           box-sizing: border-box;
           cursor: text;
           display: flex;
           flex-direction: row;
-          width: 100%;
+          min-width: 200px;
           -webkit-tap-highlight-color: transparent;
         }
 
-        :host( [disabled] ) aa-icon::part( icon ),
+        :host( [disabled] ) aa-icon,
         :host( [disabled] ) input,
         :host( [disabled] ) label {
           cursor: not-allowed;
+          --icon-cursor: disabled;
         }
       </style>
       <label>
-        <aa-icon name="search" size="21" weight="300"></aa-icon>
-        <input type="text" />
-        <aa-icon-button filled hidden icon="cancel" size="21" weight="400"></aa-icon-button>
+        <aa-icon size="s" src="./img/search.svg"></aa-icon>
+        <input placeholder="Search" type="search" />
+        <aa-icon-button size="s" src="./img/close.svg"></aa-icon-button>
       </label>
     `;
 
     // Private
     this._data = null;
+    this._touch = ( 'ontouchstart' in document.documentElement ) ? true : false;    
 
     // Root
     this.attachShadow( {mode: 'open'} );
@@ -97,8 +113,13 @@ export default class AASearch extends HTMLElement {
 
     // Elements
     this.$clear = this.shadowRoot.querySelector( 'aa-icon-button' );
-    this.$clear.addEventListener( 'click', () => {
+    this.$clear.addEventListener( this._touch ? 'touchstart' : 'click', ( evt ) => {
+      evt.preventDefault();
+
       this.value = null;
+
+      this.$input.focus();
+      
       this.dispatchEvent( new CustomEvent( 'aa-change', {
         detail: {
           value: null
@@ -108,6 +129,7 @@ export default class AASearch extends HTMLElement {
     this.$input = this.shadowRoot.querySelector( 'input' );
     this.$input.addEventListener( 'keyup', () => {
       this.value = this.$input.value.trim().length === 0 ? null : this.$input.value;
+      
       this.dispatchEvent( new CustomEvent( 'aa-change', {
         detail: {
           value: this.value
@@ -121,7 +143,6 @@ export default class AASearch extends HTMLElement {
     this.$input.disabled = this.disabled;
     this.$input.placeholder = this.placeholder === null ? 'Search' : this.placeholder;
     this.$input.value = this.value === null ? '' : this.value;
-    this.$clear.hidden = this.value === null ? true : false;
   }
 
   // Promote properties

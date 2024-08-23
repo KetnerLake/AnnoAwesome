@@ -9,9 +9,10 @@ export default class AADivider extends HTMLElement {
           background-color: #e5e5e5;
           box-sizing: border-box;
           display: block;
-          margin: 0;
+          margin: 0 0 0 16px;
           min-height: 1px;          
           position: relative;
+          width: calc( 100% - 16px );
         } 
 
         :host( [concealed] ) {

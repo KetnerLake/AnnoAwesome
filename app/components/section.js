@@ -1,4 +1,8 @@
-export default class AAHBox extends HTMLElement {
+import AAHBox from "./hbox.js";
+import AALabel from "./label.js";
+import AAVBox from "./vbox.js";
+
+export default class AASection extends HTMLElement {
   constructor() {
     super();
 
@@ -8,7 +12,7 @@ export default class AAHBox extends HTMLElement {
         :host {
           box-sizing: border-box;
           display: flex;
-          flex-direction: row;
+          flex-direction: column;
           position: relative;
         }
 
@@ -20,40 +24,28 @@ export default class AAHBox extends HTMLElement {
           display: none;
         }
 
-        :host( [centered] ) {
-          align-items: center;
+        aa-vbox {
+          background-color: #ffffff;
+          border-radius: 4px;
         }
 
-        :host( [justified] ) {
-          justify-content: center;
+        ::slotted( aa-button ) {
+          --button-text-align: left;
         }
 
-        :host( [flex] ) {
-          flex-basis: 0;
-          flex-grow: 1;
+        :host( :not( [notes] ) ) aa-label[part=notes],
+        :host( :not( [title] ) ) aa-label[part=title] {
+          display: none;
         }
-
-        :host( [gap=xs] ) {
-          gap: 2px;
-        }
-
-        :host( [gap=s] ) {
-          gap: 4px;
-        }       
-        
-        :host( [gap=m] ) {
-          gap: 8px;
-        }       
-        
-        :host( [gap=l] ) {
-          gap: 16px;
-        }        
-
-        :host( [gap=xl] ) {
-          gap: 32px;
-        }        
       </style>
-      <slot></slot>
+      <aa-hbox>
+        <aa-label part="title"></aa-label>
+        <slot name="count"></slot>
+      </aa-hbox>
+      <aa-vbox>
+        <slot></slot>      
+      </aa-vbox>
+      <aa-label part="notes"></aa-label>
     `;
 
     // Private
@@ -62,10 +54,17 @@ export default class AAHBox extends HTMLElement {
     // Root
     this.attachShadow( {mode: 'open'} );
     this.shadowRoot.appendChild( template.content.cloneNode( true ) );
+
+    // Elements
+    this.$title = this.shadowRoot.querySelector( 'aa-label[part=title]' );
+    this.$notes = this.shadowRoot.querySelector( 'aa-label[part=notes]' );
   }
 
    // When attributes change
-  _render() {;}
+  _render() {
+    this.$title.text = this.title;
+    this.$notes.text = this.notes;
+  }
 
   // Promote properties
   // Values may be set before module load
@@ -79,23 +78,21 @@ export default class AAHBox extends HTMLElement {
 
   // Setup
   connectedCallback() {
-    this._upgrade( 'centered' );  
     this._upgrade( 'concealed' );  
     this._upgrade( 'data' );      
-    this._upgrade( 'gap' );            
-    this._upgrade( 'hidden' );    
-    this._upgrade( 'justified' );      
+    this._upgrade( 'hidden' );  
+    this._upgrade( 'notes' );  
+    this._upgrade( 'title' );      
     this._render();
   }
 
   // Watched attributes
   static get observedAttributes() {
     return [
-      'centered',
       'concealed',
-      'gap',      
       'hidden',
-      'justified'
+      'notes',
+      'title'
     ];
   }
 
@@ -119,26 +116,6 @@ export default class AAHBox extends HTMLElement {
   // Attributes
   // Reflected
   // Boolean, Number, String, null
-  get centered() {
-    return this.hasAttribute( 'centered' );
-  }
-
-  set centered( value ) {
-    if( value !== null ) {
-      if( typeof value === 'boolean' ) {
-        value = value.toString();
-      }
-
-      if( value === 'false' ) {
-        this.removeAttribute( 'centered' );
-      } else {
-        this.setAttribute( 'centered', '' );
-      }
-    } else {
-      this.removeAttribute( 'centered' );
-    }
-  }
-
   get concealed() {
     return this.hasAttribute( 'concealed' );
   }
@@ -157,23 +134,7 @@ export default class AAHBox extends HTMLElement {
     } else {
       this.removeAttribute( 'concealed' );
     }
-  }  
-
-  get gap() {
-    if( this.hasAttribute( 'gap' ) ) {
-      return this.getAttribute( 'gap' );
-    }
-
-    return null;
   }
-
-  set gap( value ) {
-    if( value !== null ) {
-      this.setAttribute( 'gap', value );
-    } else {
-      this.removeAttribute( 'gap' );
-    }
-  }   
 
   get hidden() {
     return this.hasAttribute( 'hidden' );
@@ -195,25 +156,37 @@ export default class AAHBox extends HTMLElement {
     }
   }   
 
-  get justified() {
-    return this.hasAttribute( 'justified' );
+  get notes() {
+    if( this.hasAttribute( 'notes' ) ) {
+      return this.getAttribute( 'notes' );
+    }
+
+    return null;
   }
 
-  set justified( value ) {
+  set notes( value ) {
     if( value !== null ) {
-      if( typeof value === 'boolean' ) {
-        value = value.toString();
-      }
-
-      if( value === 'false' ) {
-        this.removeAttribute( 'justified' );
-      } else {
-        this.setAttribute( 'justified', '' );
-      }
+      this.setAttribute( 'notes', value );
     } else {
-      this.removeAttribute( 'justified' );
+      this.removeAttribute( 'notes' );
     }
-  }  
+  }   
+
+  get title() {
+    if( this.hasAttribute( 'title' ) ) {
+      return this.getAttribute( 'title' );
+    }
+
+    return null;
+  }
+
+  set title( value ) {
+    if( value !== null ) {
+      this.setAttribute( 'title', value );
+    } else {
+      this.removeAttribute( 'title' );
+    }
+  }     
 }
 
-window.customElements.define( 'aa-hbox', AAHBox );
+window.customElements.define( 'aa-section', AASection );

@@ -8,10 +8,8 @@ export default class AAInput extends HTMLElement {
     template.innerHTML = /* template */ `
       <style>
         :host {
-          align-items: center;
           box-sizing: border-box;
-          display: flex;
-          flex-direction: row;
+          display: inline;
           position: relative;
         } 
 
@@ -24,7 +22,22 @@ export default class AAInput extends HTMLElement {
         } 
 
         aa-icon-button {
-          --icon-button-color: #c6c6c6;
+          /*
+          --icon-color: 
+            invert( 55% ) 
+            sepia( 1% ) 
+            saturate( 0% ) 
+            hue-rotate( 157deg ) 
+            brightness( 92% ) 
+            contrast( 91% );  
+          */
+          --icon-color: 
+            invert( 76% ) 
+            sepia( 0% ) 
+            saturate( 107% ) 
+            hue-rotate( 140deg ) 
+            brightness( 83% ) 
+            contrast( 90% );
         }
 
         input {
@@ -33,8 +46,10 @@ export default class AAInput extends HTMLElement {
           border: none;
           box-sizing: border-box;
           color: #272727;
-          font-family: 'Source Sans 3', sans-serif;  
-          font-size: 17px;
+          flex-basis: 0;
+          flex-grow: 1;
+          font-family: 'IBM Plex Sans', sans-serif;  
+          font-size: 16px;
           height: 36px;
           line-height: 36px;
           margin: 0;
@@ -47,18 +62,25 @@ export default class AAInput extends HTMLElement {
 
         input::placeholder {
           color: #c6c6c6;
+          font-family: 'IBM Plex Sans', sans-serif;            
           opacity: 1.0;
         }
 
-        :host( [value]:focus-within ) aa-icon-button {
-          display: block;
+        input:placeholder-shown ~ aa-icon-button,
+        input:placeholder-shown ~ aa-icon-button {
+          display: none;
+        }                
+
+        label {
+          align-items: center;
+          box-sizing: border-box;
+          cursor: text;
+          display: flex;
+          flex-direction: row;
+          -webkit-tap-highlight-color: transparent;
         }
 
         :host( [value]:not( :focus-within ) ) aa-icon-button {
-          display: none;
-        }
-
-        :host( :not( [value] ) ) aa-icon-button {
           display: none;
         }
 
@@ -66,9 +88,11 @@ export default class AAInput extends HTMLElement {
           display: none;
         }
       </style>
-      <input type="text" />
-      <aa-icon-button icon="visibility_off" part="visibility" size="21" weight="400"></aa-icon-button>      
-      <aa-icon-button filled icon="cancel" part="clear" size="21" weight="400"></aa-icon-button>
+      <label part="label">
+        <input part="input" type="text" />
+        <aa-icon-button part="visibility" size="s" src="./img/eye-slash-fill.svg"></aa-icon-button>
+        <aa-icon-button part="clear" size="s" src="./img/close.svg"></aa-icon-button>
+      </label>      
     `;
 
     // Private
@@ -81,7 +105,7 @@ export default class AAInput extends HTMLElement {
 
     // Elements
     this.$clear = this.shadowRoot.querySelector( 'aa-icon-button[part=clear]' );
-    this.$clear.addEventListener( this._touch ? 'touchstart' : 'mousedown', ( evt ) => {
+    this.$clear.addEventListener( this._touch ? 'touchstart' : 'click', ( evt ) => {
       evt.preventDefault();
 
       this.value = null
@@ -106,13 +130,13 @@ export default class AAInput extends HTMLElement {
       } ) );
     } );
     this.$visibility = this.shadowRoot.querySelector( 'aa-icon-button[part=visibility]' );
-    this.$visibility.addEventListener( this._touch ? 'touchstart' : 'mousedown', ( evt ) => {
+    this.$visibility.addEventListener( this._touch ? 'touchstart' : 'click', ( evt ) => {
       evt.preventDefault();
 
-      this.$input.type = this.$visibility.icon === 'visibility_off' ? 'text' : 'password';
+      this.$input.type = this.$visibility.src === './img/eye-slash-fill.svg' ? 'text' : 'password';
       this.focus();      
 
-      this.$visibility.icon = this.$visibility.icon === 'visibility_off' ? 'visibility' : 'visibility_off';      
+      this.$visibility.src = this.$visibility.src === './img/eye-slash-fill.svg' ? './img/eye-fill.svg' : './img/eye-slash-fill.svg';      
     } );
   }
 

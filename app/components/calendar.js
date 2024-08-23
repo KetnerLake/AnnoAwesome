@@ -1,3 +1,7 @@
+import AAHBox from "./hbox.js";
+import AAIconButton from "./icon-button.js";
+import AALabel from "./label.js";
+
 export default class AACalendar extends HTMLElement {
   constructor() {
     super();
@@ -19,74 +23,28 @@ export default class AACalendar extends HTMLElement {
           display: none;
         } 
 
-        div[part=days] {
-          box-sizing: border-box;
-          display: flex;
-          flex-direction: row;
+        aa-hbox[part=days] {
           padding: 0 16px 0 16px;
         }
 
-        div[part=days] p {
-          box-sizing: border-box;
-          color: #c6c6c6;
+        aa-hbox[part=days] aa-label {
           flex-basis: 0;
           flex-grow: 1;
-          font-size: 14px;
-          line-height: 36px;
-          margin: 0;
-          padding: 0;
-          text-align: center;
-          text-rendering: optimizeLegibility;          
-          text-transform: uppercase;
+          --label-color: #c6c6c6;
+          --label-font-size: 14px;
+          --label-line-height: 36px;          
+          --label-text-align: center;
+          --label-text-transform: uppercase;          
         }
 
-        div[part=header] {
-          align-items: center;
-          box-sizing: border-box;
-          display: flex;
-          flex-direction: row;
-          gap: 8px;
+        aa-hbox[part=header] {
           padding: 8px 16px 0 16px;
         }
 
-        div[part=header] button {
-          appearance: none;
-          background: none;
-          border: none;
-          border-radius: 4px;
-          box-sizing: border-box;
-          color: #0082ff;
-          cursor: pointer;
-          font-family: 'Material Symbols Outlined';
-          font-size: 34px;
-          font-style: normal;
-          font-variation-settings:
-            'FILL' 0,
-            'wght' 200,
-            'GRAD' 0,
-            'opsz' 20;
-          font-weight: normal;              
-          height: 36px;
-          line-height: 36px;
-          margin: 0;
-          padding: 0;
-          text-align: center;
-          text-rendering: optimizeLegibility;
-          width: 36px;
-          -webkit-tap-highlight-color: transparent;
-        }
-
-        div[part=header] p {
-          color: #272727;
+        aa-hbox[part=header] aa-label {
           flex-basis: 0;
-          flex-grow: 1; 
-          font-family: 'Source Sans 3', sans-serif;            
-          font-size: 17px;
-          font-weight: 600;
-          margin: 0;
-          padding: 0;
-          text-rendering: optimizeLegibility;          
-        }
+          flex-grow: 1;
+        }        
 
         div[part=month] {
           box-sizing: border-box;
@@ -103,8 +61,8 @@ export default class AACalendar extends HTMLElement {
           border-radius: 36px;
           box-sizing: border-box;
           cursor: pointer;
-          font-family: 'Source Sans 3', sans-serif;            
-          font-size: 17px;          
+          font-family: 'IBM Plex Sans', sans-serif;            
+          font-size: 16px;          
           height: 36px;
           line-height: 36px;
           margin: 0;
@@ -136,20 +94,20 @@ export default class AACalendar extends HTMLElement {
           font-weight: 600;                    
         }
       </style>
-      <div part="header">
-        <p></p>
-        <button class="icon" type="button">chevron_left</button>
-        <button class="icon" type="button">chevron_right</button>        
-      </div>
-      <div part="days">
-        <p>Sun</p>
-        <p>Mon</p>
-        <p>Tue</p>
-        <p>Wed</p>
-        <p>Thu</p>
-        <p>Fri</p>
-        <p>Sat</p>        
-      </div>
+      <aa-hbox centered gap="m" part="header">
+        <aa-label weight="bold"></aa-label>
+        <aa-icon-button src="./img/chevron-left.svg"></aa-icon-button>
+        <aa-icon-button src="./img/chevron-right.svg"></aa-icon-button>
+      </aa-hbox>
+      <aa-hbox part="days">
+        <aa-label text="Sun"></aa-label>
+        <aa-label text="Mon"></aa-label>
+        <aa-label text="Tue"></aa-label>
+        <aa-label text="Wed"></aa-label>
+        <aa-label text="Thu"></aa-label>
+        <aa-label text="Fri"></aa-label>                
+        <aa-label text="Sat"></aa-label>        
+      </aa-hbox>
       <div part="month"></div>
     `;
 
@@ -165,7 +123,7 @@ export default class AACalendar extends HTMLElement {
     this.shadowRoot.appendChild( template.content.cloneNode( true ) );
 
     // Elements
-    this.$header = this.shadowRoot.querySelector( 'div[part=header] p' );
+    this.$header = this.shadowRoot.querySelector( 'aa-hbox[part=header] aa-label' );
     this.$month = this.shadowRoot.querySelector( 'div[part=month]' );
   }
 
@@ -189,6 +147,9 @@ export default class AACalendar extends HTMLElement {
     this.valueAsDate = selected;
 
     this.dispatchEvent( new CustomEvent( 'aa-change', {
+      bubbles: true,
+      cancelable: false,
+      composed: true,
       detail: {
         value: this.valueAsDate
       } 
@@ -215,7 +176,7 @@ export default class AACalendar extends HTMLElement {
     const formatted = new Intl.DateTimeFormat( navigator.language, {
       month: 'long'
     } ).format( displayed );    
-    this.$header.innerText = `${formatted} ${displayed.getFullYear()}`;
+    this.$header.text = `${formatted} ${displayed.getFullYear()}`;
 
     const calendar = new Date(
       displayed.getFullYear(),

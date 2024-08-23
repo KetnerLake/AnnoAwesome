@@ -20,6 +20,14 @@ export default class AAVBox extends HTMLElement {
           display: none;
         }
 
+        :host( [centered] ) {
+          align-items: center;
+        }
+
+        :host( [justified] ) {
+          justify-content: center;
+        }
+
         :host( [flex] ) {
           flex-basis: 0;
           flex-grow: 1;
@@ -71,19 +79,23 @@ export default class AAVBox extends HTMLElement {
 
   // Setup
   connectedCallback() {
+    this._upgrade( 'centered' );      
     this._upgrade( 'concealed' );  
     this._upgrade( 'data' );      
     this._upgrade( 'gap' );        
-    this._upgrade( 'hidden' );    
+    this._upgrade( 'hidden' );  
+    this._upgrade( 'justified' );        
     this._render();
   }
 
   // Watched attributes
   static get observedAttributes() {
     return [
+      'centered',
       'concealed',
       'gap',      
-      'hidden'
+      'hidden',
+      'justified'
     ];
   }
 
@@ -107,6 +119,26 @@ export default class AAVBox extends HTMLElement {
   // Attributes
   // Reflected
   // Boolean, Number, String, null
+  get centered() {
+    return this.hasAttribute( 'centered' );
+  }
+
+  set centered( value ) {
+    if( value !== null ) {
+      if( typeof value === 'boolean' ) {
+        value = value.toString();
+      }
+
+      if( value === 'false' ) {
+        this.removeAttribute( 'centered' );
+      } else {
+        this.setAttribute( 'centered', '' );
+      }
+    } else {
+      this.removeAttribute( 'centered' );
+    }
+  }
+
   get concealed() {
     return this.hasAttribute( 'concealed' );
   }
@@ -162,6 +194,26 @@ export default class AAVBox extends HTMLElement {
       this.removeAttribute( 'hidden' );
     }
   }   
+
+  get justified() {
+    return this.hasAttribute( 'justified' );
+  }
+
+  set justified( value ) {
+    if( value !== null ) {
+      if( typeof value === 'boolean' ) {
+        value = value.toString();
+      }
+
+      if( value === 'false' ) {
+        this.removeAttribute( 'justified' );
+      } else {
+        this.setAttribute( 'justified', '' );
+      }
+    } else {
+      this.removeAttribute( 'justified' );
+    }
+  }    
 }
 
 window.customElements.define( 'aa-vbox', AAVBox );

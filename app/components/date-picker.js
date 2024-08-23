@@ -42,8 +42,8 @@ export default class AADatePicker extends HTMLElement {
 
         span {
           color: #272727;
-          font-family: 'Source Sans 3', sans-serif;  
-          font-size: 17px;
+          font-family: 'IBM Plex Sans', sans-serif;  
+          font-size: 16px;
           text-rendering: optimizeLegibility;          
         }
 
@@ -69,6 +69,11 @@ export default class AADatePicker extends HTMLElement {
         :host( :not( [open] ) ) aa-calendar {
           display: none;
         }
+
+        :host( [invalid] ) span[part=value] {
+          color: red;
+          text-decoration: line-through;
+        }
       </style>
       <button part="button" type="button">
         <span part="label"></span>
@@ -87,7 +92,15 @@ export default class AADatePicker extends HTMLElement {
 
     // Elements
     this.$button = this.shadowRoot.querySelector( 'button' );
-    this.$button.addEventListener( 'click', () => this.open = !this.open );
+    this.$button.addEventListener( 'click', () => {
+      this.open = !this.open
+
+      this.dispatchEvent( new CustomEvent( 'aa-open', {
+        detail: {
+          open: this.open
+        }
+      } ) );
+    } );
     this.$calendar = this.shadowRoot.querySelector( 'aa-calendar' );
     this.$calendar.addEventListener( 'aa-change', ( evt ) => {
       this.valueAsDate = evt.detail.value;
@@ -124,6 +137,7 @@ export default class AADatePicker extends HTMLElement {
     this._upgrade( 'concealed' );                              
     this._upgrade( 'data' );                          
     this._upgrade( 'hidden' );                      
+    this._upgrade( 'invalid' );                          
     this._upgrade( 'label' );                          
     this._upgrade( 'open' );                              
     this._upgrade( 'value' );                              
@@ -136,6 +150,7 @@ export default class AADatePicker extends HTMLElement {
     return [
       'concealed',
       'hidden',
+      'invalid',
       'label',
       'open',
       'value'
@@ -213,7 +228,27 @@ export default class AADatePicker extends HTMLElement {
     } else {
       this.removeAttribute( 'hidden' );
     }
-  }   
+  }
+  
+  get invalid() {
+    return this.hasAttribute( 'invalid' );
+  }
+
+  set invalid( value ) {
+    if( value !== null ) {
+      if( typeof value === 'boolean' ) {
+        value = value.toString();
+      }
+
+      if( value === 'false' ) {
+        this.removeAttribute( 'invalid' );
+      } else {
+        this.setAttribute( 'invalid', '' );
+      }
+    } else {
+      this.removeAttribute( 'invalid' );
+    }
+  }  
 
   get label() {
     if( this.hasAttribute( 'label' ) ) {

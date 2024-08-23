@@ -7,8 +7,7 @@ export default class AALabel extends HTMLElement {
       <style>
         :host {
           box-sizing: border-box;
-          display: flex;
-          flex-direction: row;
+          display: inline;
           position: relative;
         }
 
@@ -23,8 +22,8 @@ export default class AALabel extends HTMLElement {
         p {
           color: var( --label-color, #272727 );
           cursor: var( --label-cursor, default );
-          font-family: 'Source Sans 3', sans-serif;
-          font-size: 16px;
+          font-family: 'IBM Plex Sans', sans-serif;
+          font-size: var( --label-font-size, 16px );
           font-weight: var( --label-font-weight, 400 );
           line-height: var( --label-line-height, 16px );
           margin: 0;
@@ -37,6 +36,15 @@ export default class AALabel extends HTMLElement {
 
         :host( [balanced] ) {
           text-wrap: balance;
+        }
+
+        :host( [inverted] ) p {
+          color: #ffffff;
+        }
+
+        :host( [size=xs] ) p {
+          font-size: 12px;
+          line-height: 12px;          
         }
 
         :host( [size=s] ) p {
@@ -55,8 +63,8 @@ export default class AALabel extends HTMLElement {
         }                
 
         :host( [size=xl] ) p {
-          font-size: 34px;
-          line-height: 34px;
+          font-size: 32px;
+          line-height: 32px;
         }        
 
         :host( [weight=bold] ) p {
@@ -98,6 +106,7 @@ export default class AALabel extends HTMLElement {
     this._upgrade( 'concealed' );  
     this._upgrade( 'data' );      
     this._upgrade( 'hidden' );    
+    this._upgrade( 'inverted' );    
     this._upgrade( 'size' );        
     this._upgrade( 'text' );            
     this._upgrade( 'weight' );                
@@ -110,6 +119,7 @@ export default class AALabel extends HTMLElement {
       'balanced',
       'concealed',
       'hidden',
+      'inverted',
       'size',
       'text',
       'weight'
@@ -195,6 +205,26 @@ export default class AALabel extends HTMLElement {
       this.removeAttribute( 'hidden' );
     }
   }   
+
+  get inverted() {
+    return this.hasAttribute( 'inverted' );
+  }
+
+  set inverted( value ) {
+    if( value !== null ) {
+      if( typeof value === 'boolean' ) {
+        value = value.toString();
+      }
+
+      if( value === 'false' ) {
+        this.removeAttribute( 'inverted' );
+      } else {
+        this.setAttribute( 'inverted', '' );
+      }
+    } else {
+      this.removeAttribute( 'inverted' );
+    }
+  }  
 
   get size() {
     if( this.hasAttribute( 'size' ) ) {

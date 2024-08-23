@@ -32,8 +32,8 @@ export default class AADay extends HTMLElement {
           border-radius: 32px;
           box-sizing: border-box;
           color: #272727;
-          font-family: 'Source Sans 3', sans-serif;
-          font-size: 17px;
+          font-family: 'IBM Plex Sans', sans-serif;
+          font-size: 16px;
           font-weight: 400;
           height: 30px;
           line-height: 30px;

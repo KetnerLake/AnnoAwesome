@@ -34,8 +34,9 @@ export default class AAStack extends HTMLElement {
   _render() {
     const index = this.selectedIndex === null ? 0 : this.selectedIndex;
 
-    for( let c = 0; c < this.children.length; c++ )
+    for( let c = 0; c < this.children.length; c++ ) {
       this.children[c].hidden = index === c ? false : true;
+    }
   }
 
   // Promote properties
