@@ -9,7 +9,7 @@ export default class AACheckbox extends HTMLElement {
       <style>
         :host {
           box-sizing: border-box;
-          display: inline-block;
+          display: inherit;
           height: 22px;
           min-height: 22px;
           position: relative;
@@ -24,7 +24,13 @@ export default class AACheckbox extends HTMLElement {
         } 
 
         aa-icon {
-          --icon-color: #0082ff;
+          --icon-color:
+            invert( 30% ) 
+            sepia( 94% ) 
+            saturate( 1956% ) 
+            hue-rotate( 196deg ) 
+            brightness( 103% ) 
+            contrast( 104% ); 
           --icon-cursor: pointer;
         }
 
@@ -40,7 +46,7 @@ export default class AACheckbox extends HTMLElement {
         }
       </style>
       <button part="button" type="button">
-        <aa-icon size="22"></aa-icon>      
+        <aa-icon></aa-icon>      
       </button>
     `;
 
@@ -59,7 +65,7 @@ export default class AACheckbox extends HTMLElement {
 
    // When attributes change
   _render() {
-    this.$icon.name = this.checked ? 'check_circle' : 'radio_button_unchecked';
+    this.$icon.src = './img/' + ( this.checked ? 'check-circle-fill.svg' : 'circle.svg' );
     this.$icon.filled = this.checked;
     this.$icon.weight = this.checked ? 400 : null;
   }

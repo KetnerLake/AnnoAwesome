@@ -7,7 +7,7 @@ export default class AAList extends HTMLElement {
       <style>
         :host {
           box-sizing: border-box;
-          display: inline-block;
+          display: block;
           overflow: auto;
           position: relative;
         }

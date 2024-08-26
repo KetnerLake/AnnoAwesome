@@ -30,6 +30,7 @@ const pnlLeft = document.querySelector( '#drawer_left' );
 const stkLeft = document.querySelector( '#left_stack' );
 const lstCalendars = document.querySelector( '#drawer_calendars' );
 const lstEvents = document.querySelector( '#drawer_events' );
+const btnCalendarsAdd = document.querySelector( '#drawer_add' );
 const pnlRight = document.querySelector( '#drawer_right' );
 const lstSearch = document.querySelector( '#drawer_search' );
 
@@ -54,6 +55,9 @@ const btnAccountDemo = document.querySelector( '#account_demo' );
 // Details
 const dlgDetails = document.querySelector( '#details' );
 const stkDetails = document.querySelector( '#details_stack' );
+
+// Calendar
+const dlgCalendar = document.querySelector( '#calendar' );
 
 // Form
 const btnFormCancel = document.querySelector( '#form_cancel' );
@@ -104,17 +108,31 @@ btnHeaderWizard.addEventListener( TOUCH, () => {
 
 // Header
 btnHeaderAccount.addEventListener( TOUCH, () => {
+  txtHeaderSearch.value = null;
+  btnHeaderCancel.hidden = true;
+  lstSearch.data = null;
+  pnlRight.hidden = true;
+  calYear.data = events;
+  summarize( events.length );
+
   blocker( true );
+
   dlgAccount.showModal();
   txtAccountEmail.focus();
 } );
 
 btnHeaderAdd.addEventListener( TOUCH, () => {
+  txtHeaderSearch.value = null;
+  btnHeaderCancel.hidden = true;
+  lstSearch.data = null;
+  pnlRight.hidden = true;
+  calYear.data = events;
+  summarize( events.length );
+
   stkDetails.selectedIndex = 0;
   resetForm();
   blocker( true );
   dlgDetails.removeAttribute( 'data-id' );
-  // dlgDetails.open = true;
   dlgDetails.showModal();
   txtFormTitle.focus();
 } );
@@ -122,12 +140,19 @@ btnHeaderAdd.addEventListener( TOUCH, () => {
 btnHeaderCalendars.addEventListener( TOUCH, () => {
   txtHeaderSearch.value = null;  
   btnHeaderCancel.hidden = true;
+  lstSearch.data = null;
   pnlRight.hidden = true;
+  calYear.events = events;
+  summarize( events.length );
+
+  btnHeaderList.toggle = false;
 
   if( !pnlLeft.hidden && stkLeft.selectedIndex === 0 ) {
+    btnHeaderCalendars.toggle = false;
     pnlLeft.hidden = true;
     stkLeft.selectedIndex = 0;
   } else {
+    btnHeaderCalendars.toggle = true;    
     stkLeft.selectedIndex = 0;    
     pnlLeft.hidden = false;
   }
@@ -137,20 +162,27 @@ btnHeaderCancel.addEventListener( TOUCH, () => {
   txtHeaderSearch.value = null;
   btnHeaderCancel.hidden = true;
   pnlRight.hidden = true;
-  calYear.data = events;
   lstSearch.data = null;
+  calYear.data = events;
   summarize( events.length );
 } );
 
 btnHeaderList.addEventListener( TOUCH, () => {
   txtHeaderSearch.value = null;
   btnHeaderCancel.hidden = true;  
+  lstSearch.data = null;
   pnlRight.hidden = true;
+  calYear.data = events;
+  summarize( events.length );
+
+  btnHeaderCalendars.toggle = false;
 
   if( !pnlLeft.hidden && stkLeft.selectedIndex === 1 ) {
+    btnHeaderList.toggle = false;
     pnlLeft.hidden = true;
     stkLeft.selectedIndex = 1;
   } else {
+    btnHeaderList.toggle = true;
     stkLeft.selectedIndex = 1;    
     pnlLeft.hidden = false;
   }
@@ -205,6 +237,15 @@ btnHeaderToday.addEventListener( TOUCH, () => {
   } );  
 } );
 
+txtHeaderSearch.addEventListener( 'focus', () => {
+  pnlLeft.hidden = true;
+  pnlRight.hidden = false;
+  btnHeaderCancel.hidden = false;
+
+  lstSearch.data = events;
+  summarize( events.length );
+} );
+
 txtHeaderSearch.addEventListener( 'aa-change', ( evt ) => {
   if( txtHeaderSearch.value === null ) {
     calYear.data = events;
@@ -231,10 +272,6 @@ txtHeaderSearch.addEventListener( 'aa-change', ( evt ) => {
   calYear.data = filtered;
   lstSearch.data = filtered;
   summarize( filtered.length );
-  
-  pnlLeft.hidden = true;
-  pnlRight.hidden = false;
-  btnHeaderCancel.hidden = false;
 } );
 
 // Account
@@ -321,6 +358,8 @@ btnFormAdd.addEventListener( TOUCH, () => {
 
     if( session === null ) {
       events.push( buildEvent() );
+      sortEvents();
+
       calYear.data = events;
       lstEvents.data = events;
       summarize( events.length );
@@ -329,6 +368,7 @@ btnFormAdd.addEventListener( TOUCH, () => {
       addEvent( buildEvent() )
       .then( ( data ) => {
         events.push( data );
+        sortEvents();
   
         calYear.data = events;
         lstEvents.data = events;
@@ -354,6 +394,12 @@ calFormEnds.addEventListener( 'aa-open', ( evt ) => {
   calFormStarts.open = false;
 } );
 
+calFormStarts.addEventListener( 'aa-change', ( evt ) => {
+  if( calFormStarts.valueAsDate.getTime() > calFormEnds.valueAsDate.getTime() ) {
+    calFormEnds.valueAsDate = new Date( calFormStarts.valueAsDate.getTime() );
+  }
+} );
+
 calFormStarts.addEventListener( 'aa-open', ( evt ) => {
   calFormEnds.open = false;
 } );
@@ -377,7 +423,6 @@ btnViewDelete.addEventListener( TOUCH, () => {
     lstEvents.data = events;
     blocker( false );
     dlgDetails.close();
-    // dlgDetails.open = false;
     dlgDetails.removeAttribute( 'data-id' );
 
     summarize( events.length );    
@@ -391,7 +436,6 @@ btnViewDelete.addEventListener( TOUCH, () => {
       lstEvents.data = events;
       blocker( false );
       dlgDetails.close();
-      // dlgDetails.open = false;
       dlgDetails.removeAttribute( 'data-id' );
   
       summarize( events.length );
@@ -409,6 +453,17 @@ btnViewEdit.addEventListener( TOUCH, () => {
   btnFormAdd.label = 'Done';
   stkDetails.selectedIndex = 0;
   dlgDetails.classList.add( 'transparent' );
+} );
+
+// Drawers
+btnCalendarsAdd.addEventListener( TOUCH, () => {
+
+} );
+
+lstCalendars.addEventListener( 'aa-info', ( evt ) => {
+  console.log( evt.detail.id ); 
+  blocker( true );
+  dlgCalendar.showModal();
 } );
 
 // Calendar
@@ -609,6 +664,28 @@ function resetForm() {
   calFormEnds.open = false;  
   txtFormUrl.value = null;
   txtFormNotes.value = null;
+}
+
+function sortEvents() {
+  events.sort( ( a, b ) => {
+    let parts = a.startsAt.split( '-' );
+    const startsA = new Date(
+      parseInt( parts[0] ),
+      parseInt( parts[1] ) - 1,
+      parseInt( parts[2] )
+    );
+    
+    parts = b.startsAt.split( '-' );
+    const startsB = new Date(
+      parseInt( parts[0] ),
+      parseInt( parts[1] ) - 1,
+      parseInt( parts[2] )
+    );    
+
+    if( startsA.getTime() < startsB.getTime() ) return -1;
+    if( startsA.getTime() > startsB.getTime() ) return 1;
+    return 0;
+  } );
 }
 
 function summarize( count = null ) {

@@ -21,7 +21,7 @@ export default class AAButton extends HTMLElement {
 
         button {
           appearance: none;
-          background: none;
+          background: var( --button-background, none );
           border: none;
           border-radius: 4px;
           box-sizing: border-box;

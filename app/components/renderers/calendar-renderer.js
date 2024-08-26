@@ -30,7 +30,13 @@ export default class AACalendarRenderer extends HTMLElement {
         }
 
         aa-icon-button {
-          --icon-color: #0082ff;
+          --icon-color:
+            invert( 30% ) 
+            sepia( 94% ) 
+            saturate( 1956% ) 
+            hue-rotate( 196deg ) 
+            brightness( 103% ) 
+            contrast( 104% );          
         }
 
         aa-label {
@@ -40,11 +46,12 @@ export default class AACalendarRenderer extends HTMLElement {
       </style>
       <aa-checkbox></aa-checkbox>
       <aa-label part="label" size="m"></aa-label>
-      <aa-icon-button icon="info" part="info" size="24"></aa-icon-button>
+      <aa-icon-button part="info" src="./img/info-circle.svg"></aa-icon-button>
     `;
 
     // Private
     this._data = null;
+    this._touch = ( 'ontouchstart' in document.documentElement ) ? true : false;
 
     // Root
     this.attachShadow( {mode: 'open'} );
@@ -53,6 +60,17 @@ export default class AACalendarRenderer extends HTMLElement {
     // Elements
     this.$checkbox = this.shadowRoot.querySelector( 'aa-checkbox' );
     this.$label = this.shadowRoot.querySelector( 'aa-label' );
+    this.$info = this.shadowRoot.querySelector( 'aa-icon-button' );
+    this.$info.addEventListener( this._touch ? 'touchstart' : 'click', () => {
+      this.dispatchEvent( new CustomEvent( 'aa-info', {
+        bubbles: true,
+        cancelable: false,
+        composed: true,
+        detail: {
+          id: this._data.id
+        }
+      } ) );
+    } );
   }
 
    // When attributes change

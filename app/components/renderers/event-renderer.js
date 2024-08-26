@@ -98,12 +98,12 @@ export default class AAEventRenderer extends HTMLElement {
         </aa-vbox>
       </div>
       <aa-vbox part="details">
-        <aa-hbox part="first">
-          <aa-label part="summary" weight="bold"></aa-label>
+        <aa-hbox gap="m" part="first">
+          <aa-label part="summary" truncate weight="bold"></aa-label>
           <aa-label part="label" size="s" text="Ends"></aa-label>
         </aa-hbox>
-        <aa-hbox part="second">
-          <aa-label part="location" size="s"></aa-label>
+        <aa-hbox gap="m" part="second">
+          <aa-label part="location" size="s" truncate></aa-label>
           <aa-label part="ends" size="s" text="Fri Aug 23"></aa-label>
         </aa-hbox>        
       </aa-vbox>
@@ -172,12 +172,18 @@ export default class AAEventRenderer extends HTMLElement {
     this.$label.hidden = starts.getDate() === ends.getDate() ? true : false;
     this.$location.text = this._data.location;
 
-    formatted = new Intl.DateTimeFormat( navigator.language, {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric'
-    } ).format( ends );        
-    this.$ends.text = formatted;
+    if( starts.getDate() === ends.getDate() &&
+        starts.getMonth() === ends.getMonth() ) {
+      this.$ends.hidden = true;
+    } else {
+      formatted = new Intl.DateTimeFormat( navigator.language, {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric'
+      } ).format( ends );      
+      this.$ends.hidden = false;  
+      this.$ends.text = formatted;
+    }
   }
 
   // Promote properties

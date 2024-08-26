@@ -10,7 +10,7 @@ export default class AADrawer extends HTMLElement {
           box-sizing: border-box;
           display: flex;
           flex-direction: column;
-          min-width: 300px;
+          min-width: 0;
           position: relative;
           width: 300px;
         }

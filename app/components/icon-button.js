@@ -43,9 +43,27 @@ export default class AAIconButton extends HTMLElement {
           -webkit-tap-highlight-color: transparent;            
         }
 
+        :host( [toggle] ) button {
+          background-color: #0082ff;
+        }
+
+        :host( [toggle] ) aa-icon {
+          --icon-color: 
+            invert( 98% ) 
+            sepia( 2% ) 
+            saturate( 2077% ) 
+            hue-rotate( 187deg ) 
+            brightness( 100% ) 
+            contrast( 96% );
+        }        
+
         :host( [disabled] ) aa-icon {
           --icon-cursor: not-allowed;
         }
+
+        :host( [disabled][toggle] ) button {
+          background-color: #dad9e0;
+        }        
 
         :host( [disabled] ) button {
           cursor: not-allowed;
@@ -97,6 +115,7 @@ export default class AAIconButton extends HTMLElement {
     this._upgrade( 'inverted' );                          
     this._upgrade( 'size' );                              
     this._upgrade( 'src' );                              
+    this._upgrade( 'toggle' );                                  
     this._render();
   }
 
@@ -109,7 +128,8 @@ export default class AAIconButton extends HTMLElement {
       'hidden',
       'inverted',
       'size',
-      'src'      
+      'src',
+      'toggle'   
     ];
   }
 
@@ -262,6 +282,26 @@ export default class AAIconButton extends HTMLElement {
       this.setAttribute( 'src', value );
     } else {
       this.removeAttribute( 'src' );
+    }
+  }  
+
+  get toggle() {
+    return this.hasAttribute( 'toggle' );
+  }
+
+  set toggle( value ) {
+    if( value !== null ) {
+      if( typeof value === 'boolean' ) {
+        value = value.toString();
+      }
+
+      if( value === 'false' ) {
+        this.removeAttribute( 'toggle' );
+      } else {
+        this.setAttribute( 'toggle', '' );
+      }
+    } else {
+      this.removeAttribute( 'toggle' );
     }
   }  
 }

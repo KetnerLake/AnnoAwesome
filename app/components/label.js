@@ -7,7 +7,7 @@ export default class AALabel extends HTMLElement {
       <style>
         :host {
           box-sizing: border-box;
-          display: inline;
+          display: inline-block;
           position: relative;
         }
 
@@ -70,6 +70,15 @@ export default class AALabel extends HTMLElement {
         :host( [weight=bold] ) p {
           font-weight: 600;
         }
+
+        :host( [truncate] ) p {
+          display: block;
+          line-clamp: 1;
+          min-width: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }        
       </style>
       <p part="label"></p>
     `;
@@ -109,6 +118,7 @@ export default class AALabel extends HTMLElement {
     this._upgrade( 'inverted' );    
     this._upgrade( 'size' );        
     this._upgrade( 'text' );            
+    this._upgrade( 'truncate' );            
     this._upgrade( 'weight' );                
     this._render();
   }
@@ -122,6 +132,7 @@ export default class AALabel extends HTMLElement {
       'inverted',
       'size',
       'text',
+      'truncate',
       'weight'
     ];
   }
@@ -257,6 +268,26 @@ export default class AALabel extends HTMLElement {
       this.removeAttribute( 'text' );
     }
   }     
+
+  get truncate() {
+    return this.hasAttribute( 'truncate' );
+  }
+
+  set truncate( value ) {
+    if( value !== null ) {
+      if( typeof value === 'boolean' ) {
+        value = value.toString();
+      }
+
+      if( value === 'false' ) {
+        this.removeAttribute( 'truncate' );
+      } else {
+        this.setAttribute( 'truncate', '' );
+      }
+    } else {
+      this.removeAttribute( 'truncate' );
+    }
+  }    
 
   get weight() {
     if( this.hasAttribute( 'weight' ) ) {

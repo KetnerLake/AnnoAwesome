@@ -13,7 +13,7 @@ export default class AASearch extends HTMLElement {
           display: inline;
           min-width: 200px;
           position: relative;
-          width: 200px;
+          width: 202px;
         }
 
         :host( [concealed] ) {

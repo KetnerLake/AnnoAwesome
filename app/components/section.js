@@ -24,6 +24,12 @@ export default class AASection extends HTMLElement {
           display: none;
         }
 
+        aa-label {
+          margin: 0 16px 11px 12px;
+          --label-color: #868686;
+          --label-text-transform: uppercase;
+        }
+
         aa-vbox {
           background-color: #ffffff;
           border-radius: 4px;
@@ -39,7 +45,7 @@ export default class AASection extends HTMLElement {
         }
       </style>
       <aa-hbox>
-        <aa-label part="title"></aa-label>
+        <aa-label size="s" part="label"></aa-label>
         <slot name="count"></slot>
       </aa-hbox>
       <aa-vbox>
@@ -56,13 +62,13 @@ export default class AASection extends HTMLElement {
     this.shadowRoot.appendChild( template.content.cloneNode( true ) );
 
     // Elements
-    this.$title = this.shadowRoot.querySelector( 'aa-label[part=title]' );
+    this.$title = this.shadowRoot.querySelector( 'aa-label[part=label]' );
     this.$notes = this.shadowRoot.querySelector( 'aa-label[part=notes]' );
   }
 
    // When attributes change
   _render() {
-    this.$title.text = this.title;
+    this.$title.text = this.label;
     this.$notes.text = this.notes;
   }
 
@@ -80,9 +86,9 @@ export default class AASection extends HTMLElement {
   connectedCallback() {
     this._upgrade( 'concealed' );  
     this._upgrade( 'data' );      
-    this._upgrade( 'hidden' );  
+    this._upgrade( 'hidden' ); 
+    this._upgrade( 'label' );           
     this._upgrade( 'notes' );  
-    this._upgrade( 'title' );      
     this._render();
   }
 
@@ -91,8 +97,8 @@ export default class AASection extends HTMLElement {
     return [
       'concealed',
       'hidden',
-      'notes',
-      'title'
+      'label',      
+      'notes'
     ];
   }
 
@@ -156,6 +162,22 @@ export default class AASection extends HTMLElement {
     }
   }   
 
+  get label() {
+    if( this.hasAttribute( 'label' ) ) {
+      return this.getAttribute( 'label' );
+    }
+
+    return null;
+  }
+
+  set label( value ) {
+    if( value !== null ) {
+      this.setAttribute( 'label', value );
+    } else {
+      this.removeAttribute( 'label' );
+    }
+  }  
+
   get notes() {
     if( this.hasAttribute( 'notes' ) ) {
       return this.getAttribute( 'notes' );
@@ -170,23 +192,7 @@ export default class AASection extends HTMLElement {
     } else {
       this.removeAttribute( 'notes' );
     }
-  }   
-
-  get title() {
-    if( this.hasAttribute( 'title' ) ) {
-      return this.getAttribute( 'title' );
-    }
-
-    return null;
-  }
-
-  set title( value ) {
-    if( value !== null ) {
-      this.setAttribute( 'title', value );
-    } else {
-      this.removeAttribute( 'title' );
-    }
-  }     
+  }        
 }
 
 window.customElements.define( 'aa-section', AASection );

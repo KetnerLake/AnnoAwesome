@@ -85,6 +85,7 @@ export default class AADatePicker extends HTMLElement {
 
     // Private 
     this._data = null;
+    this._touch = ( 'ontouchstart' in document.documentElement ) ? true : false; 
 
     // Root
     this.attachShadow( {mode: 'open'} );
@@ -92,7 +93,7 @@ export default class AADatePicker extends HTMLElement {
 
     // Elements
     this.$button = this.shadowRoot.querySelector( 'button' );
-    this.$button.addEventListener( 'click', () => {
+    this.$button.addEventListener( this._touch ? 'touchstart' : 'click', () => {
       this.open = !this.open
 
       this.dispatchEvent( new CustomEvent( 'aa-open', {

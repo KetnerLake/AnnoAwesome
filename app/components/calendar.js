@@ -96,8 +96,8 @@ export default class AACalendar extends HTMLElement {
       </style>
       <aa-hbox centered gap="m" part="header">
         <aa-label weight="bold"></aa-label>
-        <aa-icon-button src="./img/chevron-left.svg"></aa-icon-button>
-        <aa-icon-button src="./img/chevron-right.svg"></aa-icon-button>
+        <aa-icon-button part="left" src="./img/chevron-left.svg"></aa-icon-button>
+        <aa-icon-button part="right" src="./img/chevron-right.svg"></aa-icon-button>
       </aa-hbox>
       <aa-hbox part="days">
         <aa-label text="Sun"></aa-label>
@@ -114,6 +114,7 @@ export default class AACalendar extends HTMLElement {
     // Private 
     this._data = null;
     this._display = null;
+    this._touch = ( 'ontouchstart' in document.documentElement ) ? true : false; 
 
     // Events
     this.doDateClick = this.doDateClick.bind( this );
@@ -124,16 +125,87 @@ export default class AACalendar extends HTMLElement {
 
     // Elements
     this.$header = this.shadowRoot.querySelector( 'aa-hbox[part=header] aa-label' );
+    this.$left = this.shadowRoot.querySelector( 'aa-icon-button[part=left]' );    
+    this.$left.addEventListener( this._touch ? 'touchstart' : 'click', () => {
+      let displayed = null;
+
+      if( this._display === null ) {
+        if( this.value === null ) {
+          displayed = new Date();
+        } else {
+          displayed = new Date( this.valueAsDate.getTime() );
+        }
+      } else {
+        displayed = new Date( this._display.getTime() );
+      }    
+  
+      let month = displayed.getMonth();
+      let year = displayed.getFullYear();
+  
+      year = ( month === 0 ) ? year - 1 : year;
+      month = ( month === 0 ) ? 11 : month - 1;
+  
+      this._display = new Date(
+        year,
+        month,
+        displayed.getDate()
+      );
+  
+      this.dispatchEvent( new CustomEvent( 'aa-change', {
+        detail: {
+          display: this._display,
+          name: this.name,
+          value: this.valueAsDate
+        }
+      } ) );
+    } );
     this.$month = this.shadowRoot.querySelector( 'div[part=month]' );
+    this.$right = this.shadowRoot.querySelector( 'aa-icon-button[part=right]' );
+    this.$right.addEventListener( this._touch ? 'touchstart' : 'click', () => {
+      let displayed = null;
+
+      if( this._display === null ) {
+        if( this.value === null ) {
+          displayed = new Date();
+        } else {
+          displayed = new Date( this.valueAsDate.getTime() );          
+        }
+      } else {
+        displayed = new Date( this._display.getTime() );
+      }    
+  
+      let month = displayed.getMonth();
+      let year = displayed.getFullYear();
+  
+      year = ( month === 11 ) ? year + 1 : year;
+      month = ( month + 1 ) % 12;
+  
+      this._display = new Date(
+        year,
+        month,
+        displayed.getDate()
+      );
+  
+      this.dispatchEvent( new CustomEvent( 'aa-change', {
+        detail: {
+          display: this._display,
+          name: this.name,
+          value: this.valueAsDate
+        }
+      } ) );
+    } );
   }
 
   // Month is in the range 1 - 12
   // https://stackoverflow.com/questions/2483719/get-weeks-in-month-through-javascript
-  weekCount( year, month, start ) {
+  weekCount( year, month, start = 0 ) {
+    const firstDayOfWeek = start || 0;
     const firstOfMonth = new Date( year, month - 1, 1 );
     const lastOfMonth = new Date( year, month, 0 );
-    const used = firstOfMonth.getDay() + ( firstOfMonth.getDay() === 0 ? 6 : -1 ) + lastOfMonth.getDate();
-  
+    const numberOfDaysInMonth = lastOfMonth.getDate();
+    const firstWeekDay = ( firstOfMonth.getDay() - firstDayOfWeek + 7 ) % 7;
+    const used = firstWeekDay + numberOfDaysInMonth;
+
     return Math.ceil( used / 7 );
   }
 
@@ -186,13 +258,13 @@ export default class AACalendar extends HTMLElement {
     calendar.setDate( calendar.getDate() - calendar.getDay() );
 
     while( this.$month.children.length > ( weeks * 7 ) ) {
-      this.$month.children[0].removeEventListener( 'click', this.doDateClick );
+      this.$month.children[0].removeEventListener( this._touch ? 'touchstart' : 'click', this.doDateClick );
       this.$month.children[0].remove();
     }
 
     while( this.$month.children.length < ( weeks * 7 ) ) {
       const button = document.createElement( 'button' );
-      button.addEventListener( 'click', this.doDateClick );
+      button.addEventListener( this._touch ? 'touchstart' : 'click', this.doDateClick );
       button.type = 'button';
       this.$month.appendChild( button );
     }  

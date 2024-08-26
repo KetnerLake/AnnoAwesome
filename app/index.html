@@ -18,17 +18,18 @@
     <aa-drawer hidden id="drawer_left" placement="start">
       <aa-stack id="left_stack" style="display: flex; flex-direction: column; flex-basis: 0; flex-grow: 1;">
         <aa-vbox style="flex-basis: 0; flex-grow: 1;">
-          <aa-label size="xl" style="padding-left: 16px; padding-top: 62px; margin-bottom: 20px;" text="Calendars" weight="bold"></aa-label>
-          <aa-vbox style="flex-basis: 0; flex-grow: 1; margin-bottom: 16px;">
-            <aa-label text="My Awesome" size="s" style="--label-color: #868686; --label-text-transform: uppercase; margin: 0 16px 9px 28px;"></aa-label>          
-            <div style="background-color: #ffffff; border-radius: 8px; margin: 0 16px 0 16px;">
-              <aa-list id="drawer_calendars" item-renderer="aa-calendar-renderer" style="display: block;"></aa-list>
-            </div>
+          <aa-label size="xl" style="padding-left: 16px; padding-top: 62px; margin-bottom: 21px;" text="Calendars" weight="bold"></aa-label>
+          <aa-vbox gap="m" style="flex-basis: 0; flex-grow: 1; margin: 0 16px 16px 16px;">
+            <aa-section label="My Awesome">
+              <aa-list id="drawer_calendars" item-renderer="aa-calendar-renderer"></aa-list>
+            </aa-section>
+            <!-- Shared awesome -->
+            <!-- Public awesome -->
           </aa-vbox>
           <aa-hbox style="align-items: center; height: 50px;">
-            <aa-button label="Add Calendar"></aa-button>
+            <aa-button id="drawer_add" label="Add Calendar"></aa-button>
             <aa-spacer></aa-spacer>
-            <aa-button label="Hide All"></aa-button>
+            <aa-button id="drawer_hide" label="Hide All"></aa-button>
           </aa-hbox>
         </aa-vbox>
         <aa-vbox style="flex-basis: 0; flex-grow: 1;">
@@ -200,6 +201,30 @@
 
       </aa-stack>        
     </dialog>    
+
+    <!-- Calendar -->
+    <dialog class="popover transparent" id="calendar">
+      <div class="grid">
+        <aa-button id="calendar_cancel" label="Cancel" style="justify-self: start; --button-padding: 0;"></aa-button>
+        <aa-label id="calendar_label" text="Add Calendar" style="justify-self: center; --label-line-height: 36px;" weight="bold"></aa-label>
+        <aa-button disabled id="calendar_done" label="Done" style="justify-self: end; --button-padding: 0;"></aa-button>
+      </div>     
+      <aa-vbox gap="m">
+        <aa-section>
+          <aa-input id="calendar_name" placeholder="Calendar name"></aa-input>
+        </aa-section>                   
+        <aa-section label="Shared with">
+          <aa-button id="calendar_share" label="Add person..."></aa-button>
+        </aa-section>                                         
+        <aa-section label="Color">
+          <aa-input id="calendar_color" placeholder="Color"></aa-input>
+        </aa-section>                         
+        <aa-section notes="Allow anyone access to a read-only version of this calendar.">
+          <aa-button id="calendar_public" label="Public calendar"></aa-button>
+        </aa-section>                                                         
+        <aa-button id="calendar_delete" label="Delete calendar" style="--button-background: #ffffff; --button-color: red;"></aa-button>
+      </aa-vbox>
+    </dialog>
 
     <!-- Components -->
     <script src="./components.js" type="module"></script>
