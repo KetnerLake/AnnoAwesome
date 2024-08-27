@@ -287,6 +287,7 @@ frmAccount.addEventListener( 'aa-signin', ( evt ) => {
     password: evt.detail.password
   };
 
+  /*
   accountLogin( user )
   .then( ( data ) => {
     session = data;
@@ -295,6 +296,21 @@ frmAccount.addEventListener( 'aa-signin', ( evt ) => {
     blocker( false );
     dlgAccount.close();
   } );
+  */
+
+  /*
+  return fetch( `${KETNER_LAKE_API}/account/login`, {
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    method: 'POST',
+    body: JSON.stringify( user )
+  } )
+  .then( ( response ) => response.text() )
+  .then( ( data ) => {
+    return data.substring( 1, data.length - 1 );  
+  } );
+  */
 } );
 
 // Event
@@ -536,32 +552,6 @@ function blocker( disabled = true ) {
   btnCalendarsHide.disabled = disabled;
 }
 
-function buildEvent( id = null ) {
-  const now = new Date();
-
-  const event = {
-    updatedAt: now,
-    calendarId: calendars[0].id,
-    startsAt: calFormStarts.valueAsDate,
-    endsAt: calFormEnds.valueAsDate,
-    summary: txtFormTitle.value,
-    location: txtFormLocation.value,
-    latitude: null,
-    longitude: null,
-    url: txtFormUrl.value,
-    description: txtFormNotes.value    
-  };
-
-  if( id === null ) {
-    event.id = self.crypto.randomUUID();
-    event.createdAt = now;
-  } else {
-    event.id = id;
-  }
-
-  return event;
-}
-
 function checkCalendars() {
   let all = true;
 
@@ -661,28 +651,6 @@ function fillView( event ) {
   }
 }
 
-function sortEvents() {
-  events.sort( ( a, b ) => {
-    let parts = a.startsAt.split( '-' );
-    const startsA = new Date(
-      parseInt( parts[0] ),
-      parseInt( parts[1] ) - 1,
-      parseInt( parts[2] )
-    );
-    
-    parts = b.startsAt.split( '-' );
-    const startsB = new Date(
-      parseInt( parts[0] ),
-      parseInt( parts[1] ) - 1,
-      parseInt( parts[2] )
-    );    
-
-    if( startsA.getTime() < startsB.getTime() ) return -1;
-    if( startsA.getTime() > startsB.getTime() ) return 1;
-    return 0;
-  } );
-}
-
 function summarize( count = null ) {
   if( count === null ) {
     lblFooterCount.hidden = true;
@@ -690,95 +658,4 @@ function summarize( count = null ) {
     lblFooterCount.text = `${count} event${count !== 1 ? 's' : ''}`;  
     lblFooterCount.hidden = false;
   }
-}
-
-/*
-// BREAD
-*/
-
-function accountLogin( user ) {
-  return fetch( `${KETNER_LAKE_API}/account/login`, {
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    method: 'POST',
-    body: JSON.stringify( user )
-  } )
-  .then( ( response ) => response.text() )
-  .then( ( data ) => {
-    return data.substring( 1, data.length - 1 );  
-  } );
-}
-
-function browseCalendars() {
-  /*
-  return fetch( `${KETNER_LAKE_API}/calendar`, {
-    headers: {
-      'x-anno-awesome': session
-    }    
-  } )
-  .then( ( response ) => response.json() );
-  */
-  return db.calendar.toArray();
-}
-
-function browseEvents( year = null ) {
-  /*
-  year = year === null ? new Date().getFullYear() : year;
-  return fetch( `${KETNER_LAKE_API}/event/year/${year}`, {
-    headers: {
-      'x-anno-awesome': session
-    }
-  } )
-  .then( ( response ) => response.json() );
-  */
-  year = year === null ? new Date().getFullYear() : year; 
-  const start = new Date( year, 0, 1 );
-  const end = new Date( year + 1, 0, 1 );
-  return db.event.where( 'startsAt' ).between( start, end ).toArray();
-}
-
-function editEvent( event ) {
-  return fetch( `${KETNER_LAKE_API}/event/${event.id}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      'x-anno-awesome': session
-    }, 
-    method: 'PUT',
-    body: JSON.stringify( event )
-  } )
-  .then( ( response ) => response.json() );
-}
-
-function addEvent( event ) {
-  /*
-  return fetch( `${KETNER_LAKE_API}/event/${event.id}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      'x-anno-awesome': session
-    }, 
-    method: 'POST',
-    body: JSON.stringify( event )
-  } )
-  .then( ( response ) => response.json() );
-  */
-  return db.event.put( event ).then( ( data ) => {
-    console.log( data );
-    return db.event.where( {id: event.id} ).first();
-  } );
-}
-
-function deleteEvent( id ) {
-  /*
-  return fetch( `${KETNER_LAKE_API}/event/${id}`, {
-    headers: {
-      'Content-Type': 'application/json',      
-      'x-anno-awesome': session
-    },
-    method: 'DELETE',
-    body: JSON.stringify( {id: id} )
-  } )
-  .then( ( response ) => response.json() );
-  */
-  return db.event.delete( id );
 }
