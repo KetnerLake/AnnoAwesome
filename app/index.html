@@ -111,74 +111,15 @@
 
     <!-- Account -->
     <dialog class="popover transparent" id="account">
-      <aa-vbox gap="l">
-        <aa-section>
-          <aa-input autofocus id="account_email" placeholder="Email address"></aa-input>
-          <aa-divider></aa-divider>
-          <aa-input id="account_password" placeholder="Password" type="password"></aa-input>
-          <aa-divider></aa-divider>
-          <aa-button id="account_signin" label="Sign in"></aa-button>
-        </aa-section>
-        <aa-section>
-          <aa-hbox centered style="height: 36px; padding: 0 16px 0 16px;">
-            <aa-label style="flex-basis: 0; flex-grow: 1;" text="Account status"></aa-label>
-            <aa-label style="--label-color: #9e9e9e;" text="Free"></aa-label>
-          </aa-hbox>
-          <button id="account_signup" type="button">
-            <img src="./img/trident.svg" height="32" width="32" />  
-            <aa-vbox>
-              <aa-hbox gap="s">
-                <aa-label inverted style="--label-cursor: pointer;" text="Get more awesome" weight="bold"></aa-label>
-                <aa-icon inverted src="./img/arrow-right.svg" style="--icon-cursor: pointer;"></aa-icon>
-              </aa-hbox>
-              <aa-label balanced inverted style="--label-cursor: pointer; --label-line-height: 21px" text="Sync across devices, share privately or publicly, add attachments, location lookup, and more..."></aa-label>
-            </aa-vbox>
-          </button>
-        </aa-section>
-        <aa-section>
-          <aa-button id="account_demo" label="Just checking it out" style="--button-text-align: center;"></aa-button>
-        </aa-section>
-      </aa-vbox>
+      <aa-account-form id="account_form"></aa-account-form>
     </dialog>
 
     <!-- Details -->
     <!-- Placement strategy? style="margin-left: 16px; margin-top: 70px;" -->
-    <dialog class="popover transparent" id="details">
-      <aa-stack id="details_stack">
+    <dialog class="popover transparent" id="event">
+      <aa-stack id="event_stack">
 
-        <!-- Form -->
-        <aa-vbox class="form" gap="l">
-          <div class="grid">
-            <aa-button id="form_cancel" label="Cancel" style="justify-self: start; --button-padding: 0;"></aa-button>
-            <aa-label id="form_label" text="New Event" style="justify-self: center; --label-line-height: 36px;" weight="bold"></aa-label>
-            <aa-button disabled id="form_add" label="Add" style="justify-self: end; --button-padding: 0;"></aa-button>
-          </div>                  
-          <aa-section>
-            <aa-input id="form_title" placeholder="Title"></aa-input>
-            <aa-divider></aa-divider>
-            <aa-input id="form_location" placeholder="Location"></aa-input>        
-          </aa-section>
-          <aa-section>
-            <aa-date-picker id="form_starts" label="Starts"></aa-date-picker>
-            <aa-divider></aa-divider>
-            <aa-date-picker id="form_ends" label="Ends"></aa-date-picker>
-          </aa-section>
-          <aa-section>
-            <aa-hbox centered style="padding: 0 0 0 16px;">
-              <aa-label style="flex-basis: 0; flex-grow: 1;" text="Calendar"></aa-label>
-              <aa-icon src="./img/circle-fill.svg" size="xs"></aa-icon>
-              <aa-button label="Calendar" style="--button-color: #8a8a8e;"></aa-button>              
-            </aa-hbox>
-          </aa-section>
-          <aa-section>
-            <aa-attachment></aa-attachment>
-          </aa-section>
-          <aa-section>
-            <aa-input id="form_url" placeholder="URL"></aa-input>
-            <aa-divider></aa-divider>
-            <aa-textarea id="form_notes" placeholder="Notes"></aa-textarea>
-          </aa-section>
-        </aa-vbox>
+        <aa-event-form id="event_form"></aa-event-form>
 
         <!-- View -->
         <aa-vbox>

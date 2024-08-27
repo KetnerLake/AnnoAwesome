@@ -51,30 +51,16 @@ const sldFooterScale = document.querySelector( '#footer_scale' );
 // Account
 const dlgAccount = document.querySelector( '#account' );
 const stkAccount = document.querySelector( '#account_stack' );
-const txtAccountEmail = document.querySelector( '#account_email' );
-const txtAccountPassword = document.querySelector( '#account_password' );
-const btnAccountSignIn = document.querySelector( '#account_signin' );
-const btnAccountSignUp = document.querySelector( '#account_signup' );
-const btnAccountDemo = document.querySelector( '#account_demo' );
+const frmAccount = document.querySelector( '#account_form' );
 
-// Details
-const dlgDetails = document.querySelector( '#details' );
-const stkDetails = document.querySelector( '#details_stack' );
+// Event
+const dlgEvent = document.querySelector( '#event' );
+const frmEvent = document.querySelector( '#event_form' );
+const stkEvent = document.querySelector( '#event_stack' );
 
 // Calendar
 const dlgCalendar = document.querySelector( '#calendar' );
 const frmCalendar = document.querySelector( '#calendar_form' );
-
-// Form
-const btnFormCancel = document.querySelector( '#form_cancel' );
-const lblFormLabel = document.querySelector( '#form_label' );
-const btnFormAdd = document.querySelector( '#form_add' );
-const txtFormTitle = document.querySelector( '#form_title' );
-const txtFormLocation = document.querySelector( '#form_location' );
-const calFormStarts = document.querySelector( '#form_starts' );
-const calFormEnds = document.querySelector( '#form_ends' );
-const txtFormUrl = document.querySelector( '#form_url' );
-const txtFormNotes = document.querySelector( '#form_notes' );
 
 // View
 const lblViewTitle = document.querySelector( '#view_title' );
@@ -124,7 +110,7 @@ btnHeaderAccount.addEventListener( TOUCH, () => {
   blocker( true );
 
   dlgAccount.showModal();
-  txtAccountEmail.focus();
+  frmAccount.focus();
 } );
 
 btnHeaderAdd.addEventListener( TOUCH, () => {
@@ -135,12 +121,12 @@ btnHeaderAdd.addEventListener( TOUCH, () => {
   calYear.data = events;
   summarize( events.length );
 
-  stkDetails.selectedIndex = 0;
-  resetForm();
+  stkEvent.selectedIndex = 0;
+  frmEvent.reset();
   blocker( true );
-  dlgDetails.removeAttribute( 'data-id' );
-  dlgDetails.showModal();
-  txtFormTitle.focus();
+  dlgEvent.removeAttribute( 'data-id' );
+  dlgEvent.showModal();
+  frmEvent.focus();
 } );
 
 btnHeaderCalendars.addEventListener( TOUCH, () => {
@@ -290,118 +276,53 @@ txtHeaderSearch.addEventListener( 'aa-change', () => {
 } );
 
 // Account
-btnAccountDemo.addEventListener( TOUCH, () => {
+frmAccount.addEventListener( 'aa-demo', () => {
   blocker( false )
   dlgAccount.close();
 } );
 
-btnAccountSignIn.addEventListener( TOUCH, () => {
-  if( txtAccountEmail.value.trim().length === 0 ) {
-    txtAccountEmail.focus();
-    return;
-  }
-
-  if( txtAccountPassword.value.trim().length === 0 ) {
-    txtAccountPassword.focus();
-    return;
-  }
-
+frmAccount.addEventListener( 'aa-signin', ( evt ) => {
   const user = {
-    email: txtAccountEmail.value,
-    password: txtAccountPassword.value
+    email: evt.detail.email,
+    password: evt.detail.password
   };
 
   accountLogin( user )
   .then( ( data ) => {
     session = data;
     window.localStorage.setItem( 'awesome_token', session );
-
-    txtAccountEmail.value = null;
-    txtAccountPassword.value = null;
+    frmAccount.reset();
     blocker( false );
     dlgAccount.close();
-    // dlgAccount.open = false;
+  } );
+} );
 
-    return db.calendar.toArray();
-  } )
-  .then( ( data ) => {
-    calendars = [... data];    
+// Event
+frmEvent.addEventListener( 'aa-cancel', () => {
+  blocker( false );
+  dlgEvent.close();
+  frmEvent.reset();
+} );
+
+frmEvent.addEventListener( 'aa-done', () => {
+  db.event.put( frmEvent.data )
+  .then( () => {
+    blocker( false );
+    dlgEvent.close();
+    frmEvent.reset();
+
     return db.event.where( 'startsAt' ).between( starts, ends ).toArray();
   } )
   .then( ( data ) => {
     events = [... data];
+
     calYear.data = events;
     lstEvents.data = events;
     summarize( events.length );
+    
+    fillView( update );
+    stkEvent.selectedIndex = 1;
   } );
-} );
-
-// Form
-btnFormAdd.addEventListener( TOUCH, () => {
-  if( dlgDetails.hasAttribute( 'data-id' ) ) {
-    const id = dlgDetails.getAttribute( 'data-id' );
-    const update = buildEvent( id );
-
-    db.event.put( update )
-    .then( () => {
-      return db.event.where( 'startsAt' ).between( starts, ends ).toArray();
-    } )
-    .then( ( data ) => {
-      events = [... data];
-
-      calYear.data = events;
-      lstEvents.data = events;
-      summarize( events.length );
-      
-      fillView( update );
-      stkDetails.selectedIndex = 1;
-    } );
-  } else {
-    blocker( false );
-    dlgDetails.close();
-    db.event.put( buildEvent() )
-    .then( () => {
-      return db.event.where( 'startsAt' ).between( starts, ends ).toArray();
-    } )
-    .then( ( data ) => {
-      events = [... data];
-
-      calYear.data = events;
-      lstEvents.data = events;
-      summarize( events.length );
-
-      resetForm();          
-    } );
-  }
-} );
-
-btnFormCancel.addEventListener( TOUCH, () => {
-  blocker( false );
-  dlgDetails.close();
-  resetForm();
-} );
-
-calFormEnds.addEventListener( 'aa-change', () => {
-  calFormEnds.invalid = calFormEnds.valueAsDate.getTime() < calFormStarts.valueAsDate.getTime() ? true : false;
-  btnFormAdd.disabled = calFormEnds.invalid;
-} );
-
-calFormEnds.addEventListener( 'aa-open', () => {
-  calFormStarts.open = false;
-} );
-
-calFormStarts.addEventListener( 'aa-change', () => {
-  if( calFormStarts.valueAsDate.getTime() > calFormEnds.valueAsDate.getTime() ) {
-    calFormEnds.valueAsDate = new Date( calFormStarts.valueAsDate.getTime() );
-  }
-} );
-
-calFormStarts.addEventListener( 'aa-open', () => {
-  calFormEnds.open = false;
-} );
-
-txtFormTitle.addEventListener( 'aa-change', () => {
-  btnFormAdd.disabled = txtFormTitle.value === null ? true : false;
 } );
 
 // View
@@ -409,7 +330,7 @@ btnViewDelete.addEventListener( TOUCH, () => {
   const response = confirm( 'Are you sure you want to delete this event?' );
   if( !response ) return;
 
-  db.event.delete( dlgDetails.getAttribute( 'data-id' ) )
+  db.event.delete( dlgEvent.getAttribute( 'data-id' ) )
   .then( () => {
     return db.event.where( 'startsAt' ).between( starts, ends ).toArray();
   } )
@@ -418,22 +339,22 @@ btnViewDelete.addEventListener( TOUCH, () => {
     calYear.data = events;
     lstEvents.data = events;
     blocker( false );
-    dlgDetails.close();
-    dlgDetails.removeAttribute( 'data-id' );
+    dlgEvent.close();
+    dlgEvent.removeAttribute( 'data-id' );
 
     summarize( events.length );
   } );
 } );
 
 btnViewEdit.addEventListener( TOUCH, () => {
-  db.event.where( {id: dlgDetails.getAttribute( 'data-id' )} ).first()
+  db.event.where( {id: dlgEvent.getAttribute( 'data-id' )} ).first()
   .then( ( event ) => {
     fillForm( event );
 
     lblFormLabel.text = 'Edit Event';
     btnFormAdd.label = 'Done';
-    stkDetails.selectedIndex = 0;
-    dlgDetails.classList.add( 'transparent' );
+    stkEvent.selectedIndex = 0;
+    dlgEvent.classList.add( 'transparent' );
   } );
 } );
 
@@ -543,23 +464,13 @@ lstCalendars.addEventListener( 'aa-info', ( evt ) => {
 
 // Calendar
 calYear.addEventListener( 'aa-change', ( evt ) => {
-  /*
-  if( evt.detail.id === null ) {
-    blocker( false );
-    dlgDetails.close();
-    return;
-  }
-  */
-
   db.event.where( {id: evt.detail.id} ).first()
   .then( ( event ) => {
-    fillView( event );  
-
-    dlgDetails.classList.remove( 'transparent' );
-    stkDetails.selectedIndex = 1;
+    frmEvent.data = event;
+    dlgEvent.classList.remove( 'transparent' );
+    stkEvent.selectedIndex = 1;
     blocker( true );
-    dlgDetails.setAttribute( 'data-id', event.id );
-    dlgDetails.showModal();
+    dlgEvent.showModal();
   } );
 } );
 
@@ -748,22 +659,6 @@ function fillView( event ) {
     mapViewLocation.hidden = false;
     divViewLocation.hidden = false;    
   }
-}
-
-function resetForm() {
-  const now = new Date();
-
-  lblFormLabel.text = 'New Event';
-  btnFormAdd.label = 'Add';
-  btnFormAdd.disabled = true;
-  txtFormTitle.value = null;
-  txtFormLocation.value = null;
-  calFormStarts.valueAsDate = new Date( now.getFullYear(), now.getMonth(), now.getDate() );
-  calFormStarts.open = false;
-  calFormEnds.valueAsDate = new Date( now.getFullYear(), now.getMonth(), now.getDate() );
-  calFormEnds.open = false;  
-  txtFormUrl.value = null;
-  txtFormNotes.value = null;
 }
 
 function sortEvents() {

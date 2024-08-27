@@ -29,4 +29,6 @@ import AAYear from "./components/year.js";
 import AACalendarListRenderer from "./components/renderers/calendar-list-renderer.js";
 import AAEventListRenderer from "./components/renderers/event-list-renderer.js";
 
+import AAAccountForm from "./components/views/account-form.js";
 import AACalendarForm from "./components/views/calendar-form.js";
+import AAEventForm from "./components/views/event-form.js";
