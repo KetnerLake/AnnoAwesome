@@ -1,8 +1,4 @@
-import AACheckbox from "../checkbox.js";
-import AAIconButton from "../icon-button.js";
-import AALabel from "../label.js";
-
-export default class AACalendarRenderer extends HTMLElement {
+export default class AAToggle extends HTMLElement {
   constructor() {
     super();
 
@@ -10,14 +6,8 @@ export default class AACalendarRenderer extends HTMLElement {
     template.innerHTML = /* template */ `
       <style>
         :host {
-          align-items: center;
           box-sizing: border-box;
-          display: flex;
-          flex-direction: row;
-          gap: 12px;
-          height: 36px;
-          min-height: 36px;
-          padding: 0 8px 0 12px;
+          display: inline;
           position: relative;
         }
 
@@ -27,26 +17,54 @@ export default class AACalendarRenderer extends HTMLElement {
 
         :host( [hidden] ) {
           display: none;
+        } 
+
+        button {
+          align-items: center;
+          appearance: none;
+          background: none;
+          background-color: #e9e9e9;
+          border: none;
+          border-radius: 28px;
+          box-sizing: border-box;
+          cursor: pointer;
+          display: flex;
+          height: 28px;
+          margin: 0;
+          outline: none;
+          padding: 0;
+          position: relative;
+          transition: background 0.25s linear;
+          width: 50px;
+          -webkit-tap-highlight-color: transparent;                      
         }
 
-        aa-icon-button {
-          --icon-color:
-            invert( 30% ) 
-            sepia( 94% ) 
-            saturate( 1956% ) 
-            hue-rotate( 196deg ) 
-            brightness( 103% ) 
-            contrast( 104% );          
+        span {
+          background-color: #ffffff;
+          border-radius: 24px;
+          box-sizing: border-box;
+          display: block;
+          left: 2px;
+          max-height: 24px;
+          min-height: 24px;
+          max-width: 24px;
+          min-width: 24px;
+          position: absolute;
+          top: 2px;
+          transition: left 0.25s linear;
         }
 
-        aa-label {
-          flex-basis: 0;
-          flex-grow: 1;
+        :host( [checked] ) button {
+          background: #34c759;
         }
+
+        :host( [checked] ) span {
+          left: 24px;
+        }        
       </style>
-      <aa-checkbox></aa-checkbox>
-      <aa-label part="label" size="m"></aa-label>
-      <aa-icon-button part="info" src="./img/info-circle.svg"></aa-icon-button>
+      <button part="button" type="button">
+        <span></span>
+      </button>
     `;
 
     // Private
@@ -58,28 +76,19 @@ export default class AACalendarRenderer extends HTMLElement {
     this.shadowRoot.appendChild( template.content.cloneNode( true ) );
 
     // Elements
-    this.$checkbox = this.shadowRoot.querySelector( 'aa-checkbox' );
-    this.$label = this.shadowRoot.querySelector( 'aa-label' );
-    this.$info = this.shadowRoot.querySelector( 'aa-icon-button' );
-    this.$info.addEventListener( this._touch ? 'touchstart' : 'click', () => {
-      this.dispatchEvent( new CustomEvent( 'aa-info', {
-        bubbles: true,
-        cancelable: false,
-        composed: true,
+    this.$button = this.shadowRoot.querySelector( 'button' );
+    this.$button.addEventListener( this._touch ? 'touchstart' : 'click', () => {
+      this.checked = !this.checked;
+      this.dispatchEvent( new CustomEvent( 'aa-change', {
         detail: {
-          id: this._data.id
+          checked: this.checked
         }
       } ) );
     } );
   }
 
    // When attributes change
-  _render() {
-    if( this._data === null ) return;
-
-    this.$checkbox.checked = this._data.isActive;
-    this.$label.text = this._data.name;
-  }
+  _render() {;}
 
   // Promote properties
   // Values may be set before module load
@@ -93,6 +102,7 @@ export default class AACalendarRenderer extends HTMLElement {
 
   // Setup
   connectedCallback() {
+    this._upgrade( 'checked' );      
     this._upgrade( 'concealed' );  
     this._upgrade( 'data' );      
     this._upgrade( 'hidden' );    
@@ -102,6 +112,7 @@ export default class AACalendarRenderer extends HTMLElement {
   // Watched attributes
   static get observedAttributes() {
     return [
+      'checked',
       'concealed',
       'hidden'
     ];
@@ -122,12 +133,31 @@ export default class AACalendarRenderer extends HTMLElement {
 
   set data( value ) {
     this._data = value;
-    this._render();
   }  
 
   // Attributes
   // Reflected
   // Boolean, Number, String, null
+  get checked() {
+    return this.hasAttribute( 'checked' );
+  }
+
+  set checked( value ) {
+    if( value !== null ) {
+      if( typeof value === 'boolean' ) {
+        value = value.toString();
+      }
+
+      if( value === 'false' ) {
+        this.removeAttribute( 'checked' );
+      } else {
+        this.setAttribute( 'checked', '' );
+      }
+    } else {
+      this.removeAttribute( 'checked' );
+    }
+  }
+
   get concealed() {
     return this.hasAttribute( 'concealed' );
   }
@@ -166,7 +196,7 @@ export default class AACalendarRenderer extends HTMLElement {
     } else {
       this.removeAttribute( 'hidden' );
     }
-  } 
+  }   
 }
 
-window.customElements.define( 'aa-calendar-renderer', AACalendarRenderer );
+window.customElements.define( 'aa-toggle', AAToggle );

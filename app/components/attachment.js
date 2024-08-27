@@ -24,7 +24,7 @@ export default class AAAttachment extends HTMLElement {
           background: none;
           border: none;
           box-sizing: border-box;
-          color: #272727;
+          color: #0082ff;
           cursor: pointer;
           font-family: 'IBM Plex Sans', sans-serif;  
           font-size: 16px;          

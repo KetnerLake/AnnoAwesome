@@ -24,10 +24,17 @@ export default class AASection extends HTMLElement {
           display: none;
         }
 
-        aa-label {
-          margin: 0 16px 11px 12px;
+        aa-label[part=label] {
+          margin: 0 16px 8px 16px;
           --label-color: #868686;
           --label-text-transform: uppercase;
+        }
+
+        aa-label[part=notes] {
+          padding: 4px 16px 0 16px;
+          --label-color: #868686;          
+          --label-line-height: 21px;
+          --label-font-size: 14px;
         }
 
         aa-vbox {
@@ -40,12 +47,12 @@ export default class AASection extends HTMLElement {
         }
 
         :host( :not( [notes] ) ) aa-label[part=notes],
-        :host( :not( [title] ) ) aa-label[part=title] {
+        :host( :not( [label] ) ) aa-label[part=label] {
           display: none;
         }
       </style>
       <aa-hbox>
-        <aa-label size="s" part="label"></aa-label>
+        <aa-label part="label" size="s"></aa-label>
         <slot name="count"></slot>
       </aa-hbox>
       <aa-vbox>

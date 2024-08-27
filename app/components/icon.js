@@ -32,7 +32,7 @@ export default class AAIcon extends HTMLElement {
             contrast( 103% )
           );            
           height: 20px;
-          width: 20px;          
+          width: 20px;
         }
 
         :host( [inverted] ) img {
@@ -45,9 +45,19 @@ export default class AAIcon extends HTMLElement {
             contrast( 100% );                    
         }
 
+        :host( [size=xs] ) img {
+          height: 12px;
+          width: 12px;
+        }
+
         :host( [size=s] ) img {
           height: 16px;
           width: 16px;
+        }
+
+        :host( [size=l] ) img {
+          height: 32px;
+          width: 32px;
         }
 
         :host( [disabled] ) img {

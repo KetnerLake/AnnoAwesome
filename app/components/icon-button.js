@@ -43,11 +43,11 @@ export default class AAIconButton extends HTMLElement {
           -webkit-tap-highlight-color: transparent;            
         }
 
-        :host( [toggle] ) button {
+        :host( [checked] ) button {
           background-color: #0082ff;
         }
 
-        :host( [toggle] ) aa-icon {
+        :host( [checked] ) aa-icon {
           --icon-color: 
             invert( 98% ) 
             sepia( 2% ) 
@@ -61,7 +61,7 @@ export default class AAIconButton extends HTMLElement {
           --icon-cursor: not-allowed;
         }
 
-        :host( [disabled][toggle] ) button {
+        :host( [disabled][checked] ) button {
           background-color: #dad9e0;
         }        
 
@@ -107,6 +107,7 @@ export default class AAIconButton extends HTMLElement {
 
   // Setup
   connectedCallback() {
+    this._upgrade( 'checked' );                              
     this._upgrade( 'concealed' );                          
     this._upgrade( 'data' );                      
     this._upgrade( 'disabled' );                          
@@ -115,21 +116,20 @@ export default class AAIconButton extends HTMLElement {
     this._upgrade( 'inverted' );                          
     this._upgrade( 'size' );                              
     this._upgrade( 'src' );                              
-    this._upgrade( 'toggle' );                                  
     this._render();
   }
 
   // Watched attributes
   static get observedAttributes() {
     return [
+      'checked',
       'concealed',
       'disabled',
       'flat',
       'hidden',
       'inverted',
       'size',
-      'src',
-      'toggle'   
+      'src'
     ];
   }
 
@@ -153,6 +153,26 @@ export default class AAIconButton extends HTMLElement {
   // Attributes
   // Reflected
   // Boolean, Number, String, null
+  get checked() {
+    return this.hasAttribute( 'checked' );
+  }
+
+  set checked( value ) {
+    if( value !== null ) {
+      if( typeof value === 'boolean' ) {
+        value = value.toString();
+      }
+
+      if( value === 'false' ) {
+        this.removeAttribute( 'checked' );
+      } else {
+        this.setAttribute( 'checked', '' );
+      }
+    } else {
+      this.removeAttribute( 'checked' );
+    }
+  }  
+
   get concealed() {
     return this.hasAttribute( 'concealed' );
   }
@@ -282,26 +302,6 @@ export default class AAIconButton extends HTMLElement {
       this.setAttribute( 'src', value );
     } else {
       this.removeAttribute( 'src' );
-    }
-  }  
-
-  get toggle() {
-    return this.hasAttribute( 'toggle' );
-  }
-
-  set toggle( value ) {
-    if( value !== null ) {
-      if( typeof value === 'boolean' ) {
-        value = value.toString();
-      }
-
-      if( value === 'false' ) {
-        this.removeAttribute( 'toggle' );
-      } else {
-        this.setAttribute( 'toggle', '' );
-      }
-    } else {
-      this.removeAttribute( 'toggle' );
     }
   }  
 }

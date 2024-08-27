@@ -19,8 +19,17 @@ export default class AAList extends HTMLElement {
         :host( [hidden] ) {
           display: none;
         }
+
+        div[part=empty] {
+          align-items: center;
+          height: 100%;
+          justify-content: center;
+        }
       </style>
       <div part="list"></div>
+      <div part="empty">
+        <slot></slot>
+      </div>
     `;
 
     // Private
@@ -32,11 +41,16 @@ export default class AAList extends HTMLElement {
     this.shadowRoot.appendChild( template.content.cloneNode( true ) );
 
     // Elements
-    this.$list = this.shadowRoot.querySelector( 'div' );
+    this.$empty = this.shadowRoot.querySelector( 'div[part=empty]' );
+    this.$list = this.shadowRoot.querySelector( 'div[part=list]' );
   }
 
    // When attributes change
-  _render() {;}
+  _render() {
+    for( let c = 0; c < this.$list.children.length; c++ ) {
+      this.$list.children[c].disabled = this.disabled;
+    }
+  }
 
   // Promote properties
   // Values may be set before module load
@@ -52,6 +66,7 @@ export default class AAList extends HTMLElement {
   connectedCallback() {
     this._upgrade( 'concealed' );  
     this._upgrade( 'data' );      
+    this._upgrade( 'disabled' );          
     this._upgrade( 'hidden' );    
     this._upgrade( 'itemRenderer' );        
     this._upgrade( 'labelField' );  
@@ -62,8 +77,8 @@ export default class AAList extends HTMLElement {
   // Watched attributes
   static get observedAttributes() {
     return [
-      'balanced',
       'concealed',
+      'disabled',
       'hidden',
       'item-renderer',
       'label-field'      
@@ -86,6 +101,9 @@ export default class AAList extends HTMLElement {
   set data( value ) {
     this._data = value === null ? [] : [... value];
     
+    this.$list.style.display = this._data.length === 0 ? 'none' : '';
+    this.$empty.style.display = this._data.length === 0 ? 'flex' : 'none';
+
     while( this.$list.children.length > this._data.length ) {
       this.$list.children[0].remove();
     }
@@ -141,6 +159,26 @@ export default class AAList extends HTMLElement {
       this.removeAttribute( 'concealed' );
     }
   }
+
+  get disabled() {
+    return this.hasAttribute( 'disabled' );
+  }
+
+  set disabled( value ) {
+    if( value !== null ) {
+      if( typeof value === 'boolean' ) {
+        value = value.toString();
+      }
+
+      if( value === 'false' ) {
+        this.removeAttribute( 'disabled' );
+      } else {
+        this.setAttribute( 'disabled', '' );
+      }
+    } else {
+      this.removeAttribute( 'disabled' );
+    }
+  }  
 
   get hidden() {
     return this.hasAttribute( 'hidden' );

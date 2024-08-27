@@ -41,7 +41,7 @@ export default class AAYear extends HTMLElement {
         }
 
         div[part=header] p {
-          background-color: #f7f7f7;          
+          background-color: #f4f4f3;          
           border-bottom: solid 1px #c7c7c7;
           border-right: solid 1px #e5e5e5;          
           box-sizing: border-box;
@@ -227,26 +227,28 @@ export default class AAYear extends HTMLElement {
     }
 
     for( let c = 0; c < this.$events.children.length; c++ ) {
+      /*
       let parts = this._data[c].startsAt.split( '-' );
       const starts = new Date( parseInt( parts[0] ), parseInt( parts[1] ) - 1, parseInt( parts[2] ) );
       
       parts = this._data[c].endsAt.split( '-' );
       const ends = new Date( parseInt( parts[0] ), parseInt( parts[1] ) - 1, parseInt( parts[2] ) );
+      */
 
-      const diff = ( ends.getDate() - starts.getDate() ) + 1;
+      const diff = ( this._data[c].endsAt.getDate() - this._data[c].startsAt.getDate() ) + 1;
 
       this.$events.children[c].summary = this._data[c].summary;
       this.$events.children[c].location = this._data[c].location;      
       this.$events.children[c].data = this._data[c];
       
-      this.$events.children[c].style.left = `${( starts.getMonth() * 200 ) + 35}px`;
-      this.$events.children[c].style.top = `${( starts.getDate() - 1 ) * 36}px`;
+      this.$events.children[c].style.left = `${( this._data[c].startsAt.getMonth() * 200 ) + 35}px`;
+      this.$events.children[c].style.top = `${( this._data[c].startsAt.getDate() - 1 ) * 36}px`;
       this.$events.children[c].style.height = `${( diff * 36 ) - 1}px`;      
 
-      this.$events.children[c].style.setProperty( '--event-active-background-color', this._colors[starts.getMonth()].activeBackgroundColor );
-      this.$events.children[c].style.setProperty( '--event-active-color', this._colors[starts.getMonth()].activeColor );
-      this.$events.children[c].style.setProperty( '--event-inactive-background-color', this._colors[starts.getMonth()].activeBackgroundColor + '4d' );      
-      this.$events.children[c].style.setProperty( '--event-inactive-color', this._colors[starts.getMonth()].inactiveColor );      
+      this.$events.children[c].style.setProperty( '--event-active-background-color', this._colors[this._data[c].startsAt.getMonth()].activeBackgroundColor );
+      this.$events.children[c].style.setProperty( '--event-active-color', this._colors[this._data[c].startsAt.getMonth()].activeColor );
+      this.$events.children[c].style.setProperty( '--event-inactive-background-color', this._colors[this._data[c].startsAt.getMonth()].activeBackgroundColor + '4d' );      
+      this.$events.children[c].style.setProperty( '--event-inactive-color', this._colors[this._data[c].startsAt.getMonth()].inactiveColor );      
     }
   }
 

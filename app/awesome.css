@@ -15,7 +15,7 @@ html {
 }
 
 body {
-  background-color: #f7f7f7;
+  background-color: #f4f4f3;
   color: #272727;
   display: flex;
   flex-direction: row;
@@ -24,6 +24,16 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
+}
+
+aa-list aa-icon {
+  --icon-color: 
+    invert( 60% ) 
+    sepia( 7% ) 
+    saturate( 250% ) 
+    hue-rotate( 202deg ) 
+    brightness( 87% ) 
+    contrast( 88% );            
 }
 
 dialog::backdrop {
@@ -75,6 +85,7 @@ input[type=range] {
   background-color: rgba( 247, 247, 247, 0.70 );
   padding: 16px;
   width: 328px;    
+  -webkit-backdrop-filter: blur( 10px );
 }
 
 .grid {

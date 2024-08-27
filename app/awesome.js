@@ -1,4 +1,6 @@
 // Constants
+const HIDE_ALL = 'Hide All'
+const SHOW_ALL = 'Show All'
 const KETNER_LAKE_API = 'http://localhost:3000/v1';
 const TOUCH = ( 'ontouchstart' in document.documentElement ) ? 'touchstart' : 'click';
 
@@ -7,6 +9,8 @@ let calendars = [];
 let events = [];
 let session = window.localStorage.getItem( 'awesome_token' );
 let year = new Date().getFullYear();
+let starts = new Date( year, 0, 1 );
+let ends = new Date( year + 1, 0, 1 );
 
 /*
 // Elements
@@ -31,6 +35,7 @@ const stkLeft = document.querySelector( '#left_stack' );
 const lstCalendars = document.querySelector( '#drawer_calendars' );
 const lstEvents = document.querySelector( '#drawer_events' );
 const btnCalendarsAdd = document.querySelector( '#drawer_add' );
+const btnCalendarsHide = document.querySelector( '#drawer_hide' );
 const pnlRight = document.querySelector( '#drawer_right' );
 const lstSearch = document.querySelector( '#drawer_search' );
 
@@ -58,6 +63,7 @@ const stkDetails = document.querySelector( '#details_stack' );
 
 // Calendar
 const dlgCalendar = document.querySelector( '#calendar' );
+const frmCalendar = document.querySelector( '#calendar_form' );
 
 // Form
 const btnFormCancel = document.querySelector( '#form_cancel' );
@@ -145,14 +151,14 @@ btnHeaderCalendars.addEventListener( TOUCH, () => {
   calYear.events = events;
   summarize( events.length );
 
-  btnHeaderList.toggle = false;
+  btnHeaderList.checked = false;
 
   if( !pnlLeft.hidden && stkLeft.selectedIndex === 0 ) {
-    btnHeaderCalendars.toggle = false;
+    btnHeaderCalendars.checked = false;
     pnlLeft.hidden = true;
     stkLeft.selectedIndex = 0;
   } else {
-    btnHeaderCalendars.toggle = true;    
+    btnHeaderCalendars.checked = true;    
     stkLeft.selectedIndex = 0;    
     pnlLeft.hidden = false;
   }
@@ -175,14 +181,14 @@ btnHeaderList.addEventListener( TOUCH, () => {
   calYear.data = events;
   summarize( events.length );
 
-  btnHeaderCalendars.toggle = false;
+  btnHeaderCalendars.checked = false;
 
   if( !pnlLeft.hidden && stkLeft.selectedIndex === 1 ) {
-    btnHeaderList.toggle = false;
+    btnHeaderList.checked = false;
     pnlLeft.hidden = true;
     stkLeft.selectedIndex = 1;
   } else {
-    btnHeaderList.toggle = true;
+    btnHeaderList.checked = true;
     stkLeft.selectedIndex = 1;    
     pnlLeft.hidden = false;
   }
@@ -190,11 +196,13 @@ btnHeaderList.addEventListener( TOUCH, () => {
 
 btnHeaderNext.addEventListener( TOUCH, () => {
   year = year + 1;
+  starts = new Date( year, 0, 1 );
+  ends = new Date( year + 1, 0, 1 );
   lblHeaderYear.text = year;
 
-  browseEvents( year )
+  db.event.where( 'startsAt' ).between( starts, ends ).toArray()
   .then( ( data ) => {
-    events = data === null ? [] : [... data];
+    events = [... data];
     calYear.data = events;
     lstEvents.data = events;
     calYear.value = year;
@@ -204,11 +212,13 @@ btnHeaderNext.addEventListener( TOUCH, () => {
 
 btnHeaderPrevious.addEventListener( TOUCH, () => {
   year = year - 1;
+  starts = new Date( year, 0, 1 );
+  ends = new Date( year + 1, 0, 1 );
   lblHeaderYear.text = year;
 
-  browseEvents( year )
+  db.event.where( 'startsAt' ).between( starts, ends ).toArray()
   .then( ( data ) => {
-    events = data === null ? [] : [... data];
+    events = [... data];
     calYear.data = events;
     lstEvents.data = events;
     calYear.value = year;
@@ -219,6 +229,9 @@ btnHeaderPrevious.addEventListener( TOUCH, () => {
 btnHeaderToday.addEventListener( TOUCH, () => {
   const today = new Date();
   year = today.getFullYear();
+  starts = new Date( year, 0, 1 );
+  ends = new Date( year + 1, 0, 1 );
+
   lblHeaderYear.text = year;
 
   calYear.value = year;
@@ -228,9 +241,9 @@ btnHeaderToday.addEventListener( TOUCH, () => {
     behavior: 'smooth'
   } );
 
-  browseEvents( year )
+  db.event.where( 'startsAt' ).between( starts, ends ).toArray()
   .then( ( data ) => {
-    events = data === null ? [] : [... data];
+    events = [... data];
     calYear.data = events;
     lstEvents.data = events;
     summarize( events.length );
@@ -239,6 +252,8 @@ btnHeaderToday.addEventListener( TOUCH, () => {
 
 txtHeaderSearch.addEventListener( 'focus', () => {
   pnlLeft.hidden = true;
+  btnHeaderCalendars.checked = false;
+  btnHeaderList.checked = false;
   pnlRight.hidden = false;
   btnHeaderCancel.hidden = false;
 
@@ -246,7 +261,7 @@ txtHeaderSearch.addEventListener( 'focus', () => {
   summarize( events.length );
 } );
 
-txtHeaderSearch.addEventListener( 'aa-change', ( evt ) => {
+txtHeaderSearch.addEventListener( 'aa-change', () => {
   if( txtHeaderSearch.value === null ) {
     calYear.data = events;
     lstSearch.data = events;
@@ -307,14 +322,14 @@ btnAccountSignIn.addEventListener( TOUCH, () => {
     dlgAccount.close();
     // dlgAccount.open = false;
 
-    return browseCalendars();
+    return db.calendar.toArray();
   } )
   .then( ( data ) => {
     calendars = [... data];    
-    return browseEvents( year );
+    return db.event.where( 'startsAt' ).between( starts, ends ).toArray();
   } )
   .then( ( data ) => {
-    events = data === null ? [] : [... data];
+    events = [... data];
     calYear.data = events;
     lstEvents.data = events;
     summarize( events.length );
@@ -325,57 +340,38 @@ btnAccountSignIn.addEventListener( TOUCH, () => {
 btnFormAdd.addEventListener( TOUCH, () => {
   if( dlgDetails.hasAttribute( 'data-id' ) ) {
     const id = dlgDetails.getAttribute( 'data-id' );
-    
-    if( session === null ) {
-      const update = buildEvent( id );
-      const index = events.findIndex( ( value ) => value.id === id );
-      events[index] = update;
+    const update = buildEvent( id );
+
+    db.event.put( update )
+    .then( () => {
+      return db.event.where( 'startsAt' ).between( starts, ends ).toArray();
+    } )
+    .then( ( data ) => {
+      events = [... data];
 
       calYear.data = events;
       lstEvents.data = events;
       summarize( events.length );
       
       fillView( update );
-      stkDetails.selectedIndex = 1;      
-    } else {
-      editEvent( buildEvent( id ) )
-      .then( ( data ) => {
-        const index = events.findIndex( ( value ) => value.id === id );
-        events[index] = data;
-  
-        calYear.data = events;
-        lstEvents.data = events;
-        summarize( events.length );
-        
-        fillView( data );
-        stkDetails.selectedIndex = 1;
-      } );
-    }
+      stkDetails.selectedIndex = 1;
+    } );
   } else {
     blocker( false );
     dlgDetails.close();
-    // dlgDetails.open = false;
-
-    if( session === null ) {
-      events.push( buildEvent() );
-      sortEvents();
+    db.event.put( buildEvent() )
+    .then( () => {
+      return db.event.where( 'startsAt' ).between( starts, ends ).toArray();
+    } )
+    .then( ( data ) => {
+      events = [... data];
 
       calYear.data = events;
       lstEvents.data = events;
       summarize( events.length );
-      resetForm();
-    } else {
-      addEvent( buildEvent() )
-      .then( ( data ) => {
-        events.push( data );
-        sortEvents();
-  
-        calYear.data = events;
-        lstEvents.data = events;
-        summarize( events.length );
-        resetForm();    
-      } );
-    }
+
+      resetForm();          
+    } );
   }
 } );
 
@@ -390,17 +386,17 @@ calFormEnds.addEventListener( 'aa-change', () => {
   btnFormAdd.disabled = calFormEnds.invalid;
 } );
 
-calFormEnds.addEventListener( 'aa-open', ( evt ) => {
+calFormEnds.addEventListener( 'aa-open', () => {
   calFormStarts.open = false;
 } );
 
-calFormStarts.addEventListener( 'aa-change', ( evt ) => {
+calFormStarts.addEventListener( 'aa-change', () => {
   if( calFormStarts.valueAsDate.getTime() > calFormEnds.valueAsDate.getTime() ) {
     calFormEnds.valueAsDate = new Date( calFormStarts.valueAsDate.getTime() );
   }
 } );
 
-calFormStarts.addEventListener( 'aa-open', ( evt ) => {
+calFormStarts.addEventListener( 'aa-open', () => {
   calFormEnds.open = false;
 } );
 
@@ -413,57 +409,136 @@ btnViewDelete.addEventListener( TOUCH, () => {
   const response = confirm( 'Are you sure you want to delete this event?' );
   if( !response ) return;
 
-  const id = dlgDetails.getAttribute( 'data-id' );
-
-  if( session === null ) {
-    const index = events.findIndex( ( value ) => value.id === id );
-    events.splice( index, 1 );
-
+  db.event.delete( dlgDetails.getAttribute( 'data-id' ) )
+  .then( () => {
+    return db.event.where( 'startsAt' ).between( starts, ends ).toArray();
+  } )
+  .then( ( data ) => {
+    events = [... data];
     calYear.data = events;
     lstEvents.data = events;
     blocker( false );
     dlgDetails.close();
     dlgDetails.removeAttribute( 'data-id' );
 
-    summarize( events.length );    
-  } else {
-    deleteEvent( id )
-    .then( ( data ) => {
-      const index = events.findIndex( ( value ) => value.id === data.id );
-      events.splice( index, 1 );
-  
-      calYear.data = events;
-      lstEvents.data = events;
-      blocker( false );
-      dlgDetails.close();
-      dlgDetails.removeAttribute( 'data-id' );
-  
-      summarize( events.length );
-    } );
-  }
+    summarize( events.length );
+  } );
 } );
 
 btnViewEdit.addEventListener( TOUCH, () => {
-  const id = dlgDetails.getAttribute( 'data-id' );
-  const event = events.filter( ( value ) => value.id === id )[0];
+  db.event.where( {id: dlgDetails.getAttribute( 'data-id' )} ).first()
+  .then( ( event ) => {
+    fillForm( event );
 
-  fillForm( event );
-
-  lblFormLabel.text = 'Edit Event';
-  btnFormAdd.label = 'Done';
-  stkDetails.selectedIndex = 0;
-  dlgDetails.classList.add( 'transparent' );
+    lblFormLabel.text = 'Edit Event';
+    btnFormAdd.label = 'Done';
+    stkDetails.selectedIndex = 0;
+    dlgDetails.classList.add( 'transparent' );
+  } );
 } );
 
 // Drawers
 btnCalendarsAdd.addEventListener( TOUCH, () => {
+  frmCalendar.canDelete = false;
+  blocker( true );
+  dlgCalendar.showModal();
+  frmCalendar.focus();
+} );
 
+btnCalendarsHide.addEventListener( TOUCH, async () => {
+  for( let c = 0; c < calendars.length; c++ ) {
+    const calendar = await db.calendar.get( calendars[c].id );
+    calendar.isActive = btnCalendarsHide.label === HIDE_ALL ? false : true;
+    await db.calendar.put( calendar );
+  }
+
+  db.calendar.toCollection().sortBy( 'name' )
+  .then( ( data ) => {
+    calendars = [... data];
+    lstCalendars.data = calendars;
+    btnCalendarsHide.label = btnCalendarsHide.label === HIDE_ALL ? SHOW_ALL : HIDE_ALL;
+  } );
+} );
+
+frmCalendar.addEventListener( 'aa-cancel', () => {
+  frmCalendar.reset();
+  blocker( false );
+  dlgCalendar.close();
+} );
+
+frmCalendar.addEventListener( 'aa-delete', () => {
+  blocker( false );
+  dlgCalendar.close();
+
+  db.calendar.delete( frmCalendar.data.id )
+  .then( async () => {
+    const id = frmCalendar.data.id;
+
+    for( let e = 0; e < events.length; e++ ) {
+      if( events[e].calendarId === id ) {
+        await db.event.delete( events[e].id );
+      }
+    }
+
+    return db.calendar.toCollection().sortBy( 'name' );     
+  } )
+  .then( ( data ) => {
+    calendars = [... data];
+    lstCalendars.data = calendars;
+    frmCalendar.reset();    
+    checkCalendars();
+
+    return db.event.where( 'startsAt' ).between( starts, ends ).toArray();
+  } )
+  .then( ( data ) => {
+    events = [... data];
+    lstEvents.data = events;
+    calYear.data = events;
+    summarize( events.length );
+  } );
+} );
+
+frmCalendar.addEventListener( 'aa-done', () => {
+  blocker( false );
+  dlgCalendar.close();
+
+  db.calendar.put( frmCalendar.data )
+  .then( () => {
+    return db.calendar.toArray();
+  } )
+  .then( ( data ) => {
+    calendars = [... data];
+    lstCalendars.data = calendars;
+    frmCalendar.reset();
+  } );
+} );
+
+lstCalendars.addEventListener( 'aa-active', ( evt ) => {
+  db.calendar.get( evt.detail.id )
+  .then( ( data ) => {
+    data.isActive = evt.detail.active;
+    data.updatedAt = new Date();
+    return db.calendar.put( data );
+  } )
+  .then( () => {
+    return db.calendar.toArray();
+  } )
+  .then( ( data ) => {
+    calendars = [... data];
+    lstCalendars.data = calendars;
+    checkCalendars();
+  } );
 } );
 
 lstCalendars.addEventListener( 'aa-info', ( evt ) => {
-  console.log( evt.detail.id ); 
-  blocker( true );
-  dlgCalendar.showModal();
+  db.calendar.get( evt.detail.id )
+  .then( ( data ) => {
+    frmCalendar.data = data;
+    frmCalendar.canDelete = calendars.length > 1 ? true : false;
+    blocker( true );
+    dlgCalendar.showModal();
+    frmCalendar.focus();
+  } );
 } );
 
 // Calendar
@@ -476,14 +551,16 @@ calYear.addEventListener( 'aa-change', ( evt ) => {
   }
   */
 
-  const event = events.filter( ( value ) => value.id === evt.detail.id )[0];
-  fillView( event );  
+  db.event.where( {id: evt.detail.id} ).first()
+  .then( ( event ) => {
+    fillView( event );  
 
-  dlgDetails.classList.remove( 'transparent' );
-  stkDetails.selectedIndex = 1;
-  blocker( true );
-  dlgDetails.setAttribute( 'data-id', event.id );
-  dlgDetails.showModal();
+    dlgDetails.classList.remove( 'transparent' );
+    stkDetails.selectedIndex = 1;
+    blocker( true );
+    dlgDetails.setAttribute( 'data-id', event.id );
+    dlgDetails.showModal();
+  } );
 } );
 
 /*
@@ -492,36 +569,41 @@ calYear.addEventListener( 'aa-change', ( evt ) => {
 
 lblHeaderYear.text = year;
 
-if( session === null ) {
-  const now = new Date().toISOString();
-  calendars = [{
-    id: self.crypto.randomUUID(),
-    createdAt: now,
-    updatedAt: now,
-    accountId: self.crypto.randomUUID(),
-    name: 'Calendar',
-    color: null,
-    isShared: false,
-    isPublic: false,
-    isActive: true
-  }];
+const db = new Dexie( 'AnnoAwesome' );
+db.version( 4 ).stores( {
+  event: 'id, startsAt',
+  calendar: 'id'
+} );
+
+db.calendar.toCollection().sortBy( 'name' )
+.then( async ( data ) => {
+  if( data.length === 0 ) {
+    const now = Date.now();
+    await db.calendar.put( {
+      id: self.crypto.randomUUID(),
+      createdAt: new Date( now ),
+      updatedAt: new Date( now ),
+      name: 'Calendar',
+      color: null,
+      isShared: false,
+      isPublic: false,
+      isActive: true
+    } );
+    data = await db.calendar.toArray();
+  }
+
+  calendars = [... data];
   lstCalendars.data = calendars;
-  events = [];
+  checkCalendars();
+
+  return db.event.where( 'startsAt' ).between( starts, ends ).toArray();
+} )
+.then( ( data ) => {
+  events = [... data];
+  lstEvents.data = events;  
+  calYear.data = events;
   summarize( events.length );
-} else {
-  browseCalendars()
-  .then( ( data ) => {
-    calendars = [... data];
-    lstCalendars.data = calendars;
-    return browseEvents( year );
-  } )
-  .then( ( data ) => {
-    events = data === null ? [] : [... data];
-    calYear.data = events;
-    lstEvents.data = events;    
-    summarize( events.length );
-  } );
-}
+} );
 
 /*
 // Utility
@@ -538,16 +620,19 @@ function blocker( disabled = true ) {
   btnHeaderToday.disabled = disabled;
   lnkFooterLink.disabled = disabled;
   sldFooterScale.disabled = disabled;
+  lstCalendars.disabled = disabled;  
+  btnCalendarsAdd.disabled = disabled;
+  btnCalendarsHide.disabled = disabled;
 }
 
 function buildEvent( id = null ) {
-  const now = new Date().toISOString();
+  const now = new Date();
 
   const event = {
     updatedAt: now,
     calendarId: calendars[0].id,
-    startsAt: calFormStarts.value,
-    endsAt: calFormEnds.value,
+    startsAt: calFormStarts.valueAsDate,
+    endsAt: calFormEnds.valueAsDate,
     summary: txtFormTitle.value,
     location: txtFormLocation.value,
     latitude: null,
@@ -566,11 +651,24 @@ function buildEvent( id = null ) {
   return event;
 }
 
+function checkCalendars() {
+  let all = true;
+
+  for( let c = 0; c < calendars.length; c++ ) {
+    if( !calendars[c].isActive ) {
+      all = false;
+      break;
+    }
+  }
+
+  btnCalendarsHide.label = all ? HIDE_ALL : SHOW_ALL;  
+}
+
 function fillForm( event ) {  
   txtFormTitle.value = event.summary;
   txtFormLocation.value = event.location;
-  calFormStarts.value = event.startsAt;
-  calFormEnds.value = event.endsAt;
+  calFormStarts.valueAsDate = event.startsAt;
+  calFormEnds.valueAsDate = event.endsAt;
   txtFormUrl.value = event.url;
   txtFormNotes.value = event.description;
 }
@@ -589,6 +687,7 @@ function fillView( event ) {
     lblViewLocation.hidden = true;
   }
 
+  /*
   let parts = event.startsAt.split( '-' );
   const start = new Date( 
     parseInt( parts[0] ),
@@ -601,6 +700,7 @@ function fillView( event ) {
     parseInt( parts[1] - 1 ),
     parseInt( parts[2] )
   );  
+  */
   const formatter = new Intl.DateTimeFormat( navigator.language, {
     day: 'numeric',
     weekday: 'long',
@@ -608,14 +708,14 @@ function fillView( event ) {
     year: 'numeric'
   } );      
 
-  if( start.getDate() === end.getDate() ) {
+  if( event.startsAt.getDate() === event.endsAt.getDate() ) {
     lblViewStartLabel.hidden = true;
-    lblViewStart.text = formatter.format( start );
+    lblViewStart.text = formatter.format( event.startsAt );
     boxViewEnd.hidden = true;
   } else {
     lblViewStartLabel.hidden = false;    
-    lblViewStart.text = formatter.format( start );
-    lblViewEnd.text = formatter.format( end );
+    lblViewStart.text = formatter.format( event.startsAt );
+    lblViewEnd.text = formatter.format( events.endsAt );
     boxViewEnd.hidden = false;
   }
 
@@ -716,15 +816,19 @@ function accountLogin( user ) {
 }
 
 function browseCalendars() {
+  /*
   return fetch( `${KETNER_LAKE_API}/calendar`, {
     headers: {
       'x-anno-awesome': session
     }    
   } )
   .then( ( response ) => response.json() );
+  */
+  return db.calendar.toArray();
 }
 
 function browseEvents( year = null ) {
+  /*
   year = year === null ? new Date().getFullYear() : year;
   return fetch( `${KETNER_LAKE_API}/event/year/${year}`, {
     headers: {
@@ -732,6 +836,11 @@ function browseEvents( year = null ) {
     }
   } )
   .then( ( response ) => response.json() );
+  */
+  year = year === null ? new Date().getFullYear() : year; 
+  const start = new Date( year, 0, 1 );
+  const end = new Date( year + 1, 0, 1 );
+  return db.event.where( 'startsAt' ).between( start, end ).toArray();
 }
 
 function editEvent( event ) {
@@ -747,6 +856,7 @@ function editEvent( event ) {
 }
 
 function addEvent( event ) {
+  /*
   return fetch( `${KETNER_LAKE_API}/event/${event.id}`, {
     headers: {
       'Content-Type': 'application/json',
@@ -756,9 +866,15 @@ function addEvent( event ) {
     body: JSON.stringify( event )
   } )
   .then( ( response ) => response.json() );
+  */
+  return db.event.put( event ).then( ( data ) => {
+    console.log( data );
+    return db.event.where( {id: event.id} ).first();
+  } );
 }
 
 function deleteEvent( id ) {
+  /*
   return fetch( `${KETNER_LAKE_API}/event/${id}`, {
     headers: {
       'Content-Type': 'application/json',      
@@ -768,4 +884,6 @@ function deleteEvent( id ) {
     body: JSON.stringify( {id: id} )
   } )
   .then( ( response ) => response.json() );
+  */
+  return db.event.delete( id );
 }

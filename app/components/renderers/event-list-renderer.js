@@ -2,7 +2,7 @@ import AAHBox from "../hbox.js";
 import AALabel from "../label.js";
 import AAVBox from "../vbox.js";
 
-export default class AAEventRenderer extends HTMLElement {
+export default class AAEventListRenderer extends HTMLElement {
   constructor() {
     super();
 
@@ -94,7 +94,7 @@ export default class AAEventRenderer extends HTMLElement {
       <div>
         <aa-vbox centered justified part="calendar">
           <aa-label part="date" text="6" weight="bold"></aa-label>
-          <aa-label part="month" size="xs" text="Jan"></aa-label>
+          <aa-label part="month" size="xs"></aa-label>
         </aa-vbox>
       </div>
       <aa-vbox part="details">
@@ -104,7 +104,7 @@ export default class AAEventRenderer extends HTMLElement {
         </aa-hbox>
         <aa-hbox gap="m" part="second">
           <aa-label part="location" size="s" truncate></aa-label>
-          <aa-label part="ends" size="s" text="Fri Aug 23"></aa-label>
+          <aa-label part="ends" size="s"></aa-label>
         </aa-hbox>        
       </aa-vbox>
     `;
@@ -144,43 +144,47 @@ export default class AAEventRenderer extends HTMLElement {
   _render() {
     if( this._data === null ) return;
 
+    /*
     let parts = this._data.startsAt.split( '-' );
     const starts = new Date(
       parseInt( parts[0] ),
       parseInt( parts[1] ) - 1,
       parseInt( parts[2] )
-    );    
+    );
+    */    
 
     let formatted = new Intl.DateTimeFormat( navigator.language, {
       month: 'short'
-    } ).format( starts );        
+    } ).format( this._data.startsAt );        
 
-    this.$calendar.style.setProperty( 'background', this._colors[starts.getMonth()].activeBackgroundColor + '4d' );    
-    this.$date.style.setProperty( '--label-color', this._colors[starts.getMonth()].inactiveColor );        
-    this.$date.text = starts.getDate();
-    this.$month.style.setProperty( '--label-color', this._colors[starts.getMonth()].inactiveColor );            
+    this.$calendar.style.setProperty( 'background', this._colors[this._data.startsAt.getMonth()].activeBackgroundColor + '4d' );    
+    this.$date.style.setProperty( '--label-color', this._colors[this._data.startsAt.getMonth()].inactiveColor );        
+    this.$date.text = this._data.startsAt.getDate();
+    this.$month.style.setProperty( '--label-color', this._colors[this._data.startsAt.getMonth()].inactiveColor );            
     this.$month.text = formatted;
     
+    /*
     parts = this._data.endsAt.split( '-' );
     const ends = new Date(
       parseInt( parts[0] ),
       parseInt( parts[1] ) - 1,
       parseInt( parts[2] )
     );
+    */
 
     this.$summary.text = this._data.summary;
-    this.$label.hidden = starts.getDate() === ends.getDate() ? true : false;
+    this.$label.hidden = this._data.startsAt.getDate() === this._data.endsAt.getDate() ? true : false;
     this.$location.text = this._data.location;
 
-    if( starts.getDate() === ends.getDate() &&
-        starts.getMonth() === ends.getMonth() ) {
+    if( this._data.startsAt.getDate() === this._data.endsAt.getDate() &&
+        this._data.startsAt.getMonth() === this._data.endsAt.getMonth() ) {
       this.$ends.hidden = true;
     } else {
       formatted = new Intl.DateTimeFormat( navigator.language, {
         weekday: 'short',
         month: 'short',
         day: 'numeric'
-      } ).format( ends );      
+      } ).format( this._data.endsAt );      
       this.$ends.hidden = false;  
       this.$ends.text = formatted;
     }
@@ -230,13 +234,16 @@ export default class AAEventRenderer extends HTMLElement {
   set data( value ) {
     this._data = value;
 
+    /*
     const parts = this._data.endsAt.split( '-' );
     const ends = new Date(
       parseInt( parts[0] ),
       parseInt( parts[1] ) - 1,
       parseInt( parts[2] )
-    );    
-    this.outdated = ends.getTime() < Date.now() ? true : false;    
+    );
+    */
+
+    this.outdated = this._data.endsAt.getTime() < Date.now() ? true : false;    
 
     this._render();
   }  
@@ -305,4 +312,4 @@ export default class AAEventRenderer extends HTMLElement {
   }  
 }
 
-window.customElements.define( 'aa-event-renderer', AAEventRenderer );
+window.customElements.define( 'aa-event-list-renderer', AAEventListRenderer );
