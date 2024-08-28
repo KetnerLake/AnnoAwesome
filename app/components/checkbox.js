@@ -34,7 +34,7 @@ export default class AACheckbox extends HTMLElement {
         }
 
         svg {
-          color: var( --checkbox-color, #00b0ff );
+          color: var( --checkbox-color, #1badf8 );
         }
 
         :host( [disabled] ) svg {

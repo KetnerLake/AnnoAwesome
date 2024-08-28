@@ -63,7 +63,7 @@ export default class AACalendarForm extends HTMLElement {
           <aa-input part="name" placeholder="Calendar name"></aa-input>
         </aa-section>                   
         <aa-section label="Color">
-          <aa-input part="color" placeholder="Color"></aa-input>
+          <aa-color-picker label="Color"></aa-color-picker>
         </aa-section>                                 
         <aa-section label="Shared with">
           <aa-button label="Add person" part="share"></aa-button>

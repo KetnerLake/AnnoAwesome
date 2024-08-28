@@ -188,6 +188,7 @@ export default class AAYear extends HTMLElement {
     this._upgrade( 'concealed' );    
     this._upgrade( 'data' );
     this._upgrade( 'hidden' );
+    this._upgrade( 'selectedItem' );        
     this._upgrade( 'value' );    
     this._render();
   }
@@ -234,7 +235,6 @@ export default class AAYear extends HTMLElement {
       parts = this._data[c].endsAt.split( '-' );
       const ends = new Date( parseInt( parts[0] ), parseInt( parts[1] ) - 1, parseInt( parts[2] ) );
       */
-
       const diff = ( this._data[c].endsAt.getDate() - this._data[c].startsAt.getDate() ) + 1;
 
       this.$events.children[c].summary = this._data[c].summary;
@@ -249,6 +249,20 @@ export default class AAYear extends HTMLElement {
       this.$events.children[c].style.setProperty( '--event-active-color', this._colors[this._data[c].startsAt.getMonth()].activeColor );
       this.$events.children[c].style.setProperty( '--event-inactive-background-color', this._colors[this._data[c].startsAt.getMonth()].activeBackgroundColor + '4d' );      
       this.$events.children[c].style.setProperty( '--event-inactive-color', this._colors[this._data[c].startsAt.getMonth()].inactiveColor );      
+    }
+  }
+
+  set selectedItem( id ) {
+    for( let c = 0; c < this.$events.children.length; c++ ) {
+      if( id === null ) {
+        this.$events.children[c].selected = false;
+      } else {
+        if( this.$events.children[c].data.id === id ) {
+          this.$events.children[c].selected = true;
+        } else {
+          this.$events.children[c].selected = false;          
+        }
+      }
     }
   }
 

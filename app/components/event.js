@@ -65,18 +65,26 @@ export default class AAEvent extends HTMLElement {
           font-weight: 600;
         }
 
+        /*
         button:focus {
-          /* background-color: #ffa500; */
           background-color: var( --event-active-background-color );
         }
 
         button:focus span {
-          /* color: #ffffff; */
           color: var( --event-active-color );
         }
+        */
 
         :host( :not( [location] ) ) span[part=location] {
           display: none;
+        }
+
+        :host( [selected] ) button {
+          background-color: var( --event-active-background-color );
+        }
+
+        :host( [selected] ) span {
+          color: var( --event-active-color );
         }
 
         :host( :not( [summary] ) ) span[part=summary] {
@@ -91,6 +99,7 @@ export default class AAEvent extends HTMLElement {
 
     // Private
     this._data = null;
+    this._touch = ( 'ontouchstart' in document.documentElement ) ? true : false; 
 
     // Root
     this.attachShadow( {mode: 'open'} );
@@ -98,15 +107,16 @@ export default class AAEvent extends HTMLElement {
 
     // Elements
     this.$button = this.shadowRoot.querySelector( 'button' );
-    this.$button.addEventListener( 'click', () => {
+    this.$button.addEventListener( this._touch ? 'touchstart' : 'click', () => {
       this.selected = !this.selected;
-      if( !this.selected ) this.$button.blur();
+      // if( !this.selected ) this.$button.blur();
       this.dispatchEvent( new CustomEvent( 'aa-change', {
         bubbles: true,
         composed: true,
         cancelable: false,
         detail: {
-          id: this.selected ? this.data.id : null
+          // id: this.selected ? this.data.id : null
+          id: this.data.id
         }
       } ) );
     } );    

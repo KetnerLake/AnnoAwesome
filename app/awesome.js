@@ -105,7 +105,7 @@ btnHeaderAdd.addEventListener( TOUCH, () => {
   frmEvent.reset();
   frmEvent.calendars = calendars;
   blocker( true );
-  dlgEvent.removeAttribute( 'data-id' );
+  dlgEvent.classList.add( 'transparent' );
   dlgEvent.showModal();
   frmEvent.focus();
 } );
@@ -295,10 +295,44 @@ frmAccount.addEventListener( 'aa-signin', ( evt ) => {
 } );
 
 // Event
+dlgEvent.addEventListener( TOUCH, ( evt ) => {
+  if( evt.target === dlgEvent ) {
+    blocker( false );
+    dlgEvent.close();
+    frmEvent.reset();
+    calYear.selectedItem = null;    
+  }
+} );
+
+dlgEvent.addEventListener( 'close', () => {
+  blocker( false );
+  dlgEvent.close();
+  frmEvent.reset();
+  calYear.selectedItem = null;
+} );
+
 frmEvent.addEventListener( 'aa-cancel', () => {
   blocker( false );
   dlgEvent.close();
   frmEvent.reset();
+  calYear.selectedItem = null;
+} );
+
+frmEvent.addEventListener( 'aa-delete', ( evt ) => {
+  db.event.delete( evt.detail.id )
+  .then( () => {
+    return db.event.where( 'startsAt' ).between( starts, ends ).toArray();
+  } )
+  .then( ( data ) => {
+    events = [... data];
+    calYear.data = events;
+    lstEvents.data = events;
+    blocker( false );
+    dlgEvent.close();
+    frmEvent.reset();
+    pnlEvent.data = null;
+    summarize( events.length );
+  } );
 } );
 
 frmEvent.addEventListener( 'aa-done', () => {
@@ -306,13 +340,9 @@ frmEvent.addEventListener( 'aa-done', () => {
   .then( () => {
     blocker( false );
     dlgEvent.close();
+    calYear.selectedItem = null;
     frmEvent.reset();
 
-    return db.event.get( frmEvent.data.id );
-  } )
-  .then( ( data ) => {
-    pnlEvent.data = data;
-    stkEvent.selectedIndex = 1;    
     return db.event.where( 'startsAt' ).between( starts, ends ).toArray();
   } )
   .then( ( data ) => {
@@ -333,6 +363,7 @@ pnlEvent.addEventListener( 'aa-delete', ( evt ) => {
   .then( ( data ) => {
     events = [... data];
     calYear.data = events;
+    calYear.selectedItem = null;
     lstEvents.data = events;
     blocker( false );
     dlgEvent.close();
@@ -345,6 +376,7 @@ pnlEvent.addEventListener( 'aa-delete', ( evt ) => {
 pnlEvent.addEventListener( 'aa-edit', ( evt ) => {
   db.event.where( {id: evt.detail.id} ).first()
   .then( ( event ) => {
+    frmEvent.calendars = calendars;
     frmEvent.data = event;
     // lblFormLabel.text = 'Edit Event';
     // btnFormAdd.label = 'Done';
@@ -420,7 +452,7 @@ frmCalendar.addEventListener( 'aa-done', () => {
 
   db.calendar.put( frmCalendar.data )
   .then( () => {
-    return db.calendar.toArray();
+    return db.calendar.toCollection().sortBy( 'name' );
   } )
   .then( ( data ) => {
     calendars = [... data];
@@ -461,6 +493,7 @@ lstCalendars.addEventListener( 'aa-info', ( evt ) => {
 calYear.addEventListener( 'aa-change', ( evt ) => {
   db.event.where( {id: evt.detail.id} ).first()
   .then( ( event ) => {
+    pnlEvent.calendars = calendars;
     pnlEvent.data = event;
     dlgEvent.classList.remove( 'transparent' );
     stkEvent.selectedIndex = 1;
@@ -490,7 +523,7 @@ db.calendar.toCollection().sortBy( 'name' )
       createdAt: new Date( now ),
       updatedAt: new Date( now ),
       name: 'Calendar',
-      color: '#00b0ff',
+      color: '#1badf8',
       isShared: false,
       isPublic: false,
       isActive: true

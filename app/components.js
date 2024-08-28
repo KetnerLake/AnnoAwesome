@@ -1,6 +1,7 @@
 import AAAttachment from "./components/attachment.js";
 import AAButton from "./components/button.js";
 import AACalendar from "./components/calendar.js";
+import AAColorPicker from "./components/color-picker.js";
 import AADatePicker from "./components/date-picker.js";
 import AADrawer from "./components/drawer.js";
 import AADivider from "./components/divider.js";

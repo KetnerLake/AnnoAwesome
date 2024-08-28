@@ -74,6 +74,7 @@ export default class AAEventDetails extends HTMLElement {
       </aa-hbox>
       <aa-spacer size="m"></aa-spacer>
       <aa-divider></aa-divider>
+      <aa-select label="Calendar" label-field="name" part="calendar" value-field="id"></aa-select>
       <aa-vbox gap="m" part="url_box">
         <aa-label text="URL"></aa-label>
         <aa-link part="url_link"></aa-link>
@@ -101,6 +102,7 @@ export default class AAEventDetails extends HTMLElement {
     this.$boxEnds = this.shadowRoot.querySelector( 'aa-hbox[part=end_box]' );
     this.$boxNotes = this.shadowRoot.querySelector( 'aa-vbox[part=notes_box]' );    
     this.$boxUrl = this.shadowRoot.querySelector( 'aa-vbox[part=url_box]' );
+    this.$calendar = this.shadowRoot.querySelector( 'aa-select[part=calendar]' );
     this.$delete = this.shadowRoot.querySelector( 'aa-button[part=delete]' );
     this.$delete.addEventListener( this._touch ? 'touchstart' : 'click', () => {
       const response = confirm( 'Are you sure you want to delete this calendar?' );
@@ -147,6 +149,7 @@ export default class AAEventDetails extends HTMLElement {
 
   // Setup
   connectedCallback() {
+    this._upgrade( 'calendars' );      
     this._upgrade( 'concealed' );  
     this._upgrade( 'data' );      
     this._upgrade( 'hidden' );    
@@ -170,6 +173,15 @@ export default class AAEventDetails extends HTMLElement {
   // Properties
   // Not reflected
   // Array, Date, Function, Object, null
+  get calendars() {
+    return this._calendars.length === 0 ? null : this._calendars;
+  }
+
+  set calendars( value ) {
+    this._calendars = value === null ? [] : [... value];
+    this.$calendar.data = this._calendars;
+  }
+
   get data() {
     const now = new Date();
 
@@ -177,6 +189,7 @@ export default class AAEventDetails extends HTMLElement {
       id: this._data === null ? self.crypto.randomUUID() : this._data.id,
       createdAt: this._data === null ? now : this._data.createdAt,
       updatedAt: now,
+      calendarId: this.$calendar.value,
       name: this.$name.value,
       color: null,
       isShared: false,
@@ -219,6 +232,9 @@ export default class AAEventDetails extends HTMLElement {
       this.$ends.text = formatter.format( this._data.endsAt );
       this.$boxEnds.hidden = false;
     }
+
+    // Calendar
+    this.$calendar.value = this._data.id;
 
     // URL
     this.$boxUrl.hidden = this._data.url === null ? true : false;

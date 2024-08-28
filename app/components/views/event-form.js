@@ -31,6 +31,11 @@ export default class AAEventForm extends HTMLElement {
           --button-padding: 0;
         }        
 
+        aa-button[part=delete] {
+          --button-background: #ffffff; 
+          --button-color: red;          
+        }
+
         aa-label[part=label] {
           justify-self: center; 
           --label-line-height: 36px;
@@ -69,6 +74,7 @@ export default class AAEventForm extends HTMLElement {
         <aa-divider></aa-divider>
         <aa-textarea part="notes" placeholder="Notes"></aa-textarea>
       </aa-section>
+      <aa-button label="Delete calendar" part="delete"></aa-button>      
     `;
 
     // Private
@@ -89,6 +95,14 @@ export default class AAEventForm extends HTMLElement {
     this.$cancel = this.shadowRoot.querySelector( 'aa-button[part=cancel]' ); 
     this.$cancel.addEventListener( this._touch ? 'touchstart' : 'click', () => {
       this.dispatchEvent( new CustomEvent( 'aa-cancel' ) );
+    } );
+    this.$delete = this.shadowRoot.querySelector( 'aa-button[part=delete]' );
+    this.$delete.addEventListener( this._touch ? 'touchstart' : 'click', () => {
+      this.dispatchEvent( new CustomEvent( 'aa-delete', {
+        detail: {
+          id: this._data.id
+        }
+      } ) );
     } );
     this.$ends = this.shadowRoot.querySelector( 'aa-date-picker[part=ends]' );         
     this.$ends.addEventListener( 'aa-change', () => {
@@ -217,8 +231,10 @@ export default class AAEventForm extends HTMLElement {
   }
 
   set data( value ) {
+    console.log( value );
     this._data = value === null ? null : structuredClone( value );
 
+    this.$add.label = 'Done';
     this.$title.value = this._data.summary;
     this.$location.value = this._data.location;
     this.$starts.valueAsDate = this._data.startsAt;

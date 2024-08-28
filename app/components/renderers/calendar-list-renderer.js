@@ -45,7 +45,7 @@ export default class AACalendarListRenderer extends HTMLElement {
         }
       </style>
       <aa-checkbox></aa-checkbox>
-      <aa-label part="label" size="m"></aa-label>
+      <aa-label part="label"></aa-label>
       <aa-icon-button part="info" src="./img/info-circle.svg"></aa-icon-button>
     `;
 
@@ -137,7 +137,7 @@ export default class AACalendarListRenderer extends HTMLElement {
 
   set data( value ) {
     this._data = structuredClone( value );
-    this.$checkbox.style.setProperty( '--checkbox-color', this._data.color );
+    this.$checkbox.style.setProperty( '--checkbox-color', this._data.color === null ? '' : this._data.color );
     this._render();
   }  
 
