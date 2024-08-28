@@ -59,11 +59,7 @@ export default class AAEventForm extends HTMLElement {
         <aa-date-picker label="Ends" part="ends"></aa-date-picker>
       </aa-section>
       <aa-section>
-        <aa-hbox centered style="padding: 0 0 0 16px;">
-          <aa-label style="flex-basis: 0; flex-grow: 1;" text="Calendar"></aa-label>
-          <aa-icon src="./img/circle-fill.svg" size="xs"></aa-icon>
-          <aa-button label="Calendar" style="--button-color: #8a8a8e;"></aa-button>              
-        </aa-hbox>
+        <aa-select label="Calendar" label-field="name" part="calendars" value-field="id"></aa-select>
       </aa-section>
       <aa-section>
         <aa-attachment></aa-attachment>
@@ -76,6 +72,7 @@ export default class AAEventForm extends HTMLElement {
     `;
 
     // Private
+    this._calendars = [];
     this._data = null;
     this._touch = ( 'ontouchstart' in document.documentElement ) ? true : false; 
 
@@ -88,6 +85,7 @@ export default class AAEventForm extends HTMLElement {
     this.$add.addEventListener( this._touch ? 'touchstart' : 'click', () => {
       this.dispatchEvent( new CustomEvent( 'aa-done' ) );
     } );
+    this.$calendar = this.shadowRoot.querySelector( 'aa-select[part=calendars]' );
     this.$cancel = this.shadowRoot.querySelector( 'aa-button[part=cancel]' ); 
     this.$cancel.addEventListener( this._touch ? 'touchstart' : 'click', () => {
       this.dispatchEvent( new CustomEvent( 'aa-cancel' ) );
@@ -166,6 +164,7 @@ export default class AAEventForm extends HTMLElement {
 
   // Setup
   connectedCallback() {
+    this._upgrade( 'calendars' );      
     this._upgrade( 'concealed' );  
     this._upgrade( 'data' );      
     this._upgrade( 'hidden' );    
@@ -189,6 +188,15 @@ export default class AAEventForm extends HTMLElement {
   // Properties
   // Not reflected
   // Array, Date, Function, Object, null
+  get calendars() {
+    return this._calendars.length === 0 ? null : this._calendars;
+  }
+
+  set calendars( value ) {
+    this._calendars = value === null ? [] : [... value];
+    this.$calendar.data = this._calendars;
+  }
+
   get data() {
     const now = new Date();
 
@@ -196,6 +204,7 @@ export default class AAEventForm extends HTMLElement {
       id: this._data === null ? self.crypto.randomUUID() : this._data.id,
       createdAt: this._data === null ? now : this._data.createdAt,
       updatedAt: now,
+      calendarId: this.$calendar.value,
       startsAt: this.$starts.valueAsDate,
       endsAt: this.$ends.valueAsDate,
       summary: this.$title.value,
@@ -214,6 +223,7 @@ export default class AAEventForm extends HTMLElement {
     this.$location.value = this._data.location;
     this.$starts.valueAsDate = this._data.startsAt;
     this.$ends.valueAsDate = this._data.endsAt;
+    this.$calendar.value = this._data.calendarId;
     this.$url.value = this._data.url;
     this.$notes.value = this._data.description;
 

@@ -18,6 +18,7 @@ import AAPopover from "./components/popover.js";
 import AARainbow from "./components/rainbow.js";
 import AASearch from "./components/search.js";
 import AASection from "./components/section.js";
+import AASelect from "./components/select.js";
 import AASlider from "./components/slider.js";
 import AASpacer from "./components/spacer.js";
 import AAStack from "./components/stack.js";
@@ -31,4 +32,5 @@ import AAEventListRenderer from "./components/renderers/event-list-renderer.js";
 
 import AAAccountForm from "./components/views/account-form.js";
 import AACalendarForm from "./components/views/calendar-form.js";
+import AAEventDetails from "./components/views/event-details.js";
 import AAEventForm from "./components/views/event-form.js";

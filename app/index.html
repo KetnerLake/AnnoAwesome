@@ -21,6 +21,7 @@
           <aa-label size="xl" style="padding-left: 16px; padding-top: 64px; margin-bottom: 21px;" text="Calendars" weight="bold"></aa-label>
           <aa-vbox gap="m" style="flex-basis: 0; flex-grow: 1; margin: 0 16px 16px 16px;">
             <aa-section label="My Awesome">
+              <aa-button label="Hide all" slot="count"></aa-button>
               <aa-list id="drawer_calendars" item-renderer="aa-calendar-list-renderer"></aa-list>
             </aa-section>
             <!-- Shared awesome -->
@@ -114,47 +115,12 @@
       <aa-account-form id="account_form"></aa-account-form>
     </dialog>
 
-    <!-- Details -->
+    <!-- Event -->
     <!-- Placement strategy? style="margin-left: 16px; margin-top: 70px;" -->
     <dialog class="popover transparent" id="event">
       <aa-stack id="event_stack">
-
         <aa-event-form id="event_form"></aa-event-form>
-
-        <!-- View -->
-        <aa-vbox>
-          <aa-hbox centered style="padding: 8px 16px 0 16px;">
-            <aa-label id="view_title" style="flex-basis: 0; flex-grow: 1;" text="Event Title" weight="bold"></aa-label>            
-            <aa-button id="view_edit" label="Edit" style="justify-self: flex-end; --button-padding: 0;"></aa-button>
-          </aa-hbox>
-          <aa-link id="view_location_link" label="Location" style="margin: 0 0 0 16px;"></aa-link>
-          <aa-label id="view_location_label" label="Location" style="margin: 0 0 0 16px;"></aa-label>          
-          <aa-spacer size="m"></aa-spacer>
-          <aa-hbox gap="s" style="margin: 0 0 0 16px;">
-            <aa-label id="view_start_label" text="from" style="--label-color: #8e8e8e;"></aa-label>
-            <aa-label id="view_start" style="--label-color: #8e8e8e;" text="Monday, Jul 21 - 29, 2024"></aa-label>          
-          </aa-hbox>
-          <aa-hbox gap="s" id="view_end_box" style="margin: 8px 0 0 16px;">
-            <aa-label text="to" style="--label-color: #8e8e8e;"></aa-label>            
-            <aa-label id="view_end" style="--label-color: #8e8e8e;" text="Monday, Jul 21 - 29, 2024"></aa-label>                      
-          </aa-hbox>
-          <aa-spacer size="m"></aa-spacer>
-          <aa-divider></aa-divider>
-          <aa-vbox gap="m" id="view_url_box" style="margin: 8px 0 8px 16px;">
-            <aa-label id="view_url_label" text="URL"></aa-label>
-            <aa-link id="view_url_link" href="https://kevinhoyt.com" label="https://kevinhoyt.com"></aa-link>
-          </aa-vbox>
-          <aa-divider id="view_url_divider"></aa-divider>
-          <aa-vbox gap="m" id="view_notes_box" style="margin: 8px 0 8px 16px;">
-            <aa-label id="view_notes" text="Notes"></aa-label>
-            <aa-label id="view_description" style="--label-color: #8e8e8e;" text="Some notes here."></aa-label>
-          </aa-vbox>
-          <aa-divider id="view_notes_divider"></aa-divider>
-          <aa-map id="view_map" style="border-radius: 4px; margin: 16px;"></aa-map>
-          <aa-divider hidden id="view_map_divider"></aa-divider>          
-          <aa-button id="view_delete" label="Delete Event" style="margin: 4px 0 4px 0; --button-color: red;"></aa-button>
-        </aa-vbox>
-
+        <aa-event-details id="event_details"></aa-event-details>
       </aa-stack>        
     </dialog>    
 

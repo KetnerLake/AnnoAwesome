@@ -24,8 +24,14 @@ export default class AASection extends HTMLElement {
           display: none;
         }
 
+        aa-hbox {
+          justify-content: flex-end;
+          margin: 0 16px 8px 16px;          
+        }
+
         aa-label[part=label] {
-          margin: 0 16px 8px 16px;
+          flex-basis: 0;
+          flex-grow: 1;
           --label-color: #868686;
           --label-text-transform: uppercase;
         }
@@ -42,9 +48,17 @@ export default class AASection extends HTMLElement {
           border-radius: 4px;
         }
 
-        ::slotted( aa-button ) {
+        ::slotted( aa-button:not( [slot] ) ) {
           --button-text-align: left;
         }
+
+        ::slotted( aa-button[slot] ) {
+          --button-font-size: 14px;
+          --button-height: 14px;
+          --button-line-height: 14px;
+          --button-padding: 0;
+          --button-text-transform: uppercase;
+        }        
 
         :host( :not( [notes] ) ) aa-label[part=notes],
         :host( :not( [label] ) ) aa-label[part=label] {

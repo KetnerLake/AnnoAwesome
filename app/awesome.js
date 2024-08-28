@@ -56,32 +56,12 @@ const frmAccount = document.querySelector( '#account_form' );
 // Event
 const dlgEvent = document.querySelector( '#event' );
 const frmEvent = document.querySelector( '#event_form' );
+const pnlEvent = document.querySelector( '#event_details' );
 const stkEvent = document.querySelector( '#event_stack' );
 
 // Calendar
 const dlgCalendar = document.querySelector( '#calendar' );
 const frmCalendar = document.querySelector( '#calendar_form' );
-
-// View
-const lblViewTitle = document.querySelector( '#view_title' );
-const btnViewEdit = document.querySelector( '#view_edit' );
-const lnkViewLocation = document.querySelector( '#view_location_link' );
-const lblViewLocation = document.querySelector( '#view_location_label' );
-const lblViewStartLabel = document.querySelector( '#view_start_label' );
-const lblViewStart = document.querySelector( '#view_start' );
-const boxViewEnd = document.querySelector( '#view_end_box' );
-const lblViewEnd = document.querySelector( '#view_end' );
-const boxViewUrl = document.querySelector( '#view_url_box' );
-const lblViewUrl = document.querySelector( '#view_url_label' );
-const lnkViewUrl = document.querySelector( '#view_url_link' );
-const divViewUrl = document.querySelector( '#view_url_divider' );
-const boxViewNotes = document.querySelector( '#view_notes_box' );
-const lblViewNotes = document.querySelector( '#view_notes' );
-const lblViewDescription = document.querySelector( '#view_description' );
-const divViewNotes = document.querySelector( '#view_notes_divider' );
-const mapViewLocation = document.querySelector( '#view_map' );
-const divViewLocation = document.querySelector( '#view_map_divider' );
-const btnViewDelete = document.querySelector( '#view_delete' );
 
 /*
 // Events
@@ -123,6 +103,7 @@ btnHeaderAdd.addEventListener( TOUCH, () => {
 
   stkEvent.selectedIndex = 0;
   frmEvent.reset();
+  frmEvent.calendars = calendars;
   blocker( true );
   dlgEvent.removeAttribute( 'data-id' );
   dlgEvent.showModal();
@@ -327,6 +308,11 @@ frmEvent.addEventListener( 'aa-done', () => {
     dlgEvent.close();
     frmEvent.reset();
 
+    return db.event.get( frmEvent.data.id );
+  } )
+  .then( ( data ) => {
+    pnlEvent.data = data;
+    stkEvent.selectedIndex = 1;    
     return db.event.where( 'startsAt' ).between( starts, ends ).toArray();
   } )
   .then( ( data ) => {
@@ -335,18 +321,12 @@ frmEvent.addEventListener( 'aa-done', () => {
     calYear.data = events;
     lstEvents.data = events;
     summarize( events.length );
-    
-    fillView( update );
-    stkEvent.selectedIndex = 1;
   } );
 } );
 
-// View
-btnViewDelete.addEventListener( TOUCH, () => {
-  const response = confirm( 'Are you sure you want to delete this event?' );
-  if( !response ) return;
-
-  db.event.delete( dlgEvent.getAttribute( 'data-id' ) )
+// Details
+pnlEvent.addEventListener( 'aa-delete', ( evt ) => {
+  db.event.delete( evt.detail.id )
   .then( () => {
     return db.event.where( 'startsAt' ).between( starts, ends ).toArray();
   } )
@@ -356,19 +336,18 @@ btnViewDelete.addEventListener( TOUCH, () => {
     lstEvents.data = events;
     blocker( false );
     dlgEvent.close();
-    dlgEvent.removeAttribute( 'data-id' );
-
+    frmEvent.reset();
+    pnlEvent.data = null;
     summarize( events.length );
   } );
 } );
 
-btnViewEdit.addEventListener( TOUCH, () => {
-  db.event.where( {id: dlgEvent.getAttribute( 'data-id' )} ).first()
+pnlEvent.addEventListener( 'aa-edit', ( evt ) => {
+  db.event.where( {id: evt.detail.id} ).first()
   .then( ( event ) => {
-    fillForm( event );
-
-    lblFormLabel.text = 'Edit Event';
-    btnFormAdd.label = 'Done';
+    frmEvent.data = event;
+    // lblFormLabel.text = 'Edit Event';
+    // btnFormAdd.label = 'Done';
     stkEvent.selectedIndex = 0;
     dlgEvent.classList.add( 'transparent' );
   } );
@@ -482,7 +461,7 @@ lstCalendars.addEventListener( 'aa-info', ( evt ) => {
 calYear.addEventListener( 'aa-change', ( evt ) => {
   db.event.where( {id: evt.detail.id} ).first()
   .then( ( event ) => {
-    frmEvent.data = event;
+    pnlEvent.data = event;
     dlgEvent.classList.remove( 'transparent' );
     stkEvent.selectedIndex = 1;
     blocker( true );
@@ -511,7 +490,7 @@ db.calendar.toCollection().sortBy( 'name' )
       createdAt: new Date( now ),
       updatedAt: new Date( now ),
       name: 'Calendar',
-      color: null,
+      color: '#00b0ff',
       isShared: false,
       isPublic: false,
       isActive: true
@@ -563,92 +542,6 @@ function checkCalendars() {
   }
 
   btnCalendarsHide.label = all ? HIDE_ALL : SHOW_ALL;  
-}
-
-function fillForm( event ) {  
-  txtFormTitle.value = event.summary;
-  txtFormLocation.value = event.location;
-  calFormStarts.valueAsDate = event.startsAt;
-  calFormEnds.valueAsDate = event.endsAt;
-  txtFormUrl.value = event.url;
-  txtFormNotes.value = event.description;
-}
-
-function fillView( event ) {
-  lblViewTitle.text = event.summary;
-
-  if( event.url === null ) {
-    lnkViewLocation.hidden = true;
-    lblViewLocation.hidden = false;
-    lblViewLocation.text = event.location;
-  } else {
-    lnkViewLocation.hidden = false;
-    lnkViewLocation.label = event.location;
-    lnkViewLocation.href = event.url;
-    lblViewLocation.hidden = true;
-  }
-
-  /*
-  let parts = event.startsAt.split( '-' );
-  const start = new Date( 
-    parseInt( parts[0] ),
-    parseInt( parts[1] - 1 ),
-    parseInt( parts[2] )
-  );
-  parts = event.endsAt.split( '-' );
-  const end = new Date( 
-    parseInt( parts[0] ),
-    parseInt( parts[1] - 1 ),
-    parseInt( parts[2] )
-  );  
-  */
-  const formatter = new Intl.DateTimeFormat( navigator.language, {
-    day: 'numeric',
-    weekday: 'long',
-    month: 'short',
-    year: 'numeric'
-  } );      
-
-  if( event.startsAt.getDate() === event.endsAt.getDate() ) {
-    lblViewStartLabel.hidden = true;
-    lblViewStart.text = formatter.format( event.startsAt );
-    boxViewEnd.hidden = true;
-  } else {
-    lblViewStartLabel.hidden = false;    
-    lblViewStart.text = formatter.format( event.startsAt );
-    lblViewEnd.text = formatter.format( events.endsAt );
-    boxViewEnd.hidden = false;
-  }
-
-  if( event.url === null ) {
-    boxViewUrl.hidden = true;
-    lnkViewUrl.label = null;
-    lnkViewUrl.href = null;
-    divViewUrl.hidden = true;
-  } else {
-    boxViewUrl.hidden = false;
-    lnkViewUrl.label = event.url;
-    lnkViewUrl.href = event.url;
-    divViewUrl.hidden = false;    
-  }
-
-  if( event.description === null ) {
-    boxViewNotes.hidden = true;
-    lblViewDescription.text = null;
-    divViewNotes.hidden = true;
-  } else {
-    boxViewNotes.hidden = false;
-    lblViewDescription.text = event.description;
-    divViewNotes.hidden = false;
-  }
-
-  if( event.latitude === null ) {
-    mapViewLocation.hidden = true;
-    divViewLocation.hidden = true;
-  } else {
-    mapViewLocation.hidden = false;
-    divViewLocation.hidden = false;    
-  }
 }
 
 function summarize( count = null ) {

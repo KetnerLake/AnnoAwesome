@@ -137,6 +137,7 @@ export default class AACalendarListRenderer extends HTMLElement {
 
   set data( value ) {
     this._data = structuredClone( value );
+    this.$checkbox.style.setProperty( '--checkbox-color', this._data.color );
     this._render();
   }  
 

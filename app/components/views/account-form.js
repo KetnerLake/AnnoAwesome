@@ -21,6 +21,10 @@ export default class AAAccountForm extends HTMLElement {
           display: none;
         }
 
+        aa-button[part=demo] {
+          --button-text-align: center;
+        }
+
         aa-button[part=pin] {
           --button-text-align: center;          
         }
@@ -28,6 +32,11 @@ export default class AAAccountForm extends HTMLElement {
         aa-hbox[part=status] {
           height: 36px; 
           padding: 0 16px 0 16px;          
+        }
+
+        aa-hbox[part=status] aa-label:first-of-type {
+          flex-basis: 0;
+          flex-grow: 1;
         }
 
         aa-hbox aa-label:last-of-type {     
@@ -51,11 +60,16 @@ export default class AAAccountForm extends HTMLElement {
           border-bottom-right-radius: 4px;  
           border-top-left-radius: 0; 
           border-top-right-radius: 0;  
+          cursor: pointer;
           display: flex;
           flex-direction: row;
           height: auto;
           gap: 16px; 
           padding: 16px;           
+        }
+
+        button[part=signup] aa-label {
+          --label-cursor: pointer;
         }
       </style>
       <aa-section>

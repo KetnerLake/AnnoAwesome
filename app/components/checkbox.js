@@ -1,5 +1,3 @@
-import AAIcon from "./icon.js";
-
 export default class AACheckbox extends HTMLElement {
   constructor() {
     super();
@@ -10,8 +8,8 @@ export default class AACheckbox extends HTMLElement {
         :host {
           box-sizing: border-box;
           display: inherit;
-          height: 22px;
-          min-height: 22px;
+          height: 20px;
+          min-height: 20px;
           position: relative;
         }
 
@@ -22,17 +20,6 @@ export default class AACheckbox extends HTMLElement {
         :host( [hidden] ) {
           display: none;
         } 
-
-        aa-icon {
-          --icon-color:
-            invert( 30% ) 
-            sepia( 94% ) 
-            saturate( 1956% ) 
-            hue-rotate( 196deg ) 
-            brightness( 103% ) 
-            contrast( 104% ); 
-          --icon-cursor: pointer;
-        }
 
         button {
           appearance: none;
@@ -45,9 +32,36 @@ export default class AACheckbox extends HTMLElement {
           padding: 0;
           -webkit-tap-highlight-color: transparent;            
         }
+
+        svg {
+          color: var( --checkbox-color, #00b0ff );
+        }
+
+        :host( [disabled] ) svg {
+          color: #c6c6c6;
+        }
+
+        :host( [checked] ) path:last-of-type {
+          display: none;
+        }
+
+        :host( [checked] ) path:first-of-type {
+          display: block;
+        }        
+
+        :host( :not( [checked] ) ) path:last-of-type {
+          display: block;
+        }
+
+        :host( :not( [checked] ) ) path:first-of-type {
+          display: none;
+        }                
       </style>
       <button part="button" type="button">
-        <aa-icon></aa-icon>      
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>          
+        </svg>
       </button>
     `;
 
@@ -73,12 +87,7 @@ export default class AACheckbox extends HTMLElement {
   }
 
    // When attributes change
-  _render() {
-    this.$icon.src = './img/' + ( this.checked ? 'check-circle-fill.svg' : 'circle.svg' );
-    this.$icon.filled = this.checked;
-    this.$icon.weight = this.checked ? 400 : null;
-    this.$icon.disabled = this.disabled;
-  }
+  _render() {;}
 
   // Promote properties
   // Values may be set before module load

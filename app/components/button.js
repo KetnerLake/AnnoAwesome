@@ -29,15 +29,16 @@ export default class AAButton extends HTMLElement {
           cursor: pointer;
           display: block;
           font-family: 'IBM Plex Sans', sans-serif;    
-          font-size: 16px;          
+          font-size: var( --button-font-size, 16px );          
           font-weight: 400;
-          height: 36px;
-          line-height: 36px;
+          height: var( --button-height, 36px );
+          line-height: var( --button-line-height, 36px );
           margin: 0;
           outline: none;
           padding: var( --button-padding, 0 16px 0 16px );
           text-align: var( --button-text-align, center );
           text-rendering: optimizeLegibility;
+          text-transform: var( --button-text-transform );
           width: 100%;
           -webkit-tap-highlight-color: transparent;            
         }
