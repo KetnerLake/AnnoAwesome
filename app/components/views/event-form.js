@@ -74,7 +74,7 @@ export default class AAEventForm extends HTMLElement {
         <aa-divider></aa-divider>
         <aa-textarea part="notes" placeholder="Notes"></aa-textarea>
       </aa-section>
-      <aa-button label="Delete calendar" part="delete"></aa-button>      
+      <aa-button label="Delete event" part="delete"></aa-button> 
     `;
 
     // Private
@@ -117,9 +117,13 @@ export default class AAEventForm extends HTMLElement {
     this.$notes = this.shadowRoot.querySelector( 'aa-textarea[part=notes]' );    
     this.$starts = this.shadowRoot.querySelector( 'aa-date-picker[part=starts]' );
     this.$starts.addEventListener( 'aa-change', () => {
-      if( this.$starts.valueAsDate.getTime() > this.$starts.valueAsDate.getTime() ) {
+      this.$ends.valueAsDate = new Date( this.$starts.valueAsDate.getTime() );
+
+      /*
+      if( this.$starts.valueAsDate.getTime() > this.$ends.valueAsDate.getTime() ) {
         this.$ends.valueAsDate = new Date( this.$starts.valueAsDate.getTime() );
       }
+      */
     } );
     this.$starts.addEventListener( 'aa-open', () => {
       this.$ends.open = false;      
@@ -164,6 +168,7 @@ export default class AAEventForm extends HTMLElement {
    // When attributes change
   _render() {
     this.$label.text = `${this._data === null ? 'New' : 'Edit'} Event`;
+    this.$delete.hidden = this._data === null ? true : false;
   }
 
   // Promote properties

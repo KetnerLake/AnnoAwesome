@@ -124,10 +124,12 @@ btnHeaderCalendars.addEventListener( TOUCH, () => {
     btnHeaderCalendars.checked = false;
     pnlLeft.hidden = true;
     stkLeft.selectedIndex = 0;
+    window.localStorage.removeItem( 'aa_left_drawer' );
   } else {
     btnHeaderCalendars.checked = true;    
     stkLeft.selectedIndex = 0;    
     pnlLeft.hidden = false;
+    window.localStorage.setItem( 'aa_left_drawer', 0 );    
   }
 } );
 
@@ -154,10 +156,12 @@ btnHeaderList.addEventListener( TOUCH, () => {
     btnHeaderList.checked = false;
     pnlLeft.hidden = true;
     stkLeft.selectedIndex = 1;
+    window.localStorage.removeItem( 'aa_left_drawer' );
   } else {
     btnHeaderList.checked = true;
     stkLeft.selectedIndex = 1;    
     pnlLeft.hidden = false;
+    window.localStorage.setItem( 'aa_left_drawer', 1 );
   }
 } );
 
@@ -226,6 +230,8 @@ txtHeaderSearch.addEventListener( 'focus', () => {
 
   lstSearch.data = events;
   summarize( events.length );
+
+  window.localStorage.removeItem( 'aa_left_drawer' );
 } );
 
 txtHeaderSearch.addEventListener( 'aa-change', () => {
@@ -376,6 +382,7 @@ pnlEvent.addEventListener( 'aa-delete', ( evt ) => {
 pnlEvent.addEventListener( 'aa-edit', ( evt ) => {
   db.event.where( {id: evt.detail.id} ).first()
   .then( ( event ) => {
+    frmEvent.canDelete = true;
     frmEvent.calendars = calendars;
     frmEvent.data = event;
     // lblFormLabel.text = 'Edit Event';
@@ -507,6 +514,16 @@ calYear.addEventListener( 'aa-change', ( evt ) => {
 */
 
 lblHeaderYear.text = year;
+
+let lefty = window.localStorage.getItem( 'aa_left_drawer' );
+lefty = lefty === null ? null : parseInt( lefty );
+
+if( lefty !== null ) {
+  pnlLeft.hidden = false;
+  stkLeft.selectedIndex = lefty;
+  btnHeaderCalendars.checked = lefty === 0 ? true : false;
+  btnHeaderList.checked = lefty === 0 ? false : true;
+}
 
 const db = new Dexie( 'AnnoAwesome' );
 db.version( 4 ).stores( {

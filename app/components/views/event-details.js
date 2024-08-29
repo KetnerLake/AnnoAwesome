@@ -39,6 +39,11 @@ export default class AAEventDetails extends HTMLElement {
           margin: 8px 0 8px 16px;          
         }
 
+        aa-label[part=description] {
+          margin-top: -5px;
+          --label-line-height: 21px;
+        }
+
         aa-label[part=description],
         aa-label[part=end],
         aa-label[part=end_label],
@@ -75,6 +80,7 @@ export default class AAEventDetails extends HTMLElement {
       <aa-spacer size="m"></aa-spacer>
       <aa-divider></aa-divider>
       <aa-select label="Calendar" label-field="name" part="calendar" value-field="id"></aa-select>
+      <aa-divider part="calendar_divider"></aa-divider>      
       <aa-vbox gap="m" part="url_box">
         <aa-label text="URL"></aa-label>
         <aa-link part="url_link"></aa-link>
@@ -113,6 +119,7 @@ export default class AAEventDetails extends HTMLElement {
         }
       } ) );      
     } );
+    this.$divCalendar = this.shadowRoot.querySelector( 'aa-divider[part=calendar_divider]' );
     this.$divMap = this.shadowRoot.querySelector( 'aa-divider[part=map_divider]' );
     this.$divNotes = this.shadowRoot.querySelector( 'aa-divider[part=notes_divider]' );
     this.$labelLocation = this.shadowRoot.querySelector( 'aa-label[part=location_label]' ); 
@@ -237,6 +244,7 @@ export default class AAEventDetails extends HTMLElement {
     this.$calendar.value = this._data.id;
 
     // URL
+    this.$divCalendar.hidden = this._data.url === null ? true : false;
     this.$boxUrl.hidden = this._data.url === null ? true : false;
     this.$url.label = this._data.url;
     this.$url.href = this._data.url;    

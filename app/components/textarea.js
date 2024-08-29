@@ -28,11 +28,11 @@ export default class AATextarea extends HTMLElement {
           font-family: 'IBM Plex Sans', sans-serif;  
           font-size: 16px;
           height: 36px;
-          line-height: 36px;
+          line-height: 21px;
           margin: 0;
           min-height: 100px;
           outline: none;
-          padding: 0 16px 0 16px;
+          padding: 8px 16px 0 16px;
           resize: none;
           text-rendering: optimizeLegibility;
           width: 100%;
