@@ -94,7 +94,17 @@ export default class AAEventForm extends HTMLElement {
     this.$calendar = this.shadowRoot.querySelector( 'aa-select[part=calendars]' );
     this.$cancel = this.shadowRoot.querySelector( 'aa-button[part=cancel]' ); 
     this.$cancel.addEventListener( this._touch ? 'touchstart' : 'click', () => {
-      this.dispatchEvent( new CustomEvent( 'aa-cancel' ) );
+      if( this.$title.value === null && 
+          this.$location.value === null &&
+          this.$url.value === null &&
+          this.$notes.value === null ) {
+        this.dispatchEvent( new CustomEvent( 'aa-cancel' ) );          
+      } else {
+        const response = confirm( 'Are you sure you want to discard this new event?' );
+        if( response ) {
+          this.dispatchEvent( new CustomEvent( 'aa-cancel' ) );                    
+        }
+      }
     } );
     this.$delete = this.shadowRoot.querySelector( 'aa-button[part=delete]' );
     this.$delete.addEventListener( this._touch ? 'touchstart' : 'click', () => {
@@ -157,12 +167,7 @@ export default class AAEventForm extends HTMLElement {
   }
 
   validate() {
-    let valid = true;
-
-    if( this.$email.value === null ) valid = false;
-    if( this.$password.value === null ) valid = false;    
-
-    return valid;
+    return this.$title.value === null ? false : true;
   }
 
    // When attributes change
