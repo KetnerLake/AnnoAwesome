@@ -425,16 +425,17 @@ frmCalendar.addEventListener( 'aa-delete', () => {
   blocker( false );
   dlgCalendar.close();
 
-  db.calendar.delete( frmCalendar.data.id )
-  .then( async () => {
-    const id = frmCalendar.data.id;
+  const id = frmCalendar.data.id;
 
-    for( let e = 0; e < events.length; e++ ) {
-      if( events[e].calendarId === id ) {
-        await db.event.delete( events[e].id );
-      }
-    }
-
+  db.event.where( {calendarId: id} ).toArray()
+  .then( ( data ) => {
+    const keys = data.map( ( value ) => value.id );
+    return db.event.bulkDelete( keys );
+  } )
+  .then( () => {
+    return db.calendar.delete( id );
+  } )
+  .then( () => {
     return db.calendar.toCollection().sortBy( 'name' );     
   } )
   .then( ( data ) => {
@@ -526,8 +527,8 @@ if( lefty !== null ) {
 }
 
 const db = new Dexie( 'AnnoAwesome' );
-db.version( 4 ).stores( {
-  event: 'id, startsAt',
+db.version( 5 ).stores( {
+  event: 'id, calendarId, startsAt',
   calendar: 'id'
 } );
 
