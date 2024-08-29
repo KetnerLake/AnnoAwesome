@@ -178,15 +178,16 @@ export default class AAEventListRenderer extends HTMLElement {
 
     if( this._data.startsAt.getDate() === this._data.endsAt.getDate() &&
         this._data.startsAt.getMonth() === this._data.endsAt.getMonth() ) {
-      this.$ends.hidden = true;
+      this.$ends.concealed = true;
+      this.$ends.text = 'X';
     } else {
       formatted = new Intl.DateTimeFormat( navigator.language, {
         weekday: 'short',
         month: 'short',
         day: 'numeric'
-      } ).format( this._data.endsAt );      
-      this.$ends.hidden = false;  
-      this.$ends.text = formatted;
+      } ).format( this._data.endsAt );
+      this.$ends.text = formatted;            
+      this.$ends.concealed = false;  
     }
   }
 
@@ -243,7 +244,13 @@ export default class AAEventListRenderer extends HTMLElement {
     );
     */
 
-    this.outdated = this._data.endsAt.getTime() < Date.now() ? true : false;    
+    const ends = new Date( this._data.endsAt.getTime() );
+    ends.setMilliseconds( 999 );
+    ends.setSeconds( 59 );    
+    ends.setMinutes( 59 );
+    ends.setHours( 23 );
+
+    this.outdated = ends.getTime() < Date.now() ? true : false;    
 
     this._render();
   }  
