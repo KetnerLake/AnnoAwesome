@@ -25,6 +25,10 @@ export default class AAList extends HTMLElement {
           height: 100%;
           justify-content: center;
         }
+
+        div[part=list] aa-calendar-list-renderer:last-of-type {
+          border-bottom: solid 1px transparent;
+        } 
       </style>
       <div part="list"></div>
       <div part="empty">

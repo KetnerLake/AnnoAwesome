@@ -11,13 +11,11 @@ export default class AAEventListRenderer extends HTMLElement {
       <style>
         :host {
           align-items: center;
-          border-bottom: solid 1px #bebec3;
           box-sizing: border-box;
           display: flex;
           flex-direction: row;
           gap: 8px;
-          margin: 0 0 0 16px;
-          padding: 8px 16px 8px 0;
+          padding: 8px 16px 9px 0;
           position: relative;
         }
 
@@ -82,6 +80,16 @@ export default class AAEventListRenderer extends HTMLElement {
         div {
           background: #ffffff;
           border-radius: 4px;
+          margin-left: 16px;
+        }
+
+        div[part=divider] {
+          background: #bdbdc3;
+          bottom: 0;
+          height: 1px;
+          left: 44px;
+          position: absolute;
+          right: 0;
         }
 
         :host( [outdated] ) aa-label[part=summary],
@@ -107,6 +115,7 @@ export default class AAEventListRenderer extends HTMLElement {
           <aa-label part="ends" size="s"></aa-label>
         </aa-hbox>        
       </aa-vbox>
+      <div part="divider"></div>      
     `;
 
     // Private

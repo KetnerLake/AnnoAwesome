@@ -109,6 +109,14 @@ export default class AAEventDetails extends HTMLElement {
     this.$boxNotes = this.shadowRoot.querySelector( 'aa-vbox[part=notes_box]' );    
     this.$boxUrl = this.shadowRoot.querySelector( 'aa-vbox[part=url_box]' );
     this.$calendar = this.shadowRoot.querySelector( 'aa-select[part=calendar]' );
+    this.$calendar.addEventListener( 'aa-change', ( evt ) => {
+      this.dispatchEvent( new CustomEvent( 'aa-change', {
+        detail: {
+          id: this._data.id,
+          calendarId: evt.detail.value
+        }
+      } ) );
+    } );
     this.$delete = this.shadowRoot.querySelector( 'aa-button[part=delete]' );
     this.$delete.addEventListener( this._touch ? 'touchstart' : 'click', () => {
       const response = confirm( 'Are you sure you want to delete this calendar?' );
@@ -241,7 +249,7 @@ export default class AAEventDetails extends HTMLElement {
     }
 
     // Calendar
-    this.$calendar.value = this._data.id;
+    this.$calendar.value = this._data.calendarId;
 
     // URL
     this.$divCalendar.hidden = this._data.url === null ? true : false;

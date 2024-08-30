@@ -57,6 +57,7 @@ export default class AASelect extends HTMLElement {
           position: absolute;
           right: 0;
           top: 0;
+          -webkit-tap-highlight-color: transparent;            
         }
       </style>
       <aa-hbox centered>
@@ -97,6 +98,7 @@ export default class AASelect extends HTMLElement {
   _render() {
     this.$label.text = this.label;
     this.$select.value = this.value;
+    this.$name.text = this.$select.selectedOptions.length > 0 ? this.$select.selectedOptions[0].innerText : null;
   }
 
   // Properties set before module loaded

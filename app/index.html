@@ -17,24 +17,9 @@
     <!-- Left drawer -->
     <aa-drawer hidden id="drawer_left" placement="start">
       <aa-stack id="left_stack" style="display: flex; flex-direction: column; flex-basis: 0; flex-grow: 1;">
+        <aa-calendar-details id="left_calendars"></aa-calendar-details>
         <aa-vbox style="flex-basis: 0; flex-grow: 1;">
-          <aa-label size="xl" style="padding-left: 16px; padding-top: 64px; margin-bottom: 21px;" text="Calendars" weight="bold"></aa-label>
-          <aa-vbox gap="m" style="flex-basis: 0; flex-grow: 1; margin: 0 16px 16px 16px;">
-            <aa-section label="My Awesome">
-              <aa-button label="Hide all" slot="count"></aa-button>
-              <aa-list id="drawer_calendars" item-renderer="aa-calendar-list-renderer"></aa-list>
-            </aa-section>
-            <!-- Shared awesome -->
-            <!-- Public awesome -->
-          </aa-vbox>
-          <aa-hbox style="align-items: center; height: 50px;">
-            <aa-button id="drawer_add" label="Add Calendar"></aa-button>
-            <aa-spacer></aa-spacer>
-            <aa-button id="drawer_hide" label="Hide All"></aa-button>
-          </aa-hbox>
-        </aa-vbox>
-        <aa-vbox style="flex-basis: 0; flex-grow: 1;">
-          <aa-label size="xl" style="padding-left: 16px; padding-top: 62px; padding-bottom: 45px;" text="Events" weight="bold"></aa-label>
+          <aa-label size="xl" style="padding-left: 16px; padding-top: 64px; padding-bottom: 47px;" text="Events" weight="bold"></aa-label>
           <aa-list id="drawer_events" item-renderer="aa-event-list-renderer" style="border-top: solid 1px #c7c7c7; flex-basis: 0; flex-grow: 1;">
             <aa-label style="--label-color: #85858c;" text="No events"></aa-label>
           </aa-list>          
@@ -48,13 +33,13 @@
       <!-- Header -->
       <!-- Year -->
       <!-- Today -->
-      <header class="grid" style="margin: 0; padding: 60px 16px 8px 16px;">
-        <aa-hbox centered gap="l" justified style="grid-column: 2 / 2;">
-          <aa-icon-button id="header_previous" src="./img/chevron-left.svg"></aa-icon-button>
-          <aa-label id="header_year" size="xl" weight="bold"></aa-label>
-          <aa-icon-button id="header_next" src="./img/chevron-right.svg"></aa-icon-button>          
-        </aa-hbox>      
-        <aa-button id="header_today" label="Today" style="grid-column: 3 / 3; justify-self: end; --button-padding: 0;"></aa-button>
+      <header class="grid" style="margin: 0; padding: 64px 16px 8px 16px;">
+        <aa-label id="header_year" size="xl" weight="bold"></aa-label>        
+        <aa-hbox centered gap="l" style="grid-column: 3 / 3; justify-self: end;">
+          <aa-icon-button id="header_previous" size="s" src="./img/chevron-left.svg"></aa-icon-button>          
+          <aa-button id="header_today" label="Today" style="--button-padding: 0;"></aa-button>
+          <aa-icon-button id="header_next" size="s" src="./img/chevron-right.svg"></aa-icon-button>                    
+        </aa-hbox>
       </header>
   
       <!-- Calendar grid -->
@@ -102,6 +87,7 @@
         <aa-icon-button id="header_calendars" src="./img/calendar.svg"></aa-icon-button>
         <aa-icon-button id="header_list" src="./img/list.svg"></aa-icon-button>                        
         <aa-icon-button id="header_add" src="./img/add.svg"></aa-icon-button>                                
+        <aa-icon hidden id="header_sync" src="./img/cloud-upload.svg" style="padding: 8px;"></aa-icon>                                
         <aa-icon-button id="header_wizard" style="opacity: 0;"></aa-icon-button>                                        
       </aa-hbox>
       <aa-hbox gap="l" style="justify-self: end; grid-column: 3 / 3;">

@@ -32,6 +32,7 @@ import AACalendarListRenderer from "./components/renderers/calendar-list-rendere
 import AAEventListRenderer from "./components/renderers/event-list-renderer.js";
 
 import AAAccountForm from "./components/views/account-form.js";
+import AACalendarDetails from "./components/views/calendar-details.js";
 import AACalendarForm from "./components/views/calendar-form.js";
 import AAEventDetails from "./components/views/event-details.js";
 import AAEventForm from "./components/views/event-form.js";

@@ -11,6 +11,7 @@ export default class AACalendarListRenderer extends HTMLElement {
       <style>
         :host {
           align-items: center;
+          border-bottom: solid 1px #e5e5e5;          
           box-sizing: border-box;
           display: flex;
           flex-direction: row;
