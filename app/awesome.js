@@ -4,6 +4,10 @@ const SHOW_ALL = 'Show All'
 const KETNER_LAKE_API = 'http://localhost:3000/v1';
 const TOUCH = ( 'ontouchstart' in document.documentElement ) ? 'touchstart' : 'click';
 
+// Labels: Red, Orange, Yellow, Green, Blue, Purple
+// Trident: f89497, ffc996, ffe599 afd8a3, 96c6ec, b7a6dc
+// iOS: ff2968, ff9500, ffcc02, 63da38, 1badf8, cc73e1
+
 // Globals
 let calendars = [];
 let events = [];
@@ -13,6 +17,7 @@ let session = window.localStorage.getItem( 'awesome_token' );
 let year = new Date().getFullYear();
 let starts = new Date( year, 0, 1 );
 let ends = new Date( year + 1, 0, 1 );
+let colors = {};
 
 /*
 // Elements
@@ -562,6 +567,26 @@ pnlCalendars.addEventListener( 'aa-colors', ( evt ) => {
     window.localStorage.removeItem( 'awesome_colors' );
     using = false;
   }
+
+  for( let c = 0; c < calendars.length; c++ ) {
+    colors[calendars[c].id] = calendars[c].color;
+  }
+
+  db.event.where( 'startsAt' ).between( starts, ends ).toArray()
+  .then( ( data ) => {
+    if( using ) {
+      for( let d = 0; d < data.length; d++ ) {
+        data[d].color = colors[data[d].calendarId];
+      }
+    }
+
+    const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
+    events = data.filter( ( value ) => active.includes( value.calendarId ) );
+    lstEvents.data = events;
+    calYear.colored = using;
+    calYear.data = events;
+    summarize( events.length );
+  } );
 
   // TODO: Color rendering
 } );

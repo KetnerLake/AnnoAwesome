@@ -9,7 +9,10 @@ export default class AAColorPicker extends HTMLElement {
           box-sizing: border-box;
           display: flex;
           flex-direction: column;
+          height: 36px;
+          overflow: hidden;
           position: relative;
+          transition: height 0.25s linear;
         } 
 
         :host( [concealed] ) {
@@ -20,27 +23,50 @@ export default class AAColorPicker extends HTMLElement {
           display: none;
         } 
 
+        aa-icon {
+          --icon-cursor: pointer;
+        }
+
+        aa-label {
+          flex-basis: 0;
+          flex-grow: 1;
+          --label-cursor: pointer;
+        }
+
+        aa-vbox {
+          opacity: 0;
+          transition: opacity 0.25s linear;
+        }        
+
         button {
           align-items: center;
           appearance: none;
           background: var( --button-background, none );
           border: none;
-          border-radius: 4px;
+          border-bottom: solid 1px #e5e5e5;
           box-sizing: border-box;
           color: #272727;          
           cursor: pointer;
           display: flex;
           flex-direction: row;
           gap: 12px;
-          height: 36px;
+          min-height: 36px;
           line-height: 36px;
           margin: 0;
           outline: none;
-          padding: 0 16px 0 16px;
+          padding: 0 12px 0 16px;
           -webkit-tap-highlight-color: transparent;            
         }
 
-        span[part=color] {
+        button:first-of-type {
+          padding: 0 16px 0 16px;          
+        }
+
+        button:last-of-type {
+          border-bottom: solid 1px transparent;
+        }
+
+        button > span {
           background-color: #1badf8;
           border-radius: 12px;
           display: block;
@@ -48,19 +74,26 @@ export default class AAColorPicker extends HTMLElement {
           width: 12px;
         }
 
-        aa-icon {
+        button:not( [data-index] ) aa-icon {
           --icon-color: 
             invert( 79% ) 
             sepia( 0% ) 
             saturate( 0% ) 
             hue-rotate( 234deg ) 
             brightness( 88% )  
-            contrast( 85% );          
+            contrast( 85% ); 
         }
-        
-        aa-label[part=label] {
-          flex-basis: 0;
-          flex-grow: 1;
+
+        :host( [open] ) {
+          height: 252px;
+        }
+
+        :host( [open] ) aa-vbox {
+          opacity: 1.0;
+        }
+
+        :host( [open] ) button:not( [data-index] ) {
+          border-bottom: solid 1px #e5e5e5;          
         }
       </style>
       <button part="button" type="button">
@@ -68,11 +101,7 @@ export default class AAColorPicker extends HTMLElement {
         <aa-label part="label"></aa-label>
         <aa-icon part="icon" size="xs" src="./img/chevron-right.svg"></aa-icon>
       </button>
-      <button>
-        <span part="color" style="background-color: red;"></span>
-        <aa-label part="label"></aa-label>
-        <aa-icon part="icon" size="xs" src="./img/chevron-right.svg"></aa-icon>      
-      </button>
+      <aa-vbox part="list"></aa-vbox>
     `;
 
     // Private
@@ -82,8 +111,7 @@ export default class AAColorPicker extends HTMLElement {
       {name: 'Yellow', value: '#ffcc02'},
       {name: 'Green', value: '#63da38'},
       {name: 'Blue', value: '#1badf8'},
-      {name: 'Purple', value: '#cc73e1'},
-      {name: 'Brown', value: '#a2845e'}
+      {name: 'Purple', value: '#cc73e1'}
     ];
     this._data = null;
 
@@ -93,12 +121,53 @@ export default class AAColorPicker extends HTMLElement {
 
     // Elements
     this.$button = this.shadowRoot.querySelector( 'button[part=button]' );
-    this.$label = this.shadowRoot.querySelector( 'aa-label[part=label]' );    
+    this.$button.addEventListener( 'click', () => {
+      this.open = !this.open;
+    } );
+    this.$color = this.shadowRoot.querySelector( 'span[part=color]' );
+    this.$label = this.shadowRoot.querySelector( 'aa-label[part=label]' );
+    this.$list = this.shadowRoot.querySelector( 'aa-vbox[part=list]' );
+
+    for( let c = 0; c < this._colors.length; c++ ) {
+      const button = document.createElement( 'button' );
+      button.setAttribute( 'data-index', c );
+      button.setAttribute( 'data-value', this._colors[c].value );      
+      button.addEventListener( 'click', ( evt ) => this.doColorClick( evt ) );
+
+      const span = document.createElement( 'span' );
+      span.style.backgroundColor = this._colors[c].value;
+      button.appendChild( span );
+
+      const label = document.createElement( 'aa-label' );
+      label.text = this._colors[c].name;
+      button.appendChild( label );
+
+      const icon = document.createElement( 'aa-icon' );
+      icon.hidden = c == 2 ? false : true;
+      icon.src = './img/check2.svg';
+      button.appendChild( icon );
+
+      this.$list.appendChild( button );
+    }
+  }
+
+  doColorClick( evt ) {
+    const index = parseInt( evt.currentTarget.getAttribute( 'data-index' ) );
+    this.label = this._colors[index].name;
+    this.value = this._colors[index].value;
   }
 
   // When things change
   _render() {
-    this.$label.text = this.label;
+    const value = this.value === null ? '#1badf8' : this.value;    
+    const index = this._colors.findIndex( ( curr ) => curr.value === value );
+
+    this.$color.style.backgroundColor = value;
+    this.$label.text = this._colors[index].name;
+
+    for( let c = 0; c < this.$list.children.length; c++ ) {
+      this.$list.children[c].children[2].hidden = c === index ? false : true;      
+    }
   }
 
   // Properties set before module loaded
@@ -117,6 +186,7 @@ export default class AAColorPicker extends HTMLElement {
     this._upgrade( 'hidden' );                      
     this._upgrade( 'label' );                          
     this._upgrade( 'open' );                          
+    this._upgrade( 'value' );                              
     this._render();
   }
 
@@ -126,7 +196,8 @@ export default class AAColorPicker extends HTMLElement {
       'concealed',
       'hidden',
       'label',
-      'open'
+      'open',
+      'value'
     ];
   }
 
@@ -223,6 +294,22 @@ export default class AAColorPicker extends HTMLElement {
       }
     } else {
       this.removeAttribute( 'open' );
+    }
+  }  
+
+  get value() {
+    if( this.hasAttribute( 'value' ) ) {
+      return this.getAttribute( 'value' );
+    }
+
+    return null;
+  }
+
+  set value( value ) {
+    if( value !== null ) {
+      this.setAttribute( 'value', value );
+    } else {
+      this.removeAttribute( 'value' );
     }
   }  
 }

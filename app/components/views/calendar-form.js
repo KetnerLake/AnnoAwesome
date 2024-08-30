@@ -63,7 +63,7 @@ export default class AACalendarForm extends HTMLElement {
           <aa-input part="name" placeholder="Calendar name"></aa-input>
         </aa-section>                   
         <aa-section label="Color">
-          <aa-color-picker label="Color"></aa-color-picker>
+          <aa-color-picker part="color"></aa-color-picker>
         </aa-section>                                 
         <aa-section label="Shared with">
           <aa-button label="Add person" part="share"></aa-button>
@@ -92,6 +92,7 @@ export default class AACalendarForm extends HTMLElement {
     this.$cancel.addEventListener( this._touch ? 'touchstart' : 'click', () => {
       this.dispatchEvent( new CustomEvent( 'aa-cancel' ) );
     } );
+    this.$color = this.shadowRoot.querySelector( 'aa-color-picker[part=color]' );
     this.$delete = this.shadowRoot.querySelector( 'aa-button[part=delete]' );
     this.$delete.addEventListener( this._touch ? 'touchstart' : 'click', () => {
       const response = confirm( 'Are you sure you want to delete this calendar?' );
@@ -189,7 +190,7 @@ export default class AACalendarForm extends HTMLElement {
       createdAt: this._data === null ? now : this._data.createdAt,
       updatedAt: now,
       name: this.$name.value,
-      color: null,
+      color: this.$color.value,
       isShared: false,
       isActive: this._data === null ? true : this._data.isActive,
       isPublic: this.$public.checked
@@ -201,6 +202,7 @@ export default class AACalendarForm extends HTMLElement {
     this._changed = false;
 
     this.$name.value = value.name;
+    this.$color.value = value.color;
     this.$public.checked = value.isPublic;
 
     this._render();

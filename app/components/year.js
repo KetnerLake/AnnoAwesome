@@ -78,6 +78,8 @@ export default class AAYear extends HTMLElement {
     `;
 
     // Private
+    this._colors = ['#ff2968', '#ff9500', '#ffcc02', '#63da38', '#1badf8', '#cc73e1'];
+    /*
     this._colors = [
       {activeBackgroundColor: '#F44336', activeColor: '#ffffff', inactiveColor: '#B71C1C'},
       {activeBackgroundColor: '#E91E63', activeColor: '#ffffff', inactiveColor: '#880E4F'},      
@@ -92,6 +94,7 @@ export default class AAYear extends HTMLElement {
       {activeBackgroundColor: '#FF5722', activeColor: '#ffffff', inactiveColor: '#BF360C'},                                                                  
       {activeBackgroundColor: '#795548', activeColor: '#ffffff', inactiveColor: '#3E2723'}                                                                             
     ];
+    */
     this._data = [];
 
     // 500 and 900 from:
@@ -185,6 +188,7 @@ export default class AAYear extends HTMLElement {
 
   // Setup
   connectedCallback() {
+    this._upgrade( 'colored' );        
     this._upgrade( 'concealed' );    
     this._upgrade( 'data' );
     this._upgrade( 'hidden' );
@@ -196,6 +200,7 @@ export default class AAYear extends HTMLElement {
   // Watched attributes
   static get observedAttributes() {
     return [
+      'colored',
       'concealed',
       'hidden',
       'value'
@@ -245,10 +250,13 @@ export default class AAYear extends HTMLElement {
       this.$events.children[c].style.top = `${( this._data[c].startsAt.getDate() - 1 ) * 36}px`;
       this.$events.children[c].style.height = `${( diff * 36 ) - 1}px`;      
 
-      this.$events.children[c].style.setProperty( '--event-active-background-color', this._colors[this._data[c].startsAt.getMonth()].activeBackgroundColor );
-      this.$events.children[c].style.setProperty( '--event-active-color', this._colors[this._data[c].startsAt.getMonth()].activeColor );
-      this.$events.children[c].style.setProperty( '--event-inactive-background-color', this._colors[this._data[c].startsAt.getMonth()].activeBackgroundColor + '4d' );      
-      this.$events.children[c].style.setProperty( '--event-inactive-color', this._colors[this._data[c].startsAt.getMonth()].inactiveColor );      
+      const month = this._data[c].startsAt.getMonth();
+      const color = this.colored ? this._data[c].color : this._colors[month % this._colors.length];
+
+      this.$events.children[c].style.setProperty( '--event-active-background-color', color );
+      this.$events.children[c].style.setProperty( '--event-active-color', '#ffffff' );
+      this.$events.children[c].style.setProperty( '--event-inactive-background-color', color + '4d' );      
+      this.$events.children[c].style.setProperty( '--event-inactive-color', `hsl( from ${color} h s calc( l - 20 ) )` );      
     }
   }
 
@@ -269,6 +277,26 @@ export default class AAYear extends HTMLElement {
   // Attributes
   // Reflected
   // Boolean, Number, String, null
+  get colored() {
+    return this.hasAttribute( 'colored' );
+  }
+
+  set colored( value ) {
+    if( value !== null ) {
+      if( typeof value === 'boolean' ) {
+        value = value.toString();
+      }
+
+      if( value === 'false' ) {
+        this.removeAttribute( 'colored' );
+      } else {
+        this.setAttribute( 'colored', '' );
+      }
+    } else {
+      this.removeAttribute( 'colored' );
+    }
+  } 
+
   get concealed() {
     return this.hasAttribute( 'concealed' );
   }

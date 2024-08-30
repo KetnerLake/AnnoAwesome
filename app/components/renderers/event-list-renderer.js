@@ -119,6 +119,8 @@ export default class AAEventListRenderer extends HTMLElement {
     `;
 
     // Private
+    this._colors = ['#ff2968', '#ff9500', '#ffcc02', '#63da38', '#1badf8', '#cc73e1'];
+    /*
     this._colors = [
       {activeBackgroundColor: '#F44336', activeColor: '#ffffff', inactiveColor: '#B71C1C'},
       {activeBackgroundColor: '#E91E63', activeColor: '#ffffff', inactiveColor: '#880E4F'},      
@@ -133,6 +135,7 @@ export default class AAEventListRenderer extends HTMLElement {
       {activeBackgroundColor: '#FF5722', activeColor: '#ffffff', inactiveColor: '#BF360C'},                                                                  
       {activeBackgroundColor: '#795548', activeColor: '#ffffff', inactiveColor: '#3E2723'}                                                                             
     ];    
+    */
     this._data = null;
 
     // Root
@@ -166,10 +169,13 @@ export default class AAEventListRenderer extends HTMLElement {
       month: 'short'
     } ).format( this._data.startsAt );        
 
-    this.$calendar.style.setProperty( 'background', this._colors[this._data.startsAt.getMonth()].activeBackgroundColor + '4d' );    
-    this.$date.style.setProperty( '--label-color', this._colors[this._data.startsAt.getMonth()].inactiveColor );        
+    const month = this._data.startsAt.getMonth();
+    const color = this._data.hasOwnProperty( 'color' ) ? this._data.color : this._colors[month % this._colors.length];
+
+    this.$calendar.style.setProperty( 'background', color + '4d' );    
+    this.$date.style.setProperty( '--label-color', `hsl( from ${color} h s calc( l - 20 ) )` );        
     this.$date.text = this._data.startsAt.getDate();
-    this.$month.style.setProperty( '--label-color', this._colors[this._data.startsAt.getMonth()].inactiveColor );            
+    this.$month.style.setProperty( '--label-color', `hsl( from ${color} h s calc( l - 20 ) )` );            
     this.$month.text = formatted;
     
     /*
