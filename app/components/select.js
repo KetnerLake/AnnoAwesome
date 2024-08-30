@@ -149,7 +149,6 @@ export default class AASelect extends HTMLElement {
 
   set data( value ) {
     this._data = value === null ? [] : [... value];
-    console.log( this._data );
     while( this.$select.children.length > this._data.length ) {
       this.$select.children[0].remove();
     }

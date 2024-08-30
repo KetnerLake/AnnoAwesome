@@ -354,8 +354,15 @@ frmEvent.addEventListener( 'aa-delete', ( evt ) => {
     return db.event.where( 'startsAt' ).between( starts, ends ).toArray();
   } )
   .then( ( data ) => {
+    if( using ) {
+      for( let d = 0; d < data.length; d++ ) {
+        data[d].color = colors[data[d].calendarId];
+      }
+    }
+
     const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
     events = data.filter( ( value ) => active.includes( value.calendarId ) );
+
     calYear.data = events;
     lstEvents.data = events;
     blocker( false );
@@ -377,8 +384,15 @@ frmEvent.addEventListener( 'aa-done', () => {
     return db.event.where( 'startsAt' ).between( starts, ends ).toArray();
   } )
   .then( ( data ) => {
+    if( using ) {
+      for( let d = 0; d < data.length; d++ ) {
+        data[d].color = colors[data[d].calendarId];
+      }
+    }
+
     const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
     events = data.filter( ( value ) => active.includes( value.calendarId ) );
+
     calYear.data = events;
     lstEvents.data = events;
     summarize( events.length );
@@ -396,8 +410,15 @@ pnlEvent.addEventListener( 'aa-change', ( evt ) => {
     return db.event.where( 'startsAt' ).between( starts, ends ).toArray();
   } )
   .then( ( data ) => {
+    if( using ) {
+      for( let d = 0; d < data.length; d++ ) {
+        data[d].color = colors[data[d].calendarId];
+      }
+    }
+    
     const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
     events = data.filter( ( value ) => active.includes( value.calendarId ) );
+    
     calYear.data = events;
     calYear.selectedItem = evt.detail.id;
     lstEvents.data = events;
@@ -411,8 +432,15 @@ pnlEvent.addEventListener( 'aa-delete', ( evt ) => {
     return db.event.where( 'startsAt' ).between( starts, ends ).toArray();
   } )
   .then( ( data ) => {
+    if( using ) {
+      for( let d = 0; d < data.length; d++ ) {
+        data[d].color = colors[data[d].calendarId];
+      }
+    }    
+    
     const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
     events = data.filter( ( value ) => active.includes( value.calendarId ) );
+    
     calYear.data = events;
     calYear.selectedItem = null;
     lstEvents.data = events;
@@ -454,6 +482,11 @@ pnlCalendars.addEventListener( 'aa-hide', async () => {
 
   db.calendar.toCollection().sortBy( 'name' )
   .then( ( data ) => {
+    colors = data.reduce( ( prev, curr ) => {
+      prev[curr.id] = curr.color;
+      return prev;
+    }, {} );      
+
     calendars = [... data];
     pnlCalendars.data = calendars;
     btnCalendarsHide.label = btnCalendarsHide.label === HIDE_ALL ? SHOW_ALL : HIDE_ALL;
@@ -498,6 +531,11 @@ frmCalendar.addEventListener( 'aa-delete', () => {
     return db.calendar.toCollection().sortBy( 'name' );     
   } )
   .then( ( data ) => {
+    colors = data.reduce( ( prev, curr ) => {
+      prev[curr.id] = curr.color;
+      return prev;
+    }, {} );      
+
     calendars = [... data];
     pnlCalendars.data = calendars;
     frmCalendar.reset();
@@ -505,8 +543,15 @@ frmCalendar.addEventListener( 'aa-delete', () => {
     return db.event.where( 'startsAt' ).between( starts, ends ).toArray();
   } )
   .then( ( data ) => {
+    if( using ) {
+      for( let d = 0; d < data.length; d++ ) {
+        data[d].color = colors[data[d].calendarId];
+      }
+    }
+
     const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
     events = data.filter( ( value ) => active.includes( value.calendarId ) );
+    
     lstEvents.data = events;
     calYear.data = events;
     summarize( events.length );
@@ -522,9 +567,30 @@ frmCalendar.addEventListener( 'aa-done', () => {
     return db.calendar.toCollection().sortBy( 'name' );
   } )
   .then( ( data ) => {
+    colors = data.reduce( ( prev, curr ) => {
+      prev[curr.id] = curr.color;
+      return prev;
+    }, {} );  
+
     calendars = [... data];
     pnlCalendars.data = calendars;
     frmCalendar.reset();
+
+    return db.event.where( 'startsAt' ).between( starts, ends ).toArray();
+  } )
+  .then( ( data ) => {
+    if( using ) {
+      for( let d = 0; d < data.length; d++ ) {
+        data[d].color = colors[data[d].calendarId];
+      }
+    }
+
+    const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
+    events = data.filter( ( value ) => active.includes( value.calendarId ) );
+    
+    lstEvents.data = events;
+    calYear.data = events;
+    summarize( events.length );    
   } );
 } );
 
@@ -545,14 +611,26 @@ pnlCalendars.addEventListener( 'aa-active', ( evt ) => {
     return db.calendar.toCollection().sortBy( 'name' );
   } )
   .then( ( data ) => {
+    colors = data.reduce( ( prev, curr ) => {
+      prev[curr.id] = curr.color;
+      return prev;
+    }, {} );      
+
     calendars = [... data];
     pnlCalendars.data = calendars;
 
     return db.event.where( 'startsAt' ).between( starts, ends ).toArray();
   } )
   .then( ( data ) => {
+    if( using ) {
+      for( let d = 0; d < data.length; d++ ) {
+        data[d].color = colors[data[d].calendarId];
+      }
+    }
+
     const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
     events = data.filter( ( value ) => active.includes( value.calendarId ) );
+
     lstEvents.data = events;  
     calYear.data = events;
     summarize( events.length );
@@ -582,13 +660,12 @@ pnlCalendars.addEventListener( 'aa-colors', ( evt ) => {
 
     const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
     events = data.filter( ( value ) => active.includes( value.calendarId ) );
+
     lstEvents.data = events;
     calYear.colored = using;
     calYear.data = events;
     summarize( events.length );
   } );
-
-  // TODO: Color rendering
 } );
 
 pnlCalendars.addEventListener( 'aa-info', ( evt ) => {
@@ -621,6 +698,7 @@ calYear.addEventListener( 'aa-change', ( evt ) => {
 
 lblHeaderYear.text = year;
 pnlCalendars.useCalendar = using;
+calYear.colored = using;
 
 if( lefty !== null ) {
   pnlLeft.hidden = false;
@@ -638,9 +716,10 @@ db.version( 5 ).stores( {
 db.calendar.toCollection().sortBy( 'name' )
 .then( async ( data ) => {
   if( data.length === 0 ) {
+    const id = self.crypto.randomUUID();
     const now = Date.now();
     await db.calendar.put( {
-      id: self.crypto.randomUUID(),
+      id: id,
       createdAt: new Date( now ),
       updatedAt: new Date( now ),
       name: 'Calendar',
@@ -649,17 +728,30 @@ db.calendar.toCollection().sortBy( 'name' )
       isPublic: false,
       isActive: true
     } );
+    colors[id] = '#1badf8';    
     data = await db.calendar.toArray();
   }
 
   calendars = [... data];
   pnlCalendars.data = calendars;
 
+  colors = calendars.reduce( ( prev, curr ) => {
+    prev[curr.id] = curr.color;
+    return prev;
+  }, {} );  
+
   return db.event.where( 'startsAt' ).between( starts, ends ).toArray();
 } )
 .then( ( data ) => {
+  if( using ) {
+    for( let d = 0; d < data.length; d++ ) {
+      data[d].color = colors[data[d].calendarId];
+    }
+  }
+
   const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
   events = data.filter( ( value ) => active.includes( value.calendarId ) );
+
   lstEvents.data = events;  
   calYear.data = events;
   summarize( events.length );

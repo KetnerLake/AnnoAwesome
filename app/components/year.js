@@ -188,7 +188,6 @@ export default class AAYear extends HTMLElement {
 
   // Setup
   connectedCallback() {
-    this._upgrade( 'colored' );        
     this._upgrade( 'concealed' );    
     this._upgrade( 'data' );
     this._upgrade( 'hidden' );
@@ -200,7 +199,6 @@ export default class AAYear extends HTMLElement {
   // Watched attributes
   static get observedAttributes() {
     return [
-      'colored',
       'concealed',
       'hidden',
       'value'
@@ -251,7 +249,7 @@ export default class AAYear extends HTMLElement {
       this.$events.children[c].style.height = `${( diff * 36 ) - 1}px`;      
 
       const month = this._data[c].startsAt.getMonth();
-      const color = this.colored ? this._data[c].color : this._colors[month % this._colors.length];
+      const color = this._data[c].hasOwnProperty( 'color' ) ? this._data[c].color : this._colors[month % this._colors.length];
 
       this.$events.children[c].style.setProperty( '--event-active-background-color', color );
       this.$events.children[c].style.setProperty( '--event-active-color', '#ffffff' );
@@ -277,26 +275,6 @@ export default class AAYear extends HTMLElement {
   // Attributes
   // Reflected
   // Boolean, Number, String, null
-  get colored() {
-    return this.hasAttribute( 'colored' );
-  }
-
-  set colored( value ) {
-    if( value !== null ) {
-      if( typeof value === 'boolean' ) {
-        value = value.toString();
-      }
-
-      if( value === 'false' ) {
-        this.removeAttribute( 'colored' );
-      } else {
-        this.setAttribute( 'colored', '' );
-      }
-    } else {
-      this.removeAttribute( 'colored' );
-    }
-  } 
-
   get concealed() {
     return this.hasAttribute( 'concealed' );
   }
