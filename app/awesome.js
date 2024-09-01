@@ -50,10 +50,7 @@ const lstSearch = document.querySelector( '#drawer_search' );
 const calYear = document.querySelector( 'aa-year' );
 
 // Footer
-const lnkFooterLink = document.querySelector( '#footer_link' );
-const lblFooterCount = document.querySelector( '#footer_count' );
-const lblFooterWizard = document.querySelector( '#footer_wizard' );
-const sldFooterScale = document.querySelector( '#footer_scale' );
+const pnlFooter = document.querySelector( 'aa-footer' );
 
 // Account
 const dlgAccount = document.querySelector( '#account' );
@@ -76,13 +73,7 @@ const frmCalendar = document.querySelector( '#calendar_form' );
 
 // Easter
 btnHeaderWizard.addEventListener( TOUCH, () => {
-  lblFooterCount.hidden = true;
-  lblFooterWizard.hidden = false;
-  
-  setTimeout( () => {
-    lblFooterCount.hidden = false;
-    lblFooterWizard.hidden = true;
-  }, 5000 );
+  pnlFooter.wizard();
 } );
 
 // Header
@@ -92,7 +83,7 @@ btnHeaderAccount.addEventListener( TOUCH, () => {
   lstSearch.data = null;
   pnlRight.hidden = true;
   calYear.data = events;
-  summarize( events.length );
+  pnlFooter.count = events.length;
 
   blocker( true );
 
@@ -106,7 +97,7 @@ btnHeaderAdd.addEventListener( TOUCH, () => {
   lstSearch.data = null;
   pnlRight.hidden = true;
   calYear.data = events;
-  summarize( events.length );
+  pnlFooter.count = events.length;
 
   stkEvent.selectedIndex = 0;
   frmEvent.reset();
@@ -123,7 +114,7 @@ btnHeaderCalendars.addEventListener( TOUCH, () => {
   lstSearch.data = null;
   pnlRight.hidden = true;
   calYear.events = events;
-  summarize( events.length );
+  pnlFooter.count = events.length;
 
   btnHeaderList.checked = false;
 
@@ -146,7 +137,7 @@ btnHeaderCancel.addEventListener( TOUCH, () => {
   pnlRight.hidden = true;
   lstSearch.data = null;
   calYear.data = events;
-  summarize( events.length );
+  pnlFooter.count = events.length;
 } );
 
 btnHeaderList.addEventListener( TOUCH, () => {
@@ -155,7 +146,7 @@ btnHeaderList.addEventListener( TOUCH, () => {
   lstSearch.data = null;
   pnlRight.hidden = true;
   calYear.data = events;
-  summarize( events.length );
+  pnlFooter.count = events.length;
 
   btnHeaderCalendars.checked = false;
 
@@ -185,7 +176,7 @@ btnHeaderNext.addEventListener( TOUCH, () => {
     calYear.data = events;
     lstEvents.data = events;
     calYear.value = year;
-    summarize( events.length );
+    pnlFooter.count = events.length;
   } );
 } );
 
@@ -202,7 +193,7 @@ btnHeaderPrevious.addEventListener( TOUCH, () => {
     calYear.data = events;
     lstEvents.data = events;
     calYear.value = year;
-    summarize( events.length );
+    pnlFooter.count = events.length;
   } );
 } );
 
@@ -227,7 +218,7 @@ btnHeaderToday.addEventListener( TOUCH, () => {
     events = data.filter( ( value ) => active.includes( value.calendarId ) );
     calYear.data = events;
     lstEvents.data = events;
-    summarize( events.length );
+    pnlFooter.count = events.length;
   } );  
 } );
 
@@ -247,14 +238,35 @@ lstSearch.addEventListener( 'aa-change', ( evt ) => {
 } );
 
 txtHeaderSearch.addEventListener( 'focus', () => {
+  if( txtHeaderSearch.value !== null ) {
+    const filtered = events.filter( ( value ) => {
+      const query = txtHeaderSearch.value.toLowerCase();
+      let match = false;
+  
+      if( value.summary !== null ) {
+        if( value.summary.toLowerCase().indexOf( query ) >= 0 ) match = true;
+      }
+  
+      if( value.description !== null ) {
+        if( value.description.toLowerCase().indexOf( query ) >= 0 ) match = true;
+      }
+  
+      return match;
+    } );
+  
+    calYear.data = filtered;
+    lstSearch.data = filtered;
+    pnlFooter.count = filtered.length;
+  } else {
+    lstSearch.data = events;
+    pnlFooter.count = events.length;
+  }
+
   pnlLeft.hidden = true;
   btnHeaderCalendars.checked = false;
   btnHeaderList.checked = false;
   pnlRight.hidden = false;
   btnHeaderCancel.hidden = false;
-
-  lstSearch.data = events;
-  summarize( events.length );
 
   window.localStorage.removeItem( 'awesome_drawer' );
 } );
@@ -263,7 +275,7 @@ txtHeaderSearch.addEventListener( 'aa-change', () => {
   if( txtHeaderSearch.value === null ) {
     calYear.data = events;
     lstSearch.data = events;
-    summarize( events.length );
+    pnlFooter.count = events.length;
     return;
   }
 
@@ -284,7 +296,7 @@ txtHeaderSearch.addEventListener( 'aa-change', () => {
 
   calYear.data = filtered;
   lstSearch.data = filtered;
-  summarize( filtered.length );
+  pnlFooter.count = filtered.length;
 } );
 
 // Account
@@ -390,7 +402,7 @@ frmEvent.addEventListener( 'aa-delete', ( evt ) => {
     dlgEvent.close();
     frmEvent.reset();
     // pnlEvent.data = null;
-    summarize( events.length );
+    pnlFooter.count = events.length;
   } );
 } );
 
@@ -420,7 +432,7 @@ frmEvent.addEventListener( 'aa-done', () => {
 
     calYear.data = events;
     lstEvents.data = events;
-    summarize( events.length );
+    pnlFooter.count = events.length;
   } );
 } );
 
@@ -448,7 +460,7 @@ pnlEvent.addEventListener( 'aa-change', ( evt ) => {
     calYear.selectedItem = evt.detail.id;
     lstEvents.data = events;
     lstEvents.selectedItem = evt.detail.id;
-    summarize( events.length );
+    pnlFooter.count = events.length;
   } );
 } );
 
@@ -476,7 +488,7 @@ pnlEvent.addEventListener( 'aa-delete', ( evt ) => {
     dlgEvent.close();
     frmEvent.reset();
     // pnlEvent.data = null;
-    summarize( events.length );
+    pnlFooter.count = events.length;
   } );
 } );
 
@@ -597,7 +609,7 @@ frmCalendar.addEventListener( 'aa-delete', () => {
     
     lstEvents.data = events;
     calYear.data = events;
-    summarize( events.length );
+    pnlFooter.count = events.length;
   } );
 } );
 
@@ -633,7 +645,7 @@ frmCalendar.addEventListener( 'aa-done', () => {
     
     lstEvents.data = events;
     calYear.data = events;
-    summarize( events.length );    
+    pnlFooter.count = events.length;
   } );
 } );
 
@@ -676,7 +688,7 @@ pnlCalendars.addEventListener( 'aa-active', ( evt ) => {
 
     lstEvents.data = events;  
     calYear.data = events;
-    summarize( events.length );
+    pnlFooter.count = events.length;
   } );
 } );
 
@@ -707,7 +719,7 @@ pnlCalendars.addEventListener( 'aa-colors', ( evt ) => {
     lstEvents.data = events;
     calYear.colored = using;
     calYear.data = events;
-    summarize( events.length );
+    pnlFooter.count = events.length;
   } );
 } );
 
@@ -798,7 +810,7 @@ db.calendar.toCollection().sortBy( 'name' )
 
   lstEvents.data = events;  
   calYear.data = events;
-  summarize( events.length );
+  pnlFooter.count = events.length;
 } );
 
 /*
@@ -814,16 +826,6 @@ function blocker( disabled = true ) {
   btnHeaderNext.disabled = disabled;  
   txtHeaderSearch.disabled = disabled;
   btnHeaderToday.disabled = disabled;
-  lnkFooterLink.disabled = disabled;
-  sldFooterScale.disabled = disabled;
+  pnlFooter.disabled = disabled;
   pnlCalendars.disabled = disabled;  
-}
-
-function summarize( count = null ) {
-  if( count === null ) {
-    lblFooterCount.hidden = true;
-  } else {
-    lblFooterCount.text = `${count} event${count !== 1 ? 's' : ''}`;  
-    lblFooterCount.hidden = false;
-  }
 }

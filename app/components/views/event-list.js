@@ -25,6 +25,10 @@ export default class AAEventList extends HTMLElement {
           height: 100%;
           justify-content: center;
         }
+
+        aa-event-list-renderer {
+          cursor: pointer;
+        }
       </style>
       <div part="list"></div>
       <div part="empty">

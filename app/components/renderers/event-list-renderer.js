@@ -11,11 +11,13 @@ export default class AAEventListRenderer extends HTMLElement {
       <style>
         :host {
           align-items: center;
+          border-radius: 4px;
           box-sizing: border-box;
           display: flex;
           flex-direction: row;
           gap: 8px;
-          padding: 8px 16px 8px 8px;
+          padding: 8px;
+          margin: 0 8px 0 8px;
           position: relative;
         }
 
@@ -51,6 +53,10 @@ export default class AAEventListRenderer extends HTMLElement {
         aa-vbox[part=details] {
           flex-basis: 0;
           flex-grow: 1;
+        }
+
+        aa-label {
+          --label-cursor: pointer;
         }
 
         aa-label[part=date] {

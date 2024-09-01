@@ -42,23 +42,11 @@
         </aa-hbox>
       </header>
   
-      <!-- Calendar grid -->
+      <!-- Year view -->
       <aa-year style="flex-grow: 1; flex-basis: 0;"></aa-year>      
   
       <!-- Footer -->
-      <!-- Attribution -->
-      <!-- Event count -->
-      <!-- Scale control -->
-      <footer class="grid">
-        <aa-hbox style="align-items: baseline;">
-          <aa-label text="Handcrafted with ❤️ at"></aa-label>
-          <aa-link href="https://ketnerlake.com" id="footer_link" label="Ketner Lake" style="margin: 0 0 0 4px" target="_blank"></aa-link>
-          <aa-label text="."></aa-label>
-        </aa-hbox>
-        <aa-label id="footer_count" style="--label-text-align: center;"></aa-label>
-        <aa-rainbow hidden id="footer_wizard" text="Tree wizard!"></aa-rainbow>
-        <input id="footer_scale" max="100" min="1" type="range" value="50" />
-      </footer>        
+      <aa-footer></aa-footer>
 
     </aa-vbox>
 
@@ -116,7 +104,7 @@
     </dialog>
 
     <!-- Data -->
-    <script src="./util/dexie-4.0.8.js"></script>
+    <script src="./lib/dexie-4.0.8.js"></script>
 
     <!-- Components -->
     <script src="./components.js" type="module"></script>
