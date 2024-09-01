@@ -15,7 +15,7 @@ export default class AAEventListRenderer extends HTMLElement {
           display: flex;
           flex-direction: row;
           gap: 8px;
-          padding: 8px 16px 9px 0;
+          padding: 8px 16px 8px 8px;
           position: relative;
         }
 
@@ -77,19 +77,28 @@ export default class AAEventListRenderer extends HTMLElement {
           flex-grow: 1;
         }
 
-        div {
-          background: #ffffff;
+        div[part=backdrop] {
+          background-color: #ffffff;
           border-radius: 4px;
-          margin-left: 16px;
         }
 
         div[part=divider] {
           background: #bdbdc3;
           bottom: 0;
           height: 1px;
-          left: 44px;
+          left: 60px;
           position: absolute;
           right: 0;
+        }        
+
+        div[part=selected] {
+          align-items: center;
+          background: transparent;
+          border-radius: 4px;
+          display: flex;
+          flex-direction: row;
+          gap: 8px;
+          padding: 8px;          
         }
 
         :host( [outdated] ) aa-label[part=summary],
@@ -98,8 +107,12 @@ export default class AAEventListRenderer extends HTMLElement {
         :host( [outdated] ) aa-label[part=ends] {
           --label-color: #a9a9b0;
         }
+
+        :host( [selected] ) {
+          background: #dad9e1;
+        }
       </style>
-      <div>
+      <div part="backdrop">
         <aa-vbox centered justified part="calendar">
           <aa-label part="date" text="6" weight="bold"></aa-label>
           <aa-label part="month" size="xs"></aa-label>
@@ -115,7 +128,6 @@ export default class AAEventListRenderer extends HTMLElement {
           <aa-label part="ends" size="s"></aa-label>
         </aa-hbox>        
       </aa-vbox>
-      <div part="divider"></div>      
     `;
 
     // Private
@@ -222,6 +234,7 @@ export default class AAEventListRenderer extends HTMLElement {
     this._upgrade( 'data' );      
     this._upgrade( 'hidden' );    
     this._upgrade( 'outdated' );          
+    this._upgrade( 'selected' );              
     this._render();
   }
 
@@ -230,7 +243,8 @@ export default class AAEventListRenderer extends HTMLElement {
     return [
       'concealed',
       'hidden',
-      'outdated'
+      'outdated',
+      'selected'
     ];
   }
 
@@ -330,6 +344,26 @@ export default class AAEventListRenderer extends HTMLElement {
       }
     } else {
       this.removeAttribute( 'outdated' );
+    }
+  }  
+
+  get selected() {
+    return this.hasAttribute( 'selected' );
+  }
+
+  set selected( value ) {
+    if( value !== null ) {
+      if( typeof value === 'boolean' ) {
+        value = value.toString();
+      }
+
+      if( value === 'false' ) {
+        this.removeAttribute( 'selected' );
+      } else {
+        this.setAttribute( 'selected', '' );
+      }
+    } else {
+      this.removeAttribute( 'selected' );
     }
   }  
 }

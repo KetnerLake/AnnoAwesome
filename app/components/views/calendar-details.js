@@ -64,15 +64,15 @@ export default class AACalendarDetails extends HTMLElement {
       <aa-vbox gap="l" part="groups">
         <aa-section label="My Awesome">
           <aa-button label="Hide All" slot="count"></aa-button>
-          <aa-list item-renderer="aa-calendar-list-renderer" part="mine"></aa-list>
+          <aa-vbox part="mine"></aa-vbox>
         </aa-section>
         <aa-section label="Shared Awesome">
           <aa-button label="Hide All" slot="count"></aa-button>
-          <aa-list item-renderer="aa-calendar-list-renderer" part="shared"></aa-list>
+          <aa-vbox part="shared"></aa-vbox>          
         </aa-section>
         <aa-section label="Public Awesome" notes="Hiding a shared or public calendar does not make it private.">
           <aa-button label="Hide All" slot="count"></aa-button>
-          <aa-list item-renderer="aa-calendar-list-renderer" part="public"></aa-list>
+          <aa-vbox part="public"></aa-vbox>
         </aa-section>                        
         <button centered part="colors">
           <aa-checkbox part="check"></aa-checkbox>
@@ -135,7 +135,7 @@ export default class AACalendarDetails extends HTMLElement {
       } ) );
     } );
     this.$my_group = this.shadowRoot.querySelector( 'aa-section:nth-of-type( 1 )' );
-    this.$my_list = this.shadowRoot.querySelector( 'aa-section:nth-of-type( 1 ) aa-list' );
+    this.$my_list = this.shadowRoot.querySelector( 'aa-section:nth-of-type( 1 ) aa-vbox' );
     this.$public_hide = this.shadowRoot.querySelector( 'aa-section:nth-of-type( 3 ) aa-button' );    
     this.$public_hide.addEventListener( this._touch ? 'touchstart' : 'click', () => {
       this.$public_hide.label = this.$public_hide.label === this._HIDE ? this._SHOW : this._HIDE;      
@@ -148,7 +148,7 @@ export default class AACalendarDetails extends HTMLElement {
       } ) );      
     } );
     this.$public_group = this.shadowRoot.querySelector( 'aa-section:nth-of-type( 3 )' );    
-    this.$public_list = this.shadowRoot.querySelector( 'aa-section:nth-of-type( 3 ) aa-list' );    
+    this.$public_list = this.shadowRoot.querySelector( 'aa-section:nth-of-type( 3 ) aa-vbox' );    
     this.$shared_hide = this.shadowRoot.querySelector( 'aa-section:nth-of-type( 2 ) aa-button' );        
     this.$shared_hide.addEventListener( this._touch ? 'touchstart' : 'click', () => {
       this.$shared_hide.label = this.$shared_hide.label === this._HIDE ? this._SHOW : this._HIDE;      
@@ -161,10 +161,25 @@ export default class AACalendarDetails extends HTMLElement {
       } ) );      
     } );
     this.$shared_group = this.shadowRoot.querySelector( 'aa-section:nth-of-type( 2 )' );    
-    this.$shared_list = this.shadowRoot.querySelector( 'aa-section:nth-of-type( 2 ) aa-list' );    
+    this.$shared_list = this.shadowRoot.querySelector( 'aa-section:nth-of-type( 2 ) aa-vbox' );    
   }
 
-   // When attributes change
+  build( list, data ) {
+    while( list.children.length > data.length ) {
+      list.children[0].remove();
+    } 
+
+    while( list.children.length < data.length ) {
+      const element = document.createElement( 'aa-calendar-list-renderer' );
+      list.appendChild( element );      
+    }    
+
+    for( let c = 0; c < list.children.length; c++ ) {
+      list.children[c].data = data[c];
+    }
+  }
+
+  // When attributes change
   _render() {
     this.$my_list.disabled = this.disabled;
     this.$my_hide.disabled = this.disabled;
@@ -244,13 +259,15 @@ export default class AACalendarDetails extends HTMLElement {
       this.$hide.label = this._HIDE;
     }
 
-    this.$my_list.data = mine;
-    this.$shared_group.hidden = shared.length === 0 ? true : false;
-    this.$shared_list.data = shared;
-    this.$public_group.hidden = publicly.length === 0 ? true : false;
-    this.$public_list.data = publicly;
+    this.build( this.$my_list, mine );
+    this.build( this.$shared_list, shared ); 
+    this.build( this.$public_list, publicly );       
 
-    this._render();
+    this.$shared_group.hidden = shared.length === 0 ? true : false;
+    this.$public_group.hidden = publicly.length === 0 ? true : false;    
+
+    this.$shared_group.hideNotes = publicly.length === 0 ? false : true;    
+    this.$public_group.hideNotes = shared.length === 0 ? false : true;        
   }  
 
   // Attributes

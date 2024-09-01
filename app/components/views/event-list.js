@@ -1,4 +1,4 @@
-export default class AAList extends HTMLElement {
+export default class AAEventList extends HTMLElement {
   constructor() {
     super();
 
@@ -25,11 +25,6 @@ export default class AAList extends HTMLElement {
           height: 100%;
           justify-content: center;
         }
-
-        div[part=list] aa-event-list-renderer:last-of-type,
-        div[part=list] aa-calendar-list-renderer:last-of-type {
-          border-bottom: solid 1px transparent;
-        }
       </style>
       <div part="list"></div>
       <div part="empty">
@@ -39,7 +34,6 @@ export default class AAList extends HTMLElement {
 
     // Private
     this._data = [];
-    this._label = null;
     this._touch = ( 'ontouchstart' in document.documentElement ) ? true : false; 
 
     // Events
@@ -56,7 +50,7 @@ export default class AAList extends HTMLElement {
 
   doItemClick( evt ) {
     const index = parseInt( evt.currentTarget.getAttribute( 'data-index' ) );
-    this.selectedIndex = this.selectedIndex === index ? null : index;
+    this.selectedIndex = index;
 
     this.dispatchEvent( new CustomEvent( 'aa-change', {
       detail: {
@@ -68,13 +62,10 @@ export default class AAList extends HTMLElement {
   // When attributes change
   _render() {
     for( let c = 0; c < this.$list.children.length; c++ ) {
-      if( !this.inert ) {
-        if( this.selectedIndex !== null ) {
-          console.log( this.selectedIndex );
-          this.$list.children[c].selected = this.selectedIndex === c ? true : false;
-        } else {
-          this.$list.children[c].selected = false;
-        }
+      if( this.selectedIndex !== null ) {
+        this.$list.children[c].selected = this.selectedIndex === c ? true : false;
+      } else {
+        this.$list.children[c].selected = false;
       }
 
       this.$list.children[c].disabled = this.disabled;
@@ -97,11 +88,8 @@ export default class AAList extends HTMLElement {
     this._upgrade( 'data' );      
     this._upgrade( 'disabled' );          
     this._upgrade( 'hidden' );    
-    this._upgrade( 'inert' );          
-    this._upgrade( 'itemRenderer' );        
-    this._upgrade( 'labelField' );  
-    this._upgrade( 'labelFunction' );
     this._upgrade( 'selectedIndex' );              
+    this._upgrade( 'selectedItem' );                  
     this._render();
   }
 
@@ -111,9 +99,6 @@ export default class AAList extends HTMLElement {
       'concealed',
       'disabled',
       'hidden',
-      'inert',
-      'item-renderer',
-      'label-field',
       'selected-index'
     ];
   }
@@ -143,39 +128,24 @@ export default class AAList extends HTMLElement {
     }
 
     while( this.$list.children.length < this._data.length ) {
-      const renderer = this.itemRenderer === null ? 'p' : this.itemRenderer;
-      const element = document.createElement( renderer );
-
-      if( !this.inert ) {
-        element.addEventListener( this._touch ? 'touchstart' : 'click', this.doItemClick );
-      }
-
+      const element = document.createElement( 'aa-event-list-renderer' );
+      element.addEventListener( this._touch ? 'touchstart' : 'click', this.doItemClick );
       this.$list.appendChild( element );
     }
 
     for( let c = 0; c < this.$list.children.length; c++ ) {
       this.$list.children[c].setAttribute( 'data-index', c );
-
-      if( this.itemRenderer === null ) {
-        if( this.labelField !== null ) {
-          this.$list.children[c].data = this._data[c][this.labelField];
-        } else if( this.labelFunction !== null ) {
-          this.$list.children[c].data = this._label( this._data[c] );
-        } else {
-          this.$list.children[c].data = this._data[c].toString();
-        }
-      } else {
-        this.$list.children[c].data = this._data[c];
-      }
+      this.$list.children[c].data = this._data[c];
     }
   }  
 
-  get labelFunction() {
-    return this._label;
+  get selectedItem() {
+    if( this.selectedIndex === null ) return null;
+    return this._data[this.selectedIndex].id
   }
 
-  set labelFunction( func ) {
-    this._label = func;
+  set selectedItem( id ) {
+    this.selectedIndex = this._data.findIndex( ( value ) => value.id === id );
   }
 
   // Attributes
@@ -240,58 +210,6 @@ export default class AAList extends HTMLElement {
       this.removeAttribute( 'hidden' );
     }
   }     
-
-  get inert() {
-    return this.hasAttribute( 'inert' );
-  }
-
-  set inert( value ) {
-    if( value !== null ) {
-      if( typeof value === 'boolean' ) {
-        value = value.toString();
-      }
-
-      if( value === 'false' ) {
-        this.removeAttribute( 'inert' );
-      } else {
-        this.setAttribute( 'inert', '' );
-      }
-    } else {
-      this.removeAttribute( 'inert' );
-    }
-  }  
-  
-  get itemRenderer() {
-    if( this.hasAttribute( 'item-renderer' ) ) {
-      return this.getAttribute( 'item-renderer' );
-    }
-
-    return null;
-  }
-
-  set itemRenderer( value ) {
-    if( value !== null ) {
-      this.setAttribute( 'item-renderer', value );
-    } else {
-      this.removeAttribute( 'item-renderer' );
-    }
-  }  
-
-  get labelField() {
-    if( this.hasAttribute( 'label-field' ) ) {
-      return this.getAttribute( 'label-field' );
-    }
-
-    return null;
-  }
-
-  set labelField( value ) {
-    if( value !== null ) {
-      this.setAttribute( 'label-field', value );
-    } else {
-      this.removeAttribute( 'label-field' );
-    }
-  }  
   
   get selectedIndex() {
     if( this.hasAttribute( 'selected-index' ) ) {
@@ -310,4 +228,4 @@ export default class AAList extends HTMLElement {
   }           
 }
 
-window.customElements.define( 'aa-list', AAList );
+window.customElements.define( 'aa-event-list', AAEventList );

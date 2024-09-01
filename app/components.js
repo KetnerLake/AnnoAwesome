@@ -36,3 +36,4 @@ import AACalendarDetails from "./components/views/calendar-details.js";
 import AACalendarForm from "./components/views/calendar-form.js";
 import AAEventDetails from "./components/views/event-details.js";
 import AAEventForm from "./components/views/event-form.js";
+import AAEventList from "./components/views/event-list.js";

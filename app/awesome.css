@@ -38,6 +38,7 @@ aa-list aa-icon {
 
 dialog[open] {
   animation: open 0.25s forwards;
+  outline: none;
 }
 
 @keyframes open {

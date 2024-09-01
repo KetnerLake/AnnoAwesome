@@ -20,9 +20,9 @@
         <aa-calendar-details id="left_calendars"></aa-calendar-details>
         <aa-vbox style="flex-basis: 0; flex-grow: 1;">
           <aa-label size="xl" style="padding-left: 16px; padding-top: 64px; padding-bottom: 47px;" text="Events" weight="bold"></aa-label>
-          <aa-list id="drawer_events" item-renderer="aa-event-list-renderer" style="border-top: solid 1px #c7c7c7; flex-basis: 0; flex-grow: 1;">
+          <aa-event-list id="drawer_events" style="border-top: solid 1px #c7c7c7; flex-basis: 0; flex-grow: 1;">
             <aa-label style="--label-color: #85858c;" text="No events"></aa-label>
-          </aa-list>          
+          </aa-event-list>
         </aa-vbox>
       </aa-stack>
     </aa-drawer>
@@ -64,13 +64,13 @@
 
     <!-- Right drawer -->
     <aa-drawer hidden id="drawer_right" placement="end" style="background-color: #f4f4f3; padding-top: 68px;">
-      <aa-list id="drawer_search" item-renderer="aa-event-list-renderer" style="background-color: #f2f2f9; border-top: solid 1px #c7c7c7; flex-basis: 0; flex-grow: 1;">
+      <aa-event-list id="drawer_search" style="background-color: #f2f2f9; border-top: solid 1px #c7c7c7; flex-basis: 0; flex-grow: 1;">
         <aa-vbox centered gap="m" style="width: 65%;">
           <aa-icon size="l" src="./img/search.svg" style="margin-bottom: 8px;"></aa-icon>
           <aa-label size="l" text="No events" weight="bold"></aa-label>
           <aa-label style="--label-color: #85858c; --label-line-height: 21px; --label-text-align: center;" text="Check the spelling or try a new search."></aa-label>
         </aa-vbox>
-      </aa-list>          
+      </aa-event-list>
     </aa-drawer>
 
     <!-- Controls -->

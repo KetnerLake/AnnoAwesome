@@ -108,6 +108,7 @@ export default class AASection extends HTMLElement {
     this._upgrade( 'concealed' );  
     this._upgrade( 'data' );      
     this._upgrade( 'hidden' ); 
+    this._upgrade( 'hideNotes' );      
     this._upgrade( 'label' );           
     this._upgrade( 'notes' );  
     this._render();
@@ -118,6 +119,7 @@ export default class AASection extends HTMLElement {
     return [
       'concealed',
       'hidden',
+      'hide-notes',
       'label',      
       'notes'
     ];
@@ -182,6 +184,26 @@ export default class AASection extends HTMLElement {
       this.removeAttribute( 'hidden' );
     }
   }   
+
+  get hideNotes() {
+    return this.hasAttribute( 'hide-notes' );
+  }
+
+  set hideNotes( value ) {
+    if( value !== null ) {
+      if( typeof value === 'boolean' ) {
+        value = value.toString();
+      }
+
+      if( value === 'false' ) {
+        this.removeAttribute( 'hide-notes' );
+      } else {
+        this.setAttribute( 'hide-notes', '' );
+      }
+    } else {
+      this.removeAttribute( 'hide-notes' );
+    }
+  }  
 
   get label() {
     if( this.hasAttribute( 'label' ) ) {

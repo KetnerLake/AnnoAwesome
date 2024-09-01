@@ -87,11 +87,7 @@ export default class AACalendarListRenderer extends HTMLElement {
 
    // When attributes change
   _render() {
-    if( this._data === null ) return;
-
-    this.$checkbox.checked = this._data.isActive;
     this.$checkbox.disabled = this.disabled;
-    this.$label.text = this._data.name;
     this.$info.disabled = this.disabled;
   }
 
@@ -138,8 +134,11 @@ export default class AACalendarListRenderer extends HTMLElement {
 
   set data( value ) {
     this._data = structuredClone( value );
+
+    this.$checkbox.checked = this._data.isActive;
     this.$checkbox.style.setProperty( '--checkbox-color', this._data.color === null ? '' : this._data.color );
-    this._render();
+
+    this.$label.text = this._data.name;
   }  
 
   // Attributes

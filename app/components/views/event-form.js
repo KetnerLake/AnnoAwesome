@@ -79,6 +79,7 @@ export default class AAEventForm extends HTMLElement {
 
     // Private
     this._calendars = [];
+    this._changed = false;
     this._data = null;
     this._touch = ( 'ontouchstart' in document.documentElement ) ? true : false; 
 
@@ -94,16 +95,20 @@ export default class AAEventForm extends HTMLElement {
     this.$calendar = this.shadowRoot.querySelector( 'aa-select[part=calendars]' );
     this.$cancel = this.shadowRoot.querySelector( 'aa-button[part=cancel]' ); 
     this.$cancel.addEventListener( this._touch ? 'touchstart' : 'click', () => {
-      if( this.$title.value === null && 
-          this.$location.value === null &&
-          this.$url.value === null &&
-          this.$notes.value === null ) {
-        this.dispatchEvent( new CustomEvent( 'aa-cancel' ) );          
-      } else {
-        const response = confirm( 'Are you sure you want to discard this new event?' );
-        if( response ) {
-          this.dispatchEvent( new CustomEvent( 'aa-cancel' ) );                    
+      if( this._changed ) {
+        if( this._data === null ) {
+          const response = confirm( 'Are you sure you want to discard this new event?' );
+          if( response ) {
+            this.dispatchEvent( new CustomEvent( 'aa-cancel' ) );                    
+          }
+        } else {
+          const response = confirm( 'Are you sure you want to discard your changes?' );
+          if( response ) {
+            this.dispatchEvent( new CustomEvent( 'aa-cancel' ) );                    
+          }
         }
+      } else {
+        this.dispatchEvent( new CustomEvent( 'aa-cancel' ) );                            
       }
     } );
     this.$delete = this.shadowRoot.querySelector( 'aa-button[part=delete]' );
@@ -124,7 +129,15 @@ export default class AAEventForm extends HTMLElement {
     } );
     this.$label = this.shadowRoot.querySelector( 'aa-label[part=label]' );
     this.$location = this.shadowRoot.querySelector( 'aa-input[part=location]' );
+    this.$location.addEventListener( 'aa-change', () => {
+      this._changed = true;
+      this.$add.disabled = !this.validate();
+    } );    
     this.$notes = this.shadowRoot.querySelector( 'aa-textarea[part=notes]' );    
+    this.$notes.addEventListener( 'aa-change', () => {
+      this._changed = true;
+      this.$add.disabled = !this.validate();
+    } );    
     this.$starts = this.shadowRoot.querySelector( 'aa-date-picker[part=starts]' );
     this.$starts.addEventListener( 'aa-change', () => {
       this.$ends.valueAsDate = new Date( this.$starts.valueAsDate.getTime() );
@@ -140,9 +153,14 @@ export default class AAEventForm extends HTMLElement {
     } );
     this.$title = this.shadowRoot.querySelector( 'aa-input[part=title]' );
     this.$title.addEventListener( 'aa-change', () => {
-      this.$add.disabled = this.$title.value === null ? true : false;
+      this._changed = true;
+      this.$add.disabled = !this.validate();
     } );    
     this.$url = this.shadowRoot.querySelector( 'aa-input[part=url]' );
+    this.$url.addEventListener( 'aa-change', () => {
+      this._changed = true;
+      this.$add.disabled = !this.validate();
+    } );    
   }
 
   focus() {
@@ -151,6 +169,7 @@ export default class AAEventForm extends HTMLElement {
 
   reset() {
     this._data = null;
+    this._changed = false;
 
     const now = new Date();
 
@@ -241,8 +260,8 @@ export default class AAEventForm extends HTMLElement {
   }
 
   set data( value ) {
-    console.log( value );
     this._data = value === null ? null : structuredClone( value );
+    this._changed = false;
 
     this.$add.label = 'Done';
     this.$title.value = this._data.summary;

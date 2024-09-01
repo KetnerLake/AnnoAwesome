@@ -265,6 +265,7 @@ export default class AAYear extends HTMLElement {
       } else {
         if( this.$events.children[c].data.id === id ) {
           this.$events.children[c].selected = true;
+          this.$events.children[c].scrollIntoView( {behavior: 'smooth', block: 'end', inline: 'start'} );
         } else {
           this.$events.children[c].selected = false;          
         }

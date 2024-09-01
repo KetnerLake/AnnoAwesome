@@ -231,6 +231,21 @@ btnHeaderToday.addEventListener( TOUCH, () => {
   } );  
 } );
 
+lstSearch.addEventListener( 'aa-change', ( evt ) => {
+  calYear.selectedItem = evt.detail.id;
+  lstSearch.selectedItem = evt.detail.id;
+
+  db.event.where( {id: evt.detail.id} ).first()
+  .then( ( event ) => {
+    pnlEvent.calendars = calendars;
+    pnlEvent.data = event;
+    dlgEvent.classList.remove( 'transparent' );
+    stkEvent.selectedIndex = 1;
+    blocker( true );
+    dlgEvent.showModal();
+  } );
+} );
+
 txtHeaderSearch.addEventListener( 'focus', () => {
   pnlLeft.hidden = true;
   btnHeaderCalendars.checked = false;
@@ -331,6 +346,8 @@ dlgEvent.addEventListener( TOUCH, ( evt ) => {
     dlgEvent.close();
     frmEvent.reset();
     calYear.selectedItem = null;    
+    lstEvents.selectedIndex = null;
+    lstSearch.selectedIndex = null;
   }
 } );
 
@@ -339,6 +356,8 @@ dlgEvent.addEventListener( 'close', () => {
   dlgEvent.close();
   frmEvent.reset();
   calYear.selectedItem = null;
+  lstEvents.selectedIndex = null;  
+  lstSearch.selectedIndex = null;
 } );
 
 frmEvent.addEventListener( 'aa-cancel', () => {
@@ -346,6 +365,8 @@ frmEvent.addEventListener( 'aa-cancel', () => {
   dlgEvent.close();
   frmEvent.reset();
   calYear.selectedItem = null;
+  lstEvents.selectedIndex = null;
+  lstSearch.selectedIndex = null;
 } );
 
 frmEvent.addEventListener( 'aa-delete', ( evt ) => {
@@ -374,11 +395,15 @@ frmEvent.addEventListener( 'aa-delete', ( evt ) => {
 } );
 
 frmEvent.addEventListener( 'aa-done', () => {
+  const id = frmEvent.data.id;
+
   db.event.put( frmEvent.data )
   .then( () => {
     blocker( false );
     dlgEvent.close();
     calYear.selectedItem = null;
+    lstEvents.selectedIndex = null;
+    lstSearch.selectedIndex = null;
     frmEvent.reset();
 
     return db.event.where( 'startsAt' ).between( starts, ends ).toArray();
@@ -422,6 +447,7 @@ pnlEvent.addEventListener( 'aa-change', ( evt ) => {
     calYear.data = events;
     calYear.selectedItem = evt.detail.id;
     lstEvents.data = events;
+    lstEvents.selectedItem = evt.detail.id;
     summarize( events.length );
   } );
 } );
@@ -443,6 +469,8 @@ pnlEvent.addEventListener( 'aa-delete', ( evt ) => {
     
     calYear.data = events;
     calYear.selectedItem = null;
+    lstEvents.selectedIndex = null;
+    lstSearch.selectedIndex = null;
     lstEvents.data = events;
     blocker( false );
     dlgEvent.close();
@@ -466,6 +494,21 @@ pnlEvent.addEventListener( 'aa-edit', ( evt ) => {
 } );
 
 // Drawers
+lstEvents.addEventListener( 'aa-change', ( evt ) => {
+  calYear.selectedItem = evt.detail.id;
+  lstEvents.selectedItem = evt.detail.id;
+
+  db.event.where( {id: evt.detail.id} ).first()
+  .then( ( event ) => {
+    pnlEvent.calendars = calendars;
+    pnlEvent.data = event;
+    dlgEvent.classList.remove( 'transparent' );
+    stkEvent.selectedIndex = 1;
+    blocker( true );
+    dlgEvent.showModal();
+  } );
+} );
+
 pnlCalendars.addEventListener( 'aa-add', () => {
   frmCalendar.canDelete = false;
   blocker( true );
@@ -683,6 +726,7 @@ pnlCalendars.addEventListener( 'aa-info', ( evt ) => {
 calYear.addEventListener( 'aa-change', ( evt ) => {
   db.event.where( {id: evt.detail.id} ).first()
   .then( ( event ) => {
+    lstEvents.selectedItem = event.id;
     pnlEvent.calendars = calendars;
     pnlEvent.data = event;
     dlgEvent.classList.remove( 'transparent' );
