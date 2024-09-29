@@ -26,6 +26,20 @@ body {
   padding: 0;
 }
 
+aa-controls {
+  left: 16px;
+  position: absolute;                        
+  right: 16px;
+  top: 16px;
+  z-index: 50;  
+}
+
+aa-header {
+  margin: 0; 
+  padding: 64px 16px 8px 16px;  
+}
+
+/*
 aa-list aa-icon {
   --icon-color: 
     invert( 60% ) 
@@ -35,6 +49,7 @@ aa-list aa-icon {
     brightness( 87% ) 
     contrast( 88% );            
 }
+*/
 
 dialog[open] {
   animation: open 0.25s forwards;
@@ -56,6 +71,7 @@ dialog::backdrop {
   opacity: 0;
 }
 
+/*
 footer {
   align-items: center;
   border-top: solid 1px #c7c7c7;  
@@ -67,6 +83,15 @@ footer {
 input[type=range] {
   justify-self: end;
   width: 200px;
+}
+*/
+
+main {
+  display: flex;
+  flex-basis: 0;
+  flex-direction: column; 
+  flex-grow: 1; 
+  min-width: 0;
 }
 
 .popover {
@@ -88,9 +113,11 @@ input[type=range] {
   -webkit-backdrop-filter: blur( 10px );
 }
 
+/*
 .grid {
   display: grid; 
   grid-template-columns: 1fr 1fr 1fr; 
   grid-template-rows: 1fr; 
   gap: 0px 0px;  
 }
+*/

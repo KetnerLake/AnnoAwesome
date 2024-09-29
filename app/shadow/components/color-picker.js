@@ -84,9 +84,11 @@ export default class AAColorPicker extends HTMLElement {
             contrast( 85% ); 
         }
 
+        /*
         :host( [open] ) {
           height: 252px;
         }
+        */
 
         :host( [open] ) aa-vbox {
           opacity: 1.0;
@@ -105,15 +107,11 @@ export default class AAColorPicker extends HTMLElement {
     `;
 
     // Private
-    this._colors = [
-      {name: 'Red', value: '#ff2968'},
-      {name: 'Orange', value: '#ff9500'},
-      {name: 'Yellow', value: '#ffcc02'},
-      {name: 'Green', value: '#63da38'},
-      {name: 'Blue', value: '#1badf8'},
-      {name: 'Purple', value: '#cc73e1'}
-    ];
-    this._data = null;
+    this._data = [];
+    this._touch = ( 'ontouchstart' in document.documentElement ) ? true : false;
+
+    // Events
+    this.doColorClick = this.doColorClick.bind( this );
 
     // Root
     this.attachShadow( {mode: 'open'} );
@@ -121,52 +119,49 @@ export default class AAColorPicker extends HTMLElement {
 
     // Elements
     this.$button = this.shadowRoot.querySelector( 'button[part=button]' );
-    this.$button.addEventListener( 'click', () => {
+    this.$button.addEventListener( this._touch ? 'touchstart' : 'click', () => {
+      if( this.open ) {
+        this.animate( [
+          {height: `${( this._data.length + 1 ) * 36}px` },          
+          {height: '36px'}
+        ], {
+          duration: 250,
+          fill: 'both'
+        } );
+      } else {
+        this.animate( [
+          {height: '36px'},
+          {height: `${( this._data.length + 1 ) * 36}px` }
+        ], {
+          duration: 250,
+          fill: 'both'
+        } );        
+      }
+
       this.open = !this.open;
     } );
     this.$color = this.shadowRoot.querySelector( 'span[part=color]' );
     this.$label = this.shadowRoot.querySelector( 'aa-label[part=label]' );
     this.$list = this.shadowRoot.querySelector( 'aa-vbox[part=list]' );
-
-    for( let c = 0; c < this._colors.length; c++ ) {
-      const button = document.createElement( 'button' );
-      button.setAttribute( 'data-index', c );
-      button.setAttribute( 'data-value', this._colors[c].value );      
-      button.addEventListener( 'click', ( evt ) => this.doColorClick( evt ) );
-
-      const span = document.createElement( 'span' );
-      span.style.backgroundColor = this._colors[c].value;
-      button.appendChild( span );
-
-      const label = document.createElement( 'aa-label' );
-      label.text = this._colors[c].name;
-      button.appendChild( label );
-
-      const icon = document.createElement( 'aa-icon' );
-      icon.hidden = c == 2 ? false : true;
-      icon.src = './img/check2.svg';
-      button.appendChild( icon );
-
-      this.$list.appendChild( button );
-    }
   }
 
   doColorClick( evt ) {
     const index = parseInt( evt.currentTarget.getAttribute( 'data-index' ) );
-    this.label = this._colors[index].name;
-    this.value = this._colors[index].value;
+    this.selectedIndex = index;
+    this.value = this._data[index].value;
   }
 
   // When things change
   _render() {
-    const value = this.value === null ? '#1badf8' : this.value;    
-    const index = this._colors.findIndex( ( curr ) => curr.value === value );
+    if( this._data.length === 0 ) return;
 
-    this.$color.style.backgroundColor = value;
-    this.$label.text = this._colors[index].name;
+    const index = this.selectedIndex === null ? 0 : this.selectedIndex;
+
+    this.$label.text = this._data[index].name;
+    this.$color.style.backgroundColor = this._data[index].value;
 
     for( let c = 0; c < this.$list.children.length; c++ ) {
-      this.$list.children[c].children[2].hidden = c === index ? false : true;      
+      this.$list.children[c].children[2].hidden = index === c ? false : true;      
     }
   }
 
@@ -186,6 +181,8 @@ export default class AAColorPicker extends HTMLElement {
     this._upgrade( 'hidden' );                      
     this._upgrade( 'label' );                          
     this._upgrade( 'open' );                          
+    this._upgrade( 'selectedIndex' );                          
+    this._upgrade( 'selectedItem' );                              
     this._upgrade( 'value' );                              
     this._render();
   }
@@ -197,6 +194,7 @@ export default class AAColorPicker extends HTMLElement {
       'hidden',
       'label',
       'open',
+      'selected-index',
       'value'
     ];
   }
@@ -211,12 +209,53 @@ export default class AAColorPicker extends HTMLElement {
   // Not reflected
   // Array, Date, Function, Object, null
   get data() {
-    return this._data;
+    return this._data.length === 0 ? null : this._data;
   }
 
   set data( value ) {
-    this._data = value;
+    this._data = value === null ? [] : [... value];
+
+    this.style.height = '36px';
+
+    while( this.$list.children.length > this._data.length ) {
+      this.$list.children[0].removeEventListener( this._touch ? 'touchstart' : 'click', this.doColorClick );
+    }
+
+    while( this.$list.children.length < this._data.length ) {
+      const button = document.createElement( 'button' );
+      button.addEventListener( this._touch ? 'touchstart' : 'click', this.doColorClick );
+
+      const span = document.createElement( 'span' );
+      button.appendChild( span );
+
+      const label = document.createElement( 'aa-label' );
+      button.appendChild( label );
+
+      const icon = document.createElement( 'aa-icon' );
+      icon.src = './img/check2.svg';
+      button.appendChild( icon );
+
+      this.$list.appendChild( button );      
+    }
+
+    for( let c = 0; c < this.$list.children.length; c++ ) {
+      this.$list.children[c].setAttribute( 'data-index', c );
+      this.$list.children[c].setAttribute( 'data-label', this._data[c].name );      
+      this.$list.children[c].setAttribute( 'data-value', this._data[c].value );            
+      this.$list.children[c].children[0].style.backgroundColor = this._data[c].value;
+      this.$list.children[c].children[1].text = this._data[c].name;     
+    }    
+
+    this._render();
   }  
+
+  get selectedItem() {
+    return this.selectedIndex === null ? null : this._data[this.selectedIndex].value;
+  }
+
+  set selectedItem( color ) {
+    this.selectedIndex = color === null ? null : this._data.findIndex( ( item ) => item.value === color ? true : false );  
+  }
 
   // Attributes
   // Reflected
@@ -296,6 +335,22 @@ export default class AAColorPicker extends HTMLElement {
       this.removeAttribute( 'open' );
     }
   }  
+
+  get selectedIndex() {
+    if( this.hasAttribute( 'selected-index' ) ) {
+      return parseInt( this.getAttribute( 'selected-index' ) );
+    }
+
+    return null;
+  }
+
+  set selectedIndex( value ) {
+    if( value !== null ) {
+      this.setAttribute( 'selected-index', value );
+    } else {
+      this.removeAttribute( 'selected-index' );
+    }
+  }         
 
   get value() {
     if( this.hasAttribute( 'value' ) ) {

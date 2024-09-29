@@ -1,116 +1,1031 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-
+  
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Remote management of developer relations and communities.">
+    <meta name="description" content="Plan your year. Track annual progress. Feel awesome about your accomplishments. Anno Awesome: The missing year view.">
 
     <title>Anno Awesome</title>
 
     <link href="./img/trident.svg" rel="icon" type="image/svg+xml" />
-    <link href="awesome.css" rel="stylesheet" />
+    <link href="./style/awesome.css" rel="stylesheet" />
 
   </head>
   <body>
 
-    <!-- Left drawer -->
-    <aa-drawer hidden id="drawer_left" placement="start">
-      <aa-stack id="left_stack" style="display: flex; flex-direction: column; flex-basis: 0; flex-grow: 1;">
-        <aa-calendar-details id="left_calendars"></aa-calendar-details>
-        <aa-vbox style="flex-basis: 0; flex-grow: 1;">
-          <aa-label size="xl" style="padding-left: 16px; padding-top: 64px; padding-bottom: 47px;" text="Events" weight="bold"></aa-label>
-          <aa-event-list id="drawer_events" style="border-top: solid 1px #c7c7c7; flex-basis: 0; flex-grow: 1;">
-            <aa-label style="--label-color: #85858c;" text="No events"></aa-label>
-          </aa-event-list>
-        </aa-vbox>
+    <!-- Left -->
+    <aside id="left" class="hidden">
+      <aa-stack selected-index="0">
+
+        <!-- Calendars -->
+        <aa-calendar-details>
+          <h3>Calendars</h3>
+
+          <!-- Mine/private -->
+          <aa-calendar-section>
+            <div class="hbox">
+              <p class="label grouped">My Awesome</p>
+              <button aria-label="Hide my events" type="button">Hide All</button>
+            </div>
+            <ul class="list">
+              <li>
+                <label>
+                  <input id="group_mine" type="checkbox" />
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                  </svg>
+                </label>
+                <p>Calendar</p>
+                <button aria-label="Calendar information" class="icon" type="button">
+                  <img alt="Calendar information" src="./img/info-circle.svg" />
+                </button>
+              </li>                  
+            </ul>
+          </aa-calendar-section>
+
+          <!-- Shared -->
+          <aa-calendar-section>
+            <div class="hbox">
+              <p class="label grouped">Shared</p>
+              <button aria-label="Hide shared events" type="button">Hide All</button>
+            </div>
+            <ul class="list"></ul>        
+          </aa-calendar-section>
+
+          <!-- Public -->
+          <aa-calendar-section>
+            <div class="hbox">
+              <p class="label grouped">Public</p>
+              <button aria-label="Hide public events" type="button">Hide All</button>
+            </div>
+            <ul class="list"></ul>        
+          </aa-calendar-section>
+
+          <small>Hiding a shared or public calendar does not make it private.</small>    
+          
+          <!-- Colors -->
+          <label id="calendar_colors">
+            <input id="use_calendar_colors" type="checkbox" />
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+              <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+            </svg>
+            <p>Use calendar colors</p>
+          </label>            
+
+          <div class="hbox">
+            <button aria-label="Add calendar" id="calendar_details_add" type="button">Add Calendar</button>
+            <button aria-label="Hide all calendars" id="calendar_details_hide" type="button">Hide All</button>        
+          </div>
+        </aa-calendar-details>
+
+        <!-- Events -->
+        <aa-event-list hidden>
+          <h3>Events</h3>
+          <ul class="list"></ul>
+          <div>
+            <p>No events available.</p>
+            <button aria-label="Add event" id="event_list_add" type="button">Add Event</button>
+          </div>
+        </aa-event-list>
+
       </aa-stack>
-    </aa-drawer>
+    </aside>
 
-    <!-- Main -->
-    <aa-vbox style="flex-basis: 0; flex-grow: 1; min-width: 0;">
+    <main>
 
-      <!-- Header -->
-      <!-- Year -->
-      <!-- Today -->
-      <header class="grid" style="margin: 0; padding: 64px 16px 8px 16px;">
-        <aa-label id="header_year" size="xl" weight="bold"></aa-label>        
-        <aa-hbox centered gap="l" style="grid-column: 3 / 3; justify-self: end;">
-          <aa-icon-button id="header_previous" size="s" src="./img/chevron-left.svg"></aa-icon-button>          
-          <aa-button id="header_today" label="Today" style="--button-padding: 0;"></aa-button>
-          <aa-icon-button id="header_next" size="s" src="./img/chevron-right.svg"></aa-icon-button>                    
-        </aa-hbox>
-      </header>
+      <aa-header>
+        <h3>2024</h3>
+        <div class="hbox">
+          <button aria-label="Previous" class="icon small" type="button">
+            <img alt="Previous" src="./img/chevron-left.svg" />
+          </button>          
+          <button aria-label="Today" type="button">Today</button>
+          <button aria-label="Next" class="icon small" type="button">
+            <img alt="Next" src="./img/chevron-right.svg" />
+          </button>                    
+        </div>
+      </aa-header>
   
-      <!-- Year view -->
-      <aa-year style="flex-grow: 1; flex-basis: 0;"></aa-year>      
-  
-      <!-- Footer -->
-      <aa-footer></aa-footer>
+      <aa-year>
+        <section class="vbox">
+          <div class="hbox sticky">
+            <h5>January</h5>            
+            <h5>February</h5>            
+            <h5>March</h5>            
+            <h5>April</h5>                      
+            <h5>May</h5>            
+            <h5>June</h5>            
+            <h5>July</h5>            
+            <h5>August</h5>                      
+            <h5>September</h5>            
+            <h5>October</h5>            
+            <h5>November</h5>            
+            <h5>December</h5>                                          
+          </div>
+          <div class="hbox">
+            <article>
+              <div>
+                <div class="day"><p class="date">1</p></div>
+                <div class="day"><p class="date">2</p></div>
+                <div class="day"><p class="date">3</p></div>
+                <div class="day"><p class="date">4</p></div>
+                <div class="day"><p class="date">5</p></div>
+                <div class="day"><p class="date">6</p></div>
+                <div class="day"><p class="date">7</p></div>
+                <div class="day"><p class="date">8</p></div>
+                <div class="day"><p class="date">9</p></div>
+                <div class="day"><p class="date">10</p></div>
+                <div class="day"><p class="date">11</p></div>
+                <div class="day"><p class="date">12</p></div>
+                <div class="day"><p class="date">13</p></div>
+                <div class="day"><p class="date">14</p></div>
+                <div class="day"><p class="date">15</p></div>
+                <div class="day"><p class="date">16</p></div>
+                <div class="day"><p class="date">17</p></div>
+                <div class="day"><p class="date">18</p></div>                    
+                <div class="day"><p class="date">19</p></div>
+                <div class="day"><p class="date">20</p></div>
+                <div class="day"><p class="date">21</p></div>
+                <div class="day"><p class="date">22</p></div>
+                <div class="day"><p class="date">23</p></div>
+                <div class="day"><p class="date">24</p></div>          
+                <div class="day"><p class="date">25</p></div>
+                <div class="day"><p class="date">26</p></div>
+                <div class="day"><p class="date">27</p></div>
+                <div class="day"><p class="date">28</p></div>
+                <div class="day"><p class="date">29</p></div>
+                <div class="day"><p class="date">30</p></div>
+                <div class="day"><p class="date">31</p></div>      
+              </div>    
+              <div></div>
+            </article>
+            <article class="month">
+              <div>
+                <div class="day"><p class="date">1</p></div>
+                <div class="day"><p class="date">2</p></div>
+                <div class="day"><p class="date">3</p></div>
+                <div class="day"><p class="date">4</p></div>
+                <div class="day"><p class="date">5</p></div>
+                <div class="day"><p class="date">6</p></div>
+                <div class="day"><p class="date">7</p></div>
+                <div class="day"><p class="date">8</p></div>
+                <div class="day"><p class="date">9</p></div>
+                <div class="day"><p class="date">10</p></div>
+                <div class="day"><p class="date">11</p></div>
+                <div class="day"><p class="date">12</p></div>
+                <div class="day"><p class="date">13</p></div>
+                <div class="day"><p class="date">14</p></div>
+                <div class="day"><p class="date">15</p></div>
+                <div class="day"><p class="date">16</p></div>
+                <div class="day"><p class="date">17</p></div>
+                <div class="day"><p class="date">18</p></div>                    
+                <div class="day"><p class="date">19</p></div>
+                <div class="day"><p class="date">20</p></div>
+                <div class="day"><p class="date">21</p></div>
+                <div class="day"><p class="date">22</p></div>
+                <div class="day"><p class="date">23</p></div>
+                <div class="day"><p class="date">24</p></div>          
+                <div class="day"><p class="date">25</p></div>
+                <div class="day"><p class="date">26</p></div>
+                <div class="day"><p class="date">27</p></div>
+                <div class="day"><p class="date">28</p></div>
+                <div class="day"><p class="date">29</p></div>
+                <div class="day"><p class="date">30</p></div>
+                <div class="day"><p class="date">31</p></div>      
+              </div>    
+              <div></div>
+            </article>
+            <article class="month">
+              <div>
+                <div class="day"><p class="date">1</p></div>
+                <div class="day"><p class="date">2</p></div>
+                <div class="day"><p class="date">3</p></div>
+                <div class="day"><p class="date">4</p></div>
+                <div class="day"><p class="date">5</p></div>
+                <div class="day"><p class="date">6</p></div>
+                <div class="day"><p class="date">7</p></div>
+                <div class="day"><p class="date">8</p></div>
+                <div class="day"><p class="date">9</p></div>
+                <div class="day"><p class="date">10</p></div>
+                <div class="day"><p class="date">11</p></div>
+                <div class="day"><p class="date">12</p></div>
+                <div class="day"><p class="date">13</p></div>
+                <div class="day"><p class="date">14</p></div>
+                <div class="day"><p class="date">15</p></div>
+                <div class="day"><p class="date">16</p></div>
+                <div class="day"><p class="date">17</p></div>
+                <div class="day"><p class="date">18</p></div>                    
+                <div class="day"><p class="date">19</p></div>
+                <div class="day"><p class="date">20</p></div>
+                <div class="day"><p class="date">21</p></div>
+                <div class="day"><p class="date">22</p></div>
+                <div class="day"><p class="date">23</p></div>
+                <div class="day"><p class="date">24</p></div>          
+                <div class="day"><p class="date">25</p></div>
+                <div class="day"><p class="date">26</p></div>
+                <div class="day"><p class="date">27</p></div>
+                <div class="day"><p class="date">28</p></div>
+                <div class="day"><p class="date">29</p></div>
+                <div class="day"><p class="date">30</p></div>
+                <div class="day"><p class="date">31</p></div>      
+              </div>    
+              <div></div>
+            </article>
+            <article class="month">
+              <div>
+                <div class="day"><p class="date">1</p></div>
+                <div class="day"><p class="date">2</p></div>
+                <div class="day"><p class="date">3</p></div>
+                <div class="day"><p class="date">4</p></div>
+                <div class="day"><p class="date">5</p></div>
+                <div class="day"><p class="date">6</p></div>
+                <div class="day"><p class="date">7</p></div>
+                <div class="day"><p class="date">8</p></div>
+                <div class="day"><p class="date">9</p></div>
+                <div class="day"><p class="date">10</p></div>
+                <div class="day"><p class="date">11</p></div>
+                <div class="day"><p class="date">12</p></div>
+                <div class="day"><p class="date">13</p></div>
+                <div class="day"><p class="date">14</p></div>
+                <div class="day"><p class="date">15</p></div>
+                <div class="day"><p class="date">16</p></div>
+                <div class="day"><p class="date">17</p></div>
+                <div class="day"><p class="date">18</p></div>                    
+                <div class="day"><p class="date">19</p></div>
+                <div class="day"><p class="date">20</p></div>
+                <div class="day"><p class="date">21</p></div>
+                <div class="day"><p class="date">22</p></div>
+                <div class="day"><p class="date">23</p></div>
+                <div class="day"><p class="date">24</p></div>          
+                <div class="day"><p class="date">25</p></div>
+                <div class="day"><p class="date">26</p></div>
+                <div class="day"><p class="date">27</p></div>
+                <div class="day"><p class="date">28</p></div>
+                <div class="day"><p class="date">29</p></div>
+                <div class="day"><p class="date">30</p></div>
+                <div class="day"><p class="date">31</p></div>      
+              </div>    
+              <div></div>
+            </article>
+            <article class="month">
+              <div>
+                <div class="day"><p class="date">1</p></div>
+                <div class="day"><p class="date">2</p></div>
+                <div class="day"><p class="date">3</p></div>
+                <div class="day"><p class="date">4</p></div>
+                <div class="day"><p class="date">5</p></div>
+                <div class="day"><p class="date">6</p></div>
+                <div class="day"><p class="date">7</p></div>
+                <div class="day"><p class="date">8</p></div>
+                <div class="day"><p class="date">9</p></div>
+                <div class="day"><p class="date">10</p></div>
+                <div class="day"><p class="date">11</p></div>
+                <div class="day"><p class="date">12</p></div>
+                <div class="day"><p class="date">13</p></div>
+                <div class="day"><p class="date">14</p></div>
+                <div class="day"><p class="date">15</p></div>
+                <div class="day"><p class="date">16</p></div>
+                <div class="day"><p class="date">17</p></div>
+                <div class="day"><p class="date">18</p></div>                    
+                <div class="day"><p class="date">19</p></div>
+                <div class="day"><p class="date">20</p></div>
+                <div class="day"><p class="date">21</p></div>
+                <div class="day"><p class="date">22</p></div>
+                <div class="day"><p class="date">23</p></div>
+                <div class="day"><p class="date">24</p></div>          
+                <div class="day"><p class="date">25</p></div>
+                <div class="day"><p class="date">26</p></div>
+                <div class="day"><p class="date">27</p></div>
+                <div class="day"><p class="date">28</p></div>
+                <div class="day"><p class="date">29</p></div>
+                <div class="day"><p class="date">30</p></div>
+                <div class="day"><p class="date">31</p></div>      
+              </div>    
+              <div></div>
+            </article>
+            <article class="month">
+              <div>
+                <div class="day"><p class="date">1</p></div>
+                <div class="day"><p class="date">2</p></div>
+                <div class="day"><p class="date">3</p></div>
+                <div class="day"><p class="date">4</p></div>
+                <div class="day"><p class="date">5</p></div>
+                <div class="day"><p class="date">6</p></div>
+                <div class="day"><p class="date">7</p></div>
+                <div class="day"><p class="date">8</p></div>
+                <div class="day"><p class="date">9</p></div>
+                <div class="day"><p class="date">10</p></div>
+                <div class="day"><p class="date">11</p></div>
+                <div class="day"><p class="date">12</p></div>
+                <div class="day"><p class="date">13</p></div>
+                <div class="day"><p class="date">14</p></div>
+                <div class="day"><p class="date">15</p></div>
+                <div class="day"><p class="date">16</p></div>
+                <div class="day"><p class="date">17</p></div>
+                <div class="day"><p class="date">18</p></div>                    
+                <div class="day"><p class="date">19</p></div>
+                <div class="day"><p class="date">20</p></div>
+                <div class="day"><p class="date">21</p></div>
+                <div class="day"><p class="date">22</p></div>
+                <div class="day"><p class="date">23</p></div>
+                <div class="day"><p class="date">24</p></div>          
+                <div class="day"><p class="date">25</p></div>
+                <div class="day"><p class="date">26</p></div>
+                <div class="day"><p class="date">27</p></div>
+                <div class="day"><p class="date">28</p></div>
+                <div class="day"><p class="date">29</p></div>
+                <div class="day"><p class="date">30</p></div>
+                <div class="day"><p class="date">31</p></div>      
+              </div>    
+              <div></div>
+            </article>
+            <article class="month">
+              <div>
+                <div class="day"><p class="date">1</p></div>
+                <div class="day"><p class="date">2</p></div>
+                <div class="day"><p class="date">3</p></div>
+                <div class="day"><p class="date">4</p></div>
+                <div class="day"><p class="date">5</p></div>
+                <div class="day"><p class="date">6</p></div>
+                <div class="day"><p class="date">7</p></div>
+                <div class="day"><p class="date">8</p></div>
+                <div class="day"><p class="date">9</p></div>
+                <div class="day"><p class="date">10</p></div>
+                <div class="day"><p class="date">11</p></div>
+                <div class="day"><p class="date">12</p></div>
+                <div class="day"><p class="date">13</p></div>
+                <div class="day"><p class="date">14</p></div>
+                <div class="day"><p class="date">15</p></div>
+                <div class="day"><p class="date">16</p></div>
+                <div class="day"><p class="date">17</p></div>
+                <div class="day"><p class="date">18</p></div>                    
+                <div class="day"><p class="date">19</p></div>
+                <div class="day"><p class="date">20</p></div>
+                <div class="day"><p class="date">21</p></div>
+                <div class="day"><p class="date">22</p></div>
+                <div class="day"><p class="date">23</p></div>
+                <div class="day"><p class="date">24</p></div>          
+                <div class="day"><p class="date">25</p></div>
+                <div class="day"><p class="date">26</p></div>
+                <div class="day"><p class="date">27</p></div>
+                <div class="day"><p class="date">28</p></div>
+                <div class="day"><p class="date">29</p></div>
+                <div class="day"><p class="date">30</p></div>
+                <div class="day"><p class="date">31</p></div>      
+              </div>    
+              <div></div>
+            </article>
+            <article class="month">
+              <div>
+                <div class="day"><p class="date">1</p></div>
+                <div class="day"><p class="date">2</p></div>
+                <div class="day"><p class="date">3</p></div>
+                <div class="day"><p class="date">4</p></div>
+                <div class="day"><p class="date">5</p></div>
+                <div class="day"><p class="date">6</p></div>
+                <div class="day"><p class="date">7</p></div>
+                <div class="day"><p class="date">8</p></div>
+                <div class="day"><p class="date">9</p></div>
+                <div class="day"><p class="date">10</p></div>
+                <div class="day"><p class="date">11</p></div>
+                <div class="day"><p class="date">12</p></div>
+                <div class="day"><p class="date">13</p></div>
+                <div class="day"><p class="date">14</p></div>
+                <div class="day"><p class="date">15</p></div>
+                <div class="day"><p class="date">16</p></div>
+                <div class="day"><p class="date">17</p></div>
+                <div class="day"><p class="date">18</p></div>                    
+                <div class="day"><p class="date">19</p></div>
+                <div class="day"><p class="date">20</p></div>
+                <div class="day"><p class="date">21</p></div>
+                <div class="day"><p class="date">22</p></div>
+                <div class="day"><p class="date">23</p></div>
+                <div class="day"><p class="date">24</p></div>          
+                <div class="day"><p class="date">25</p></div>
+                <div class="day"><p class="date">26</p></div>
+                <div class="day"><p class="date">27</p></div>
+                <div class="day"><p class="date">28</p></div>
+                <div class="day"><p class="date">29</p></div>
+                <div class="day"><p class="date">30</p></div>
+                <div class="day"><p class="date">31</p></div>      
+              </div>    
+              <div></div>
+            </article>
+            <article class="month">
+              <div>
+                <div class="day"><p class="date">1</p></div>
+                <div class="day"><p class="date">2</p></div>
+                <div class="day"><p class="date">3</p></div>
+                <div class="day"><p class="date">4</p></div>
+                <div class="day"><p class="date">5</p></div>
+                <div class="day"><p class="date">6</p></div>
+                <div class="day"><p class="date">7</p></div>
+                <div class="day"><p class="date">8</p></div>
+                <div class="day"><p class="date">9</p></div>
+                <div class="day"><p class="date">10</p></div>
+                <div class="day"><p class="date">11</p></div>
+                <div class="day"><p class="date">12</p></div>
+                <div class="day"><p class="date">13</p></div>
+                <div class="day"><p class="date">14</p></div>
+                <div class="day"><p class="date">15</p></div>
+                <div class="day"><p class="date">16</p></div>
+                <div class="day"><p class="date">17</p></div>
+                <div class="day"><p class="date">18</p></div>                    
+                <div class="day"><p class="date">19</p></div>
+                <div class="day"><p class="date">20</p></div>
+                <div class="day"><p class="date">21</p></div>
+                <div class="day"><p class="date">22</p></div>
+                <div class="day"><p class="date">23</p></div>
+                <div class="day"><p class="date">24</p></div>          
+                <div class="day"><p class="date">25</p></div>
+                <div class="day"><p class="date">26</p></div>
+                <div class="day"><p class="date">27</p></div>
+                <div class="day"><p class="date">28</p></div>
+                <div class="day"><p class="date">29</p></div>
+                <div class="day"><p class="date">30</p></div>
+                <div class="day"><p class="date">31</p></div>      
+              </div>    
+              <div></div>
+            </article>
+            <article class="month">
+              <div>
+                <div class="day"><p class="date">1</p></div>
+                <div class="day"><p class="date">2</p></div>
+                <div class="day"><p class="date">3</p></div>
+                <div class="day"><p class="date">4</p></div>
+                <div class="day"><p class="date">5</p></div>
+                <div class="day"><p class="date">6</p></div>
+                <div class="day"><p class="date">7</p></div>
+                <div class="day"><p class="date">8</p></div>
+                <div class="day"><p class="date">9</p></div>
+                <div class="day"><p class="date">10</p></div>
+                <div class="day"><p class="date">11</p></div>
+                <div class="day"><p class="date">12</p></div>
+                <div class="day"><p class="date">13</p></div>
+                <div class="day"><p class="date">14</p></div>
+                <div class="day"><p class="date">15</p></div>
+                <div class="day"><p class="date">16</p></div>
+                <div class="day"><p class="date">17</p></div>
+                <div class="day"><p class="date">18</p></div>                    
+                <div class="day"><p class="date">19</p></div>
+                <div class="day"><p class="date">20</p></div>
+                <div class="day"><p class="date">21</p></div>
+                <div class="day"><p class="date">22</p></div>
+                <div class="day"><p class="date">23</p></div>
+                <div class="day"><p class="date">24</p></div>          
+                <div class="day"><p class="date">25</p></div>
+                <div class="day"><p class="date">26</p></div>
+                <div class="day"><p class="date">27</p></div>
+                <div class="day"><p class="date">28</p></div>
+                <div class="day"><p class="date">29</p></div>
+                <div class="day"><p class="date">30</p></div>
+                <div class="day"><p class="date">31</p></div>      
+              </div>    
+              <div></div>
+            </article>
+            <article class="month">
+              <div>
+                <div class="day"><p class="date">1</p></div>
+                <div class="day"><p class="date">2</p></div>
+                <div class="day"><p class="date">3</p></div>
+                <div class="day"><p class="date">4</p></div>
+                <div class="day"><p class="date">5</p></div>
+                <div class="day"><p class="date">6</p></div>
+                <div class="day"><p class="date">7</p></div>
+                <div class="day"><p class="date">8</p></div>
+                <div class="day"><p class="date">9</p></div>
+                <div class="day"><p class="date">10</p></div>
+                <div class="day"><p class="date">11</p></div>
+                <div class="day"><p class="date">12</p></div>
+                <div class="day"><p class="date">13</p></div>
+                <div class="day"><p class="date">14</p></div>
+                <div class="day"><p class="date">15</p></div>
+                <div class="day"><p class="date">16</p></div>
+                <div class="day"><p class="date">17</p></div>
+                <div class="day"><p class="date">18</p></div>                    
+                <div class="day"><p class="date">19</p></div>
+                <div class="day"><p class="date">20</p></div>
+                <div class="day"><p class="date">21</p></div>
+                <div class="day"><p class="date">22</p></div>
+                <div class="day"><p class="date">23</p></div>
+                <div class="day"><p class="date">24</p></div>          
+                <div class="day"><p class="date">25</p></div>
+                <div class="day"><p class="date">26</p></div>
+                <div class="day"><p class="date">27</p></div>
+                <div class="day"><p class="date">28</p></div>
+                <div class="day"><p class="date">29</p></div>
+                <div class="day"><p class="date">30</p></div>
+                <div class="day"><p class="date">31</p></div>      
+              </div>    
+              <div></div>
+            </article>
+            <article class="month">
+              <div>
+                <div class="day"><p class="date">1</p></div>
+                <div class="day"><p class="date">2</p></div>
+                <div class="day"><p class="date">3</p></div>
+                <div class="day"><p class="date">4</p></div>
+                <div class="day"><p class="date">5</p></div>
+                <div class="day"><p class="date">6</p></div>
+                <div class="day"><p class="date">7</p></div>
+                <div class="day"><p class="date">8</p></div>
+                <div class="day"><p class="date">9</p></div>
+                <div class="day"><p class="date">10</p></div>
+                <div class="day"><p class="date">11</p></div>
+                <div class="day"><p class="date">12</p></div>
+                <div class="day"><p class="date">13</p></div>
+                <div class="day"><p class="date">14</p></div>
+                <div class="day"><p class="date">15</p></div>
+                <div class="day"><p class="date">16</p></div>
+                <div class="day"><p class="date">17</p></div>
+                <div class="day"><p class="date">18</p></div>                    
+                <div class="day"><p class="date">19</p></div>
+                <div class="day"><p class="date">20</p></div>
+                <div class="day"><p class="date">21</p></div>
+                <div class="day"><p class="date">22</p></div>
+                <div class="day"><p class="date">23</p></div>
+                <div class="day"><p class="date">24</p></div>          
+                <div class="day"><p class="date">25</p></div>
+                <div class="day"><p class="date">26</p></div>
+                <div class="day"><p class="date">27</p></div>
+                <div class="day"><p class="date">28</p></div>
+                <div class="day"><p class="date">29</p></div>
+                <div class="day"><p class="date">30</p></div>
+                <div class="day"><p class="date">31</p></div>      
+              </div>    
+              <div></div>
+            </article>
+          </div>          
+        </section>
+      </aa-year>
 
-    </aa-vbox>
+      <aa-footer>
+        <p>Made with ❤️ by <a href="https://ketnerlake.com" target="_blank">Kevin Hoyt</a>.</p>
+        <p>0 events</p>
+        <div class="hbox" style="gap: 0.50rem; margin-left: auto;">
+          <button aria-label="Fit to height" class="icon" type="button">
+            <img alt="Fit to height" src="./img/fit-vertical.svg" />
+          </button>
+          <button aria-label="Fit to width" class="icon" type="button">
+            <img alt="Fit to width" src="./img/fit-horizontal.svg" />
+          </button>          
+          <button aria-label="Full size" class="checked icon" type="button">
+            <img alt="Full size" src="./img/fit-full-screen.svg" />
+          </button>                    
+        </div>
+      </aa-footer>
 
-    <!-- Right drawer -->
-    <aa-drawer hidden id="drawer_right" placement="end" style="background-color: #f4f4f3; padding-top: 68px;">
-      <aa-event-list id="drawer_search" style="background-color: #f2f2f9; border-top: solid 1px #c7c7c7; flex-basis: 0; flex-grow: 1;">
-        <aa-vbox centered gap="m" style="width: 65%;">
-          <aa-icon size="l" src="./img/search.svg" style="margin-bottom: 8px;"></aa-icon>
-          <aa-label size="l" text="No events" weight="bold"></aa-label>
-          <aa-label style="--label-color: #85858c; --label-line-height: 21px; --label-text-align: center;" text="Check the spelling or try a new search."></aa-label>
-        </aa-vbox>
+    </main>
+
+    <!-- Right -->
+    <aside id="right" class="right hidden">
+
+      <!-- Results -->
+      <aa-event-list>
+        <ul class="list"></ul>
+        <div>
+          <img alt="Search results" src="./img/search.svg" />
+          <h4>No events</h4>
+          <p>Check the spelling or try a new search.</p>
+        </div>
       </aa-event-list>
-    </aa-drawer>
 
-    <!-- Controls -->
+    </aside>    
+
+    <!-- Navigation -->
     <!-- Account -->
-    <!-- Share (pending) -->          
     <!-- Calendars -->
-    <!-- List events -->
-    <!-- Add event -->
+    <!-- Events -->
+    <!-- Add -->
     <!-- Search -->
-    <div class="grid" style="position: absolute; left: 16px; right: 16px; top: 16px; z-index: 50;">
-      <aa-hbox centered gap="m">
-        <aa-icon-button id="header_account" src="./img/account.svg"></aa-icon-button>
-        <aa-icon-button hidden id="header_share" src="./img/share.svg"></aa-icon-button>
-        <aa-icon-button id="header_calendars" src="./img/calendar.svg"></aa-icon-button>
-        <aa-icon-button id="header_list" src="./img/list.svg"></aa-icon-button>                        
-        <aa-icon-button id="header_add" src="./img/add.svg"></aa-icon-button>                                
-        <aa-icon hidden id="header_sync" src="./img/cloud-upload.svg" style="padding: 8px;"></aa-icon>                                
-        <aa-icon-button id="header_wizard" style="opacity: 0;"></aa-icon-button>                                        
-      </aa-hbox>
-      <aa-hbox gap="l" style="justify-self: end; grid-column: 3 / 3;">
-        <aa-search id="header_search"></aa-search>
-        <aa-button hidden id="header_cancel" label="Cancel" style="--button-padding: 0;"></aa-button> 
-      </aa-hbox>
-    </div>    
+    <aa-navigation>
+      <div class="hbox">
+        <button aria-label="Account" class="icon" type="button">
+          <img alt="Account" src="./img/account.svg" />
+        </button>
+        <button aria-label="Calendar list" class="icon" type="button">
+          <img alt="Calendar list" src="./img/calendar.svg" />
+        </button>      
+        <button aria-label="Event list" class="icon" type="button">
+          <img alt="Event list" src="./img/list.svg" />
+        </button>      
+        <button aria-label="Add event" class="icon" type="button">
+          <img alt="Add event" src="./img/add.svg" />
+        </button>      
+      </div>
+      <div class="hbox">
+        <aa-search>
+          <label>
+            <img alt="Search" src="./img/search.svg" />
+            <input id="search_input" placeholder="Search" type="search" />
+            <button aria-label="Clear search" class="icon" type="button">
+              <img alt="Clear search" src="./img/close.svg" />
+            </button>
+          </label>   
+        </aa-search>          
+        <button aria-label="Cancel search" class="hidden slimmed" type="button">Cancel</button>               
+      </div>
+    </aa-navigation>  
 
     <!-- Account -->
-    <dialog class="popover transparent" id="account">
-      <aa-account-form id="account_form"></aa-account-form>
+    <dialog id="account">
+      <aa-account-form>
+        <form id="account_form">
+          <aa-input>
+            <label divided>
+              <input autocomplete="new-password" id="email_input" placeholder="Email address" type="text" />
+              <button aria-label="Clear email" class="icon" type="button">
+                <img alt="Clear email" src="./img/close.svg" />
+              </button>
+            </label>   
+          </aa-input>
+          <aa-input>
+            <label divided>
+              <input autocomplete="new-password" id="password_input" placeholder="Password" type="password" />
+              <button aria-label="Show password" class="icon" type="button">
+                <img alt="Show password" src="./img/eye-slash-fill.svg" />
+              </button>          
+              <button aria-label="Clear password" class="icon" type="button">
+                <img alt="Clear password" src="./img/close.svg" />
+              </button>
+            </label>   
+          </aa-input>
+          <button aria-label="Sign into account" type="button">Sign in</button>                  
+        </form>        
+        <div class="vbox filled rounded">
+          <div class="hbox">
+            <p class="label">Account status</p>
+            <p class="label">Free</p>            
+          </div>
+          <button aria-label="Sign up" class="signup" type="button">
+            <img alt="Trident logo" src="./img/trident.svg" />
+            <div class="vbox">
+              <div class="hbox cta">
+                <p>Get more awesome</p>
+                <img alt="Follow arrow" src="./img/arrow-right.svg" />
+              </div>
+              <p class="pitch">Sync across devices, share privately or publicly, add attachments, location lookup, and more...</p>
+            </div>
+          </button>
+        </div>
+        <button aria-label="Export data" class="filled" id="account_export" type="button">Export data...</button>          
+        <button aria-label="Close account details" id="account_cancel" type="button">Just checking it out</button>
+      </section>
     </dialog>
-
-    <!-- Event -->
-    <!-- Placement strategy? style="margin-left: 16px; margin-top: 70px;" -->
-    <dialog class="popover transparent" id="event">
-      <aa-stack id="event_stack">
-        <aa-event-form id="event_form"></aa-event-form>
-        <aa-event-details id="event_details"></aa-event-details>
-      </aa-stack>        
+    
+    <!-- Calendar -->
+    <dialog id="calendar">
+      <aa-calendar-form>
+        <form id="calendar_form">
+          <div class="grid">
+            <button aria-label="Cancel" id="calendar_form_cancel" type="button">Cancel</button>
+            <p class="label" id="calendar_form_title">Add Calendar</p>
+            <button aria-label="Done" disabled id="calendar_form_done" type="button">Done</button>            
+          </div>
+          <aa-input id="calendar_form_name">
+            <label filled>
+              <input autocomplete="new-password" id="calendar_name" placeholder="Calendar name" type="text" />
+              <button aria-label="Clear name" class="icon" type="button">
+                <img alt="Clear name" src="./img/close.svg" />
+              </button>
+            </label>   
+          </aa-input>  
+          <details>
+            <summary>
+              <div></div>
+              <p>Red</p>
+              <img alt="Expand color list" src="./img/chevron-right.svg" />
+            </summary>
+            <ul></ul> 
+          </details>
+          <div class="vbox">
+            <p class="label grouped">Shared with</p>
+            <button aria-label="Add person" type="button">Add person</button>
+            <small>Private sharing requires all parties have a paid account.</small>            
+          </div>
+          <div class="vbox">
+            <div class="hbox rounded">
+              <p>Public calendar</p>
+              <label class="toggle">
+                <input id="calendar_form_public" type="checkbox" />
+              </label>              
+            </div>
+            <small>Allow anyone access to a read-only version of this calendar.</small>
+          </div>
+          <button aria-label="Delete calendar" id="calendar_form_delete" type="button">Delete Calendar</button>
+        </form>
+      </aa-calendar-form>
     </dialog>    
 
-    <!-- Calendar -->
-    <dialog class="popover transparent" id="calendar">
-      <aa-calendar-form id="calendar_form"></aa-calendar-form>
+    <!-- Event -->
+    <dialog id="event">
+
+      <!-- Form -->
+      <aa-stack selected-index="1">
+
+        <aa-event-form>
+          <div class="grid sticky">
+            <button aria-label="Cancel" id="event_form_cancel" type="button">Cancel</button>
+            <p class="label" id="event_form_header">New Event</p>
+            <button aria-label="Add event" disabled id="event_form_add" type="button">Add</button>            
+          </div>          
+          <form id="event_form">
+            <div class="vbox">
+              <aa-input id="event_form_title">
+                <label divided>
+                  <input autocomplete="new-password" id="event_title" placeholder="Title" type="text" />
+                  <button aria-label="Clear title" class="icon" type="button">
+                    <img alt="Clear title" src="./img/close.svg" />
+                  </button>
+                </label>  
+              </aa-input>
+              <aa-input id="event_form_location">
+                <label>
+                  <input autocomplete="new-password" id="event_location" placeholder="Location" type="text" />
+                  <button aria-label="Clear location" class="icon" type="button">
+                    <img alt="Clear location" src="./img/close.svg" />
+                  </button>
+                </label>   
+              </aa-input>           
+            </div>
+            <div class="vbox">
+              <aa-date-picker>
+                <details>
+                  <summary>
+                    <p>Starts</p>
+                    <p>Sep 14, 2024</p>
+                  </summary>
+                </details>
+              </aa-date-picker>
+              <aa-date-picker>
+                <details>
+                  <summary class="hbox centered">
+                    <p>Ends</p>
+                    <p>Sep 14, 2024</p>
+                  </summary>
+                </details>
+              </aa-date-picker>            
+            </div>
+            <aa-select class="filled" label-field="name" value-field="id">
+              <label>
+                <div></div>
+                <p>Label</p>
+                <img alt="Toggle options" src="./img/chevron-expand.svg" />
+                <select></select>
+              </label>
+            </aa-select>
+            <button aria-label="Add attachment" class="filled" type="button">Add attachment...</button>        
+            <div class="vbox">
+              <aa-input id="event_form_url">
+                <label divided>
+                  <input autocomplete="new-password" id="event_url" placeholder="URL" type="text" />
+                  <button aria-label="Clear URL" class="icon" type="button">
+                    <img alt="Clear URL" src="./img/close.svg" />
+                  </button>
+                </label>   
+              </aa-input>  
+              <label>
+                <textarea id="event_notes" placeholder="Notes"></textarea>
+              </label>                   
+            </div>
+            <button aria-label="Delete event" class="danger filled rounded" type="button">Delete Event</button>        
+          </form>
+        </aa-event-form>
+
+        <!-- Details -->
+        <aa-event-details>
+          <div class="hbox">
+            <p id="event_details_title" class="label">Test Event</p>
+            <button aria-label="Edit" class="slimmed" id="event_details_edit" type="button">Edit</button>
+          </div>
+          <p id="event_details_location">Parker, CO</p>
+          <!-- <a href="https://kevinhoyt.com">Parker, CO</a> -->
+          <div class="vbox divided dates">
+            <p id="event_details_starts">from September 17, 2024</p>
+            <p id="event_details_ends">to September 18, 2024</p>
+          </div>
+          <aa-select class="divided" id="event_details_calendar" label-field="name" value-field="id">
+            <label>
+              <p class="label">Calendar</p>
+              <div></div>
+              <p>Label</p>
+              <img alt="Toggle options" src="./img/chevron-expand.svg" />
+              <select></select>
+            </label>
+          </aa-select>
+          <div class="vbox divided spaced url">
+            <p>URL</p>
+            <a href="https://kevinhoyt.com" id="event_details_url" target="_blank">https://kevinhoyt.com</a>
+          </div>
+          <div class="vbox divided spaced notes">
+            <p>Notes</p>
+            <p class="label" id="event_details_notes">No, no, no, nope, notes.</p>                      
+          </div>
+          <div class="vbox divided spaced map">
+            <div id="event_details_map"></div>
+          </div>          
+          <button aria-label="Delete event" class="centered danger" type="button">Delete Event</button>
+        </aa-event-details>
+
+      </aa-stack>
     </dialog>
 
-    <!-- Data -->
+    <template id="calendar_list_renderer">
+      <li>
+        <label>
+          <input type="checkbox" />
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+          </svg>
+        </label>
+        <p>Calendar</p>
+        <button aria-label="Calendar information" class="icon" type="button">
+          <img alt="Calendar information" src="./img/info-circle.svg" />
+        </button>
+      </li>    
+    </template>
+
+    <template id="color_picker_renderer">
+      <li>
+        <div></div>
+        <p>Red</p>
+        <img alt="Red selected" src="./img/check2.svg" />                
+      </li>
+    </template>
+
+    <template id="event_list_renderer">
+      <li class="event">
+        <div class="backdrop">
+          <div class="vbox">
+            <p class="day">99</p>
+            <p class="month">XXX</p>
+          </div>
+        </div>
+        <div class="vbox">
+          <div class="hbox lede">
+            <p class="summary">Summary</p>
+            <p class="ends">Ends</p>
+          </div>  
+          <div class="hbox">
+            <p class="location">Parker, CO</p>
+            <p class="starts">Thu, Jan 4</p>
+          </div>                          
+        </div>
+      </li>      
+    </template>
+
+    <template id="calendar_month">
+      <div class="vbox calendar">
+        <div class="hbox centered">
+          <p>Month 2024</p>
+          <button aria-label="Previous month" class="icon" type="button">
+            <img alt="Previous month" src="./img/chevron-left.svg" />
+          </button>
+          <button aria-label="Next month" class="icon" type="button">
+            <img alt="Next month" src="./img/chevron-right.svg" />
+          </button>          
+        </div>
+        <div class="week">
+          <p>Sun</p>
+          <p>Mon</p>
+          <p>Tue</p>
+          <p>Wed</p>
+          <p>Thu</p>
+          <p>Fri</p>
+          <p>Sat</p>
+        </div>
+        <div class="month"></div>
+      </div>        
+    </template>
+
     <script src="./lib/dexie-4.0.8.js"></script>
-
-    <!-- Components -->
-    <script src="./components.js" type="module"></script>
-
-    <!-- Application -->
+    <script src="./components/components.js"></script>
     <script src="./awesome.js"></script>
+
+    <!--
+    <script>
+      const db = new Dexie( 'AnnoAwesome' );
+      db.version( 5 ).stores( {
+        event: 'id, calendarId, startsAt',
+        calendar: 'id'
+      } );
+
+      const footer = document.querySelector( 'aa-footer' );
+      footer.addEventListener( 'aa-change', ( evt ) => {
+        console.log( evt.detail.value );
+      } );
+
+      const lstEvents = document.querySelector( 'aa-event-list' );
+      db.event.toArray()
+      .then( ( data ) => {
+        lstEvents.data = data;
+        footer.setAttribute( 'count', data.length );
+      } );
+    </script>    
+    -->
+
+    <!--
+    <script>
+      const db = new Dexie( 'AnnoAwesome' );
+      db.version( 5 ).stores( {
+        event: 'id, calendarId, startsAt',
+        calendar: 'id'
+      } );
+      const lstCalendars = document.querySelector( 'aa-calendar-details' );
+      db.calendar.toCollection().sortBy( 'name' )
+      .then( ( data ) => {
+        lstCalendars.data = data;
+        frmEvent.children[0].children[0].calendars = data;
+        console.log( frmEvent.children );
+        frmEvent.children[0].children[1].calendars = data;        
+      } );      
+      const lstEvents = document.querySelector( 'aa-stack aa-event-list' );
+      db.event.toArray()
+      .then( ( data ) => {
+        lstEvents.data = data;
+      } );
+      const stack = document.querySelector( 'aside aa-stack:has( aa-calendar-list )' );
+      const navigation = document.querySelector( 'aa-navigation' );
+      navigation.addEventListener( 'aa-account', () => {
+        account.children[0].data = null;        
+        account.showModal();
+        account.children[0].focus();
+      } );
+      navigation.addEventListener( 'aa-add', () => {
+        frmEvent.showModal();
+      } );
+      navigation.addEventListener( 'aa-calendar', ( evt ) => {
+        // lstSearch.data = null;
+        // pnlRight.hidden = true;
+        // calYear.events = events;
+        // pnlFooter.count = events.length;
+
+        if( evt.detail.calendar === true && evt.detail.event === false ) {
+          stack.setAttribute( 'selected-index', 0 );
+          stack.parentElement.classList.remove( 'hidden' );
+          // window.localStorage.setItem( 'awesome_drawer', 0 );        
+        } else if( evt.detail.calendar === false && evt.detail.event === true ) {
+          stack.setAttribute( 'selected-index', 1 );
+          stack.parentElement.classList.remove( 'hidden' );
+          // window.localStorage.setItem( 'awesome_drawer', 1 );            
+        } else if( evt.detail.calendar === false && evt.detail.event === false ) {
+          stack.parentElement.classList.add( 'hidden' );          
+          // window.localStorage.removeItem( 'awesome_drawer' );    
+        } 
+      } );
+      navigation.addEventListener( 'aa-event', ( evt ) => {
+        // lstSearch.data = null;
+        // pnlRight.hidden = true;
+        // calYear.events = events;
+        // pnlFooter.count = events.length;
+
+        if( evt.detail.calendar === true && evt.detail.event === false ) {
+          stack.setAttribute( 'selected-index', 0 );
+          stack.parentElement.classList.remove( 'hidden' );
+          // window.localStorage.setItem( 'awesome_drawer', 0 );        
+        } else if( evt.detail.calendar === false && evt.detail.event === true ) {
+          stack.setAttribute( 'selected-index', 1 );
+          stack.parentElement.classList.remove( 'hidden' );
+          // window.localStorage.setItem( 'awesome_drawer', 1 );            
+        } else if( evt.detail.calendar === false && evt.detail.event === false ) {
+          stack.parentElement.classList.add( 'hidden' );          
+          // window.localStorage.removeItem( 'awesome_drawer' );    
+        } 
+      } );      
+      const account = document.querySelector( 'dialog:has( aa-account-form )' );      
+      account.children[0].addEventListener( 'aa-demo', () => {
+        account.close();
+      } );
+      account.addEventListener( 'aa-sign-in', () => {
+        console.log( 'SUBMIT' );
+      } );      
+      account.addEventListener( 'aa-sign-up', () => {
+        window.location = './signup.html';
+      } );            
+      const frmCalendar = document.querySelector( 'dialog:has( aa-calendar-form )' );     
+      frmCalendar.addEventListener( 'aa-cancel', () => {
+        frmCalendar.close();
+      } );       
+      frmCalendar.children[0].colors = [
+        {name: 'Red', value: '#ff2968'},
+        {name: 'Orange', value: '#ff9500'},
+        {name: 'Yellow', value: '#ffcc02'},
+        {name: 'Green', value: '#63da38'},
+        {name: 'Blue', value: '#1badf8'},
+        {name: 'Purple', value: '#cc73e1'}
+      ];
+      const pnlCalendar = document.querySelector( 'aa-calendar-details' );
+      pnlCalendar.addEventListener( 'aa-add', () => {
+        pnlCalendar.setAttribute( 'disabled', '' );
+        frmCalendar.showModal();
+      } );
+      const frmEvent = document.querySelector( 'dialog:has( aa-event-form )' );            
+      frmEvent.addEventListener( 'aa-cancel', () => {
+        frmEvent.close();
+      } );
+    </script>
+  -->
 
   </body>
 </html>

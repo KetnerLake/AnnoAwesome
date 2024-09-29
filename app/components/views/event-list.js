@@ -1,83 +1,49 @@
-export default class AAEventList extends HTMLElement {
+customElements.define( 'aa-event-list', class extends HTMLElement {
   constructor() {
     super();
 
-    const template = document.createElement( 'template' );
-    template.innerHTML = /* template */ `
-      <style>
-        :host {
-          box-sizing: border-box;
-          display: block;
-          overflow: auto;
-          position: relative;
-        }
-
-        :host( [concealed] ) {
-          visibility: hidden;
-        }
-
-        :host( [hidden] ) {
-          display: none;
-        }
-
-        div[part=empty] {
-          align-items: center;
-          height: 100%;
-          justify-content: center;
-        }
-
-        aa-event-list-renderer {
-          cursor: pointer;
-        }
-      </style>
-      <div part="list"></div>
-      <div part="empty">
-        <slot></slot>
-      </div>
-    `;
-
-    // Private
+    this._colors = [];
     this._data = [];
-    this._touch = ( 'ontouchstart' in document.documentElement ) ? true : false; 
+    this._touch = ( 'ontouchstart' in document.documentElement ) ? 'touchstart' : 'click';
 
-    // Events
+    this.doAddClick = this.doAddClick.bind( this );
     this.doItemClick = this.doItemClick.bind( this );
+    this.doTitleClick = this.doTitleClick.bind( this );
 
-    // Root
-    this.attachShadow( {mode: 'open'} );
-    this.shadowRoot.appendChild( template.content.cloneNode( true ) );
+    this.$add = this.querySelector( 'div:last-of-type > button' );
+    this.$empty = this.querySelector( 'p' );
+    this.$list = this.querySelector( 'ul' );
+    this.$title = this.querySelector( 'h3' );
+    this.$template = document.querySelector( '#event_list_renderer' );
+  }
 
-    // Elements
-    this.$empty = this.shadowRoot.querySelector( 'div[part=empty]' );
-    this.$list = this.shadowRoot.querySelector( 'div[part=list]' );
+  doAddClick() {
+    this.dispatchEvent( new CustomEvent( 'aa-add' ) );    
   }
 
   doItemClick( evt ) {
-    const index = parseInt( evt.currentTarget.getAttribute( 'data-index' ) );
-    this.selectedIndex = index;
+    for( let c = 0; c < this.$list.children.length; c++ ) {
+      if( this.$list.children[c].getAttribute( 'data-id' ) === evt.currentTarget.getAttribute( 'data-id' ) ) {
+        this.$list.children[c].classList.add( 'selected' );
+      } else {
+        this.$list.children[c].classList.remove( 'selected' );
+      }
+    }
 
     this.dispatchEvent( new CustomEvent( 'aa-change', {
+      bubbles: true,
+      cancelable: false,
+      composed: true,
       detail: {
-        id: this._data[index].id
+        id: evt.currentTarget.getAttribute( 'data-id' )
       }
     } ) );
   }
 
-  // When attributes change
-  _render() {
-    for( let c = 0; c < this.$list.children.length; c++ ) {
-      if( this.selectedIndex !== null ) {
-        this.$list.children[c].selected = this.selectedIndex === c ? true : false;
-      } else {
-        this.$list.children[c].selected = false;
-      }
-
-      this.$list.children[c].disabled = this.disabled;
-    }
+  doTitleClick() {
+    this.dispatchEvent( new CustomEvent( 'aa-sort' ) );
   }
 
-  // Promote properties
-  // Values may be set before module load
   _upgrade( property ) {
     if( this.hasOwnProperty( property ) ) {
       const value = this[property];
@@ -86,150 +52,137 @@ export default class AAEventList extends HTMLElement {
     }
   }
 
-  // Setup
   connectedCallback() {
-    this._upgrade( 'concealed' );  
-    this._upgrade( 'data' );      
-    this._upgrade( 'disabled' );          
-    this._upgrade( 'hidden' );    
-    this._upgrade( 'selectedIndex' );              
-    this._upgrade( 'selectedItem' );                  
-    this._render();
+    this._upgrade( 'colors' );
+    this._upgrade( 'data' );
+
+    if( this.$add !== null ) {
+      this.$add.addEventListener( this._touch, this.doAddClick );
+    }
+
+    if( this.$title !== null ) {
+      this.$title.addEventListener( this._touch, this.doTitleClick );
+    }
   }
 
-  // Watched attributes
-  static get observedAttributes() {
+  disconnectedCallback() {
+    if( this.$add !== null ) {
+      this.$add.removeEventListener( this._touch, this.doAddClick );
+    }
+
+    if( this.$title !== null ) {
+      this.$title.removeEventListener( this._touch, this.doTitleClick );
+    }
+  }
+
+  static get observedAttributes () {
     return [
-      'concealed',
-      'disabled',
-      'hidden',
-      'selected-index'
+      'use-colors'
     ];
+  }   
+  
+  attributeChangedCallback( name, oldValue, newValue ) {
+    if( name === 'use-colors' ) {
+      for( let c = 0; c < this.$list.children.length; c++ ) {
+        let color = this.$list.children[c].getAttribute( 'data-month-color' );
+        if( this.hasAttribute( 'use-colors' ) ) {
+          color = this.$list.children[c].getAttribute( 'data-calendar-color' );
+        }        
+
+        const day = this.$list.children[c].querySelector( 'div.backdrop > div' );
+        day.children[0].style.color = `hsl( from ${color} h s calc( l - 20 ) )`;                      
+        day.children[1].style.color = `hsl( from ${color} h s calc( l - 20 ) )`;                              
+        day.style.backgroundColor = `${color}4d`;                      
+      }
+    }
+  }  
+
+  get colors() {
+    return this._colors.length === 0 ? null : this._colors;
   }
 
-  // Observed attribute has changed
-  // Update render
-  attributeChangedCallback( name, old, value ) {
-    this._render();
-  } 
+  set colors( value ) {
+    this._colors = value === null ? [] : [... value];
+  }
 
-  // Properties
-  // Not reflected
-  // Array, Date, Function, Object, null
   get data() {
     return this._data.length === 0 ? null : this._data;
   }
 
   set data( value ) {
     this._data = value === null ? [] : [... value];
-    
-    this.$list.style.display = this._data.length === 0 ? 'none' : '';
-    this.$empty.style.display = this._data.length === 0 ? 'flex' : 'none';
+
+    if( this._data.length === 0 ) {
+      this.$list.innerHTML = '';
+    }
 
     while( this.$list.children.length > this._data.length ) {
-      this.$list.children[0].removeEventListener( this._touch ? 'touchstart' : 'click', this.doItemClick );
+      this.$list.children[0].removeEventListener( this._touch, this.doItemClick );
       this.$list.children[0].remove();
     }
 
     while( this.$list.children.length < this._data.length ) {
-      const element = document.createElement( 'aa-event-list-renderer' );
-      element.addEventListener( this._touch ? 'touchstart' : 'click', this.doItemClick );
-      this.$list.appendChild( element );
-    }
+      const clone = this.$template.content.cloneNode( true );
+      this.$list.appendChild( clone );
+      this.$list.children[this.$list.children.length - 1].addEventListener( this._touch, this.doItemClick );      
+    }          
+
+    // const now = new Date().getTime();
 
     for( let c = 0; c < this.$list.children.length; c++ ) {
-      this.$list.children[c].setAttribute( 'data-index', c );
-      this.$list.children[c].data = this._data[c];
-    }
-  }  
+      const index = this._data[c].startsAt.getMonth();
+      this.$list.children[c].setAttribute( 'data-id', this._data[c].id );
+      this.$list.children[c].setAttribute( 'data-calendar-color', this._data[c].color );          
+      this.$list.children[c].setAttribute( 'data-month-color', this._colors[index % this._colors.length].value );                        
 
-  get selectedItem() {
-    if( this.selectedIndex === null ) return null;
-    return this._data[this.selectedIndex].id
-  }
-
-  set selectedItem( id ) {
-    this.selectedIndex = this._data.findIndex( ( value ) => value.id === id );
-  }
-
-  // Attributes
-  // Reflected
-  // Boolean, Number, String, null
-  get concealed() {
-    return this.hasAttribute( 'concealed' );
-  }
-
-  set concealed( value ) {
-    if( value !== null ) {
-      if( typeof value === 'boolean' ) {
-        value = value.toString();
-      }
-
-      if( value === 'false' ) {
-        this.removeAttribute( 'concealed' );
+      /*
+      if( now > this._data[c].endsAt.getTime() ) {
+        this.$list.children[c].classList.add( 'outdated' );
       } else {
-        this.setAttribute( 'concealed', '' );
+        this.$list.children[c].classList.remove( 'outdated' );
       }
-    } else {
-      this.removeAttribute( 'concealed' );
-    }
-  }
+      */
 
-  get disabled() {
-    return this.hasAttribute( 'disabled' );
-  }
-
-  set disabled( value ) {
-    if( value !== null ) {
-      if( typeof value === 'boolean' ) {
-        value = value.toString();
+      let color = this._colors[index % this._colors.length].value;
+      if( this.hasAttribute( 'use-colors' ) ) {
+        color = this._data[c].color;
       }
 
-      if( value === 'false' ) {
-        this.removeAttribute( 'disabled' );
+      const day = this.$list.children[c].querySelector( 'p.day' );
+      day.parentElement.style.backgroundColor = color + '4d';
+      day.textContent = this._data[c].startsAt.getDate();
+      day.style.color = `hsl( from ${color} h s calc( l - 20 ) )`;
+
+      let formatted = new Intl.DateTimeFormat( navigator.language, {
+        month: 'short'
+      } ).format( this._data[c].startsAt );
+
+      const month = this.$list.children[c].querySelector( 'p.month' );
+      month.textContent = formatted;
+      month.style.color = `hsl( from ${color} h s calc( l - 20 ) )`;
+
+      const summary = this.$list.children[c].querySelector( '.summary' );
+      summary.textContent = this._data[c].summary;
+
+      const location = this.$list.children[c].querySelector( '.location' );
+      location.textContent = this._data[c].location === null ? '' : this._data[c].location;      
+      
+      const label = this.$list.children[c].querySelector( '.ends' );
+      const starts = this.$list.children[c].querySelector( '.starts' );
+
+      if( this._data[c].startsAt.getDate() === this._data[c].endsAt.getDate() &&
+          this._data[c].startsAt.getMonth() === this._data[c].endsAt.getMonth() ) {
+        label.textContent = '';
+        starts.textContent = '';
       } else {
-        this.setAttribute( 'disabled', '' );
-      }
-    } else {
-      this.removeAttribute( 'disabled' );
-    }
-  }  
-
-  get hidden() {
-    return this.hasAttribute( 'hidden' );
+        formatted = new Intl.DateTimeFormat( navigator.language, {
+          weekday: 'short',
+          month: 'short',
+          day: 'numeric'
+        } ).format( this._data[c].endsAt );
+        label.textContent = 'Ends';      
+        starts.textContent = formatted;  
+      }      
+    }          
   }
-
-  set hidden( value ) {
-    if( value !== null ) {
-      if( typeof value === 'boolean' ) {
-        value = value.toString();
-      }
-
-      if( value === 'false' ) {
-        this.removeAttribute( 'hidden' );
-      } else {
-        this.setAttribute( 'hidden', '' );
-      }
-    } else {
-      this.removeAttribute( 'hidden' );
-    }
-  }     
-  
-  get selectedIndex() {
-    if( this.hasAttribute( 'selected-index' ) ) {
-      return parseInt( this.getAttribute( 'selected-index' ) );
-    }
-
-    return null;
-  }
-
-  set selectedIndex( value ) {
-    if( value !== null ) {
-      this.setAttribute( 'selected-index', value );
-    } else {
-      this.removeAttribute( 'selected-index' );
-    }
-  }           
-}
-
-window.customElements.define( 'aa-event-list', AAEventList );
+} );
