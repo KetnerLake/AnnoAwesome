@@ -669,7 +669,24 @@ db.version( 5 ).stores( {
 } );
 
 db.calendar.toCollection().sortBy( 'name' )
-.then( ( data ) => {
+.then( async ( data ) => {
+  if( data.length === 0 ) {
+    const id = self.crypto.randomUUID();
+    const now = Date.now();
+    await db.calendar.put( {
+      id: id,
+      createdAt: new Date( now ),
+      updatedAt: new Date( now ),
+      name: 'Calendar',
+      color: '#1badf8',
+      isShared: false,
+      isPublic: false,
+      isActive: true
+    } );
+    colors[id] = '#1badf8';    
+    data = await db.calendar.toArray();
+  }
+
   calendars = [... data];
   calendar_details.data = calendars;
 
