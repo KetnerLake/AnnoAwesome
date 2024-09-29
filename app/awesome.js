@@ -683,7 +683,6 @@ db.calendar.toCollection().sortBy( 'name' )
       isPublic: false,
       isActive: true
     } );
-    colors[id] = '#1badf8';    
     data = await db.calendar.toArray();
   }
 
@@ -693,7 +692,7 @@ db.calendar.toCollection().sortBy( 'name' )
   colors = calendars.reduce( ( prev, curr ) => {
     prev[curr.id] = curr.color;
     return prev;
-  }, {} );    
+  }, {} );
 
   if( sort_store === 'desc' ) {
     return db.event.where( 'startsAt' ).between( starts, ends ).reverse().toArray();  
