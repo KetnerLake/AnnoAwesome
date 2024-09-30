@@ -618,7 +618,7 @@
         <aa-search>
           <label>
             <img alt="Search" src="./img/search.svg" />
-            <input id="search_input" placeholder="Search" type="search" />
+            <input id="search_input" inputmode="search" placeholder="Search" tabindex="-1" type="search" />
             <button aria-label="Clear search" class="icon" type="button">
               <img alt="Clear search" src="./img/close.svg" />
             </button>
@@ -634,7 +634,7 @@
         <form id="account_form">
           <aa-input>
             <label divided>
-              <input autocomplete="new-password" id="email_input" placeholder="Email address" type="text" />
+              <input autocomplete="new-password" id="email_input" inputmode="email" placeholder="Email address" type="text" />
               <button aria-label="Clear email" class="icon" type="button">
                 <img alt="Clear email" src="./img/close.svg" />
               </button>
@@ -779,7 +779,7 @@
             <div class="vbox">
               <aa-input id="event_form_url">
                 <label divided>
-                  <input autocomplete="new-password" id="event_url" placeholder="URL" type="text" />
+                  <input autocomplete="new-password" id="event_url" inputmode="url" placeholder="URL" type="text" />
                   <button aria-label="Clear URL" class="icon" type="button">
                     <img alt="Clear URL" src="./img/close.svg" />
                   </button>
