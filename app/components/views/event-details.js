@@ -6,11 +6,13 @@ customElements.define( 'aa-event-details', class extends HTMLElement {
     this._data = null;
     this._touch = ( 'ontouchstart' in document.documentElement ) ? 'touchstart' : 'click';
 
+    this.doCloseClick = this.doCloseClick.bind( this );    
     this.doDeleteClick = this.doDeleteClick.bind( this );
     this.doEditClick = this.doEditClick.bind( this ); 
     this.doSelectChange = this.doSelectChange.bind( this );
 
     this.$calendar = this.querySelector( 'aa-select' );
+    this.$close = this.querySelector( 'div:first-of-type button:first-of-type' );
     this.$delete = this.querySelector( 'button.danger' );
     this.$edit = this.querySelector( '#event_details_edit' );
     this.$ends = this.querySelector( '#event_details_ends' );
@@ -20,6 +22,10 @@ customElements.define( 'aa-event-details', class extends HTMLElement {
     this.$starts = this.querySelector( '#event_details_starts' );
     this.$title = this.querySelector( '#event_details_title' );
     this.$url = this.querySelector( '#event_details_url' );
+  }
+
+  doCloseClick() {
+    this.dispatchEvent( new CustomEvent( 'aa-close' ) );
   }
 
   doDeleteClick() {
@@ -59,6 +65,7 @@ customElements.define( 'aa-event-details', class extends HTMLElement {
 
   connectedCallback() {
     this.$calendar.addEventListener( 'aa-change', this.doSelectChange );
+    this.$close.addEventListener( this._touch, this.doCloseClick );
     this.$delete.addEventListener( this._touch, this.doDeleteClick );
     this.$edit.addEventListener( this._touch, this.doEditClick );
     this._upgrade( 'calendars' );
@@ -67,6 +74,7 @@ customElements.define( 'aa-event-details', class extends HTMLElement {
 
   disconnectedCallback() {
     this.$calendar.removeEventListener( 'aa-change', this.doSelectChange );  
+    this.$close.removeEventListener( this._touch, this.doCloseClick );
     this.$delete.removeEventListener( this._touch, this.doDeleteClick );  
     this.$edit.removeEventListener( this._touch, this.doEditClick );  
   }  

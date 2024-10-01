@@ -796,36 +796,39 @@
         <!-- Details -->
         <aa-event-details>
           <div class="hbox">
-            <p id="event_details_title" class="label">Test Event</p>
+            <button aria-label="Close" class="slimmed" id="event_details_cancel" type="button">Close</button>
             <button aria-label="Edit" class="slimmed" id="event_details_edit" type="button">Edit</button>
           </div>
-          <p id="event_details_location">Parker, CO</p>
-          <!-- <a href="https://kevinhoyt.com">Parker, CO</a> -->
-          <div class="vbox divided dates">
-            <p id="event_details_starts">from September 17, 2024</p>
-            <p id="event_details_ends">to September 18, 2024</p>
-          </div>
-          <aa-select class="divided" id="event_details_calendar" label-field="name" value-field="id">
-            <label>
-              <p class="label">Calendar</p>
-              <div></div>
-              <p>Label</p>
-              <img alt="Toggle options" src="./img/chevron-expand.svg" />
-              <select></select>
-            </label>
-          </aa-select>
-          <div class="vbox divided spaced url">
-            <p>URL</p>
-            <a href="https://kevinhoyt.com" id="event_details_url" target="_blank">https://kevinhoyt.com</a>
-          </div>
-          <div class="vbox divided spaced notes">
-            <p>Notes</p>
-            <p class="label" id="event_details_notes">No, no, no, nope, notes.</p>                      
-          </div>
-          <div class="vbox divided spaced map">
-            <div id="event_details_map"></div>
-          </div>          
-          <button aria-label="Delete event" class="centered danger" type="button">Delete Event</button>
+          <article>
+            <p id="event_details_title" class="label">Test Event</p>          
+            <p id="event_details_location">Parker, CO</p>
+            <!-- <a href="https://kevinhoyt.com">Parker, CO</a> -->
+            <div class="vbox divided dates">
+              <p id="event_details_starts">from September 17, 2024</p>
+              <p id="event_details_ends">to September 18, 2024</p>
+            </div>
+            <aa-select class="divided" id="event_details_calendar" label-field="name" value-field="id">
+              <label>
+                <p class="label">Calendar</p>
+                <div></div>
+                <p>Label</p>
+                <img alt="Toggle options" src="./img/chevron-expand.svg" />
+                <select></select>
+              </label>
+            </aa-select>
+            <div class="vbox divided spaced url">
+              <p>URL</p>
+              <a href="https://kevinhoyt.com" id="event_details_url" target="_blank">https://kevinhoyt.com</a>
+            </div>
+            <div class="vbox divided spaced notes">
+              <p>Notes</p>
+              <p class="label" id="event_details_notes">No, no, no, nope, notes.</p>                      
+            </div>
+            <div class="vbox divided spaced map">
+              <div id="event_details_map"></div>
+            </div>          
+          </article>
+          <button aria-label="Delete event" class="centered danger filled" type="button">Delete Event</button>          
         </aa-event-details>
 
       </aa-stack>

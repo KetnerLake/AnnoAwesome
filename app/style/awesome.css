@@ -24,10 +24,11 @@
   --primary-text-color: #272727;
   --secondary-text-color: #0082ff;
   --small-text-color: #868686;
+  --font-family: 'IBM Plex Sans', sans-serif
 }
 
 html {
-  font-family: 'IBM Plex Sans', sans-serif;
+  font-family: var( --font-family );
   font-size: 16px;
   font-weight: 400;
   height: 100%;

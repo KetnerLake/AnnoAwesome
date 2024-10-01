@@ -4,6 +4,7 @@ input[type=text] {
   background: none;
   border: none;
   color: #272727;
+  font-family: var( --font-family );
   font-size: 1rem;
   height: 2.25rem;
   line-height: 2.25rem;

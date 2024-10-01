@@ -285,6 +285,9 @@ event_details.addEventListener( 'aa-change', ( evt ) => {
     footer.setAttribute( 'count', events.length );
   } );
 } );
+event_details.addEventListener( 'aa-close', () => {
+  event_dialog.close();
+} );
 event_details.addEventListener( 'aa-delete', ( evt ) => {
   db.event.delete( evt.detail.id )
   .then( () => {

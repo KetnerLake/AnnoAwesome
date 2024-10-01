@@ -1,6 +1,6 @@
 dialog:has( aa-event-details ):has( aa-stack[selected-index='1'] ) {
-  backdrop-filter: none; 
-  background-color: #ffffff;
+  backdrop-filter: blur( 10px ); 
+  background-color: rgba( 247, 247, 247, 0.70 );  
   border: none; 
   border-radius: 4px; 
   box-shadow:
@@ -8,11 +8,17 @@ dialog:has( aa-event-details ):has( aa-stack[selected-index='1'] ) {
     0 0 25px -15px rgba( 0, 0, 0, 0.20 ); 
   box-sizing: border-box;   
   width: 360px;    
-  padding: 1rem 1rem 0.75rem 1rem;
+  padding: 1rem;
+}
+
+article {
+  background-color: #ffffff;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
 }
 
 aa-event-details {
-  background-color: #ffffff;  
   display: flex;
   flex-direction: column;
 }
@@ -21,77 +27,102 @@ aa-event-details[hidden] {
   display: none;
 }
 
-aa-event-details > a {
+aa-event-details article > a {
   height: 1rem;
   line-height: 1rem;
 }
 
-aa-event-details div.url a {
+aa-event-details article > div.divided:not( .hidden ):nth-last-child( 2 ) {
+  border-bottom: none;
+}
+
+aa-event-details > div.hbox:first-of-type {
+  margin: 0 0 0.75rem 0;
+}
+
+aa-event-details > div.hbox > button:last-of-type {
+  margin-left: auto;
+}
+
+aa-event-details article div.url p {
+  padding: 0 0 0 1rem;
+}
+
+aa-event-details article div.url a {
   height: auto;
   line-height: 21px;
   margin: 0.25rem 0 0.50rem 0;
+  padding: 0 0 0 1rem;
 }
 
 aa-event-details > button:last-of-type {
-  margin-top: 0.75rem;
+  margin: 1rem 0 0 0;
 }
 
-aa-event-details a.hidden,
-aa-event-details div.hidden,
-aa-event-details p.hidden {
+aa-event-details article a.hidden,
+aa-event-details article div.hidden,
+aa-event-details article p.hidden {
   display: none;
 }
 
-aa-event-details > div:first-of-type p:first-of-type {
+aa-event-details article > p:first-of-type {
   flex-basis: 0;
   flex-grow: 1;
   font-weight: 600;
+  padding: 0 0 0 1rem;
 }
 
-aa-event-details div.dates {
+aa-event-details article div.dates {
   gap: 4px;
-  padding: 0.75rem 0 0.75rem 0;
+  padding: 0.75rem 0 0.75rem 1rem;
 }
 
-aa-event-details div.dates p {
+aa-event-details article div.dates p {
   color: #8e8e8e;
 }
 
-aa-event-details div.spaced {
+aa-event-details article div.spaced {
   padding-top: calc( 0.50rem + 2px );
 }
 
-aa-event-details div.spaced.map {
+aa-event-details article div.spaced.map {
   padding: 0.75rem 0 0.75rem 0;
 }
 
-aa-event-details div.spaced.map div {
+aa-event-details article div.spaced.map div {
   background-color: #f7f7f7;
   border-radius: 4px;
   min-height: 9rem;
 }
 
-aa-event-details aa-select {
-  padding: 2px 0 2px 0;
+aa-event-details article aa-select {
+  padding: 2px 0.50rem 2px 1rem;
 }
 
-aa-event-details aa-select label p:first-of-type {
+aa-event-details article aa-select label p:first-of-type {
   flex-basis: 0;
   flex-grow: 1;
   padding: 0;
 }
 
-aa-event-details aa-select label {
+aa-event-details article aa-select label {
   padding: 0 0.75rem 0 0;
 }
 
-aa-event-details aa-select label:has( select ) p:last-of-type {
+aa-event-details article aa-select label:has( select ) p:last-of-type {
   flex-basis: 0;
   flex-grow: 0;
   padding: 0 0.75rem 0 0.75rem;
 }
 
-aa-event-details div.notes p:last-of-type {
+aa-event-details article div.notes p {
+  padding: 0 0 0 1rem;
+}
+
+aa-event-details article div.notes p:last-of-type {
   color: #8e8e8e;
 }
 
+#event_details_location {
+  padding: 0 0 0 1rem;
+}
