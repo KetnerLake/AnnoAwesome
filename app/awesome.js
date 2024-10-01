@@ -242,10 +242,8 @@ event_form.addEventListener( 'aa-done', () => {
     }
   } )
   .then( ( data ) => {
-    if( color_store ) {
-      for( let d = 0; d < data.length; d++ ) {
-        data[d].color = colors[data[d].calendarId];
-      }
+    for( let d = 0; d < data.length; d++ ) {
+      data[d].color = colors[data[d].calendarId];
     }
 
     const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
@@ -422,9 +420,10 @@ calendar_form.addEventListener( 'aa-delete', ( evt ) => {
     }
   } )
   .then( ( data ) => {
-    for( let d = 0; d < data.length; d++ ) {
-      data[d].color = colors[data[d].calendarId];
-    }
+    data = data.map( ( value ) => {
+      value.color = colors[value.calendarId];
+      return value;
+    } );
 
     const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
     events = data.filter( ( value ) => active.includes( value.calendarId ) );
