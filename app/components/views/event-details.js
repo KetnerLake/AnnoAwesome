@@ -166,5 +166,14 @@ customElements.define( 'aa-event-details', class extends HTMLElement {
     } else {
       this.$delete.classList.remove( 'hidden' );      
     }
+
+    const last = this.querySelectorAll( 'article .divided:not( .hidden )' );
+    for( let c = 0; c < last.length; c++ ) {
+      if( c === last.length - 1 ) {
+        last[c].classList.add( 'nobottom' );
+      } else {
+        last[c].classList.remove( 'nobottom' );
+      }
+    }
   }
 } );

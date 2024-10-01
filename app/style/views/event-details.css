@@ -32,10 +32,6 @@ aa-event-details article > a {
   line-height: 1rem;
 }
 
-aa-event-details article > div.divided:not( .hidden ):nth-last-child( 2 ) {
-  border-bottom: none;
-}
-
 aa-event-details > div.hbox:first-of-type {
   margin: 0 0 0.75rem 0;
 }
@@ -121,6 +117,10 @@ aa-event-details article div.notes p {
 
 aa-event-details article div.notes p:last-of-type {
   color: #8e8e8e;
+}
+
+aa-event-details .nobottom {
+  border-bottom: none !important;
 }
 
 #event_details_location {
