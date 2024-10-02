@@ -55,6 +55,14 @@ customElements.define( 'aa-year', class extends HTMLElement {
     }
   }
 
+  // https://stackoverflow.com/questions/6117814/get-week-of-year-in-javascript-like-in-php/6117889#6117889
+  week( date ) {
+    date = new Date( Date.UTC( date.getFullYear(), date.getMonth(), date.getDate() ) );
+    date.setUTCDate( date.getUTCDate() + 4 - ( date.getUTCDay() || 7 ) );
+    const yearStart = new Date( Date.UTC( date.getUTCFullYear(), 0, 1 ) );
+    return Math.ceil( ( ( ( date - yearStart ) / 86400000 ) + 1 ) / 7 );
+  }
+
   _upgrade( property ) {
     if( this.hasOwnProperty( property ) ) {
       const value = this[property];
@@ -117,7 +125,9 @@ customElements.define( 'aa-year', class extends HTMLElement {
 
     if( name === 'value' ) {
       const today = new Date();
-      const year = this.hasAttribute( 'value' ) ? parseInt( this.getAttribute( 'value' ) ) : new Date.getFullYear();
+      const year = this.hasAttribute( 'value' ) ? parseInt( this.getAttribute( 'value' ) ) : new Date().getFullYear();
+
+      let index = 0;
 
       for( let m = 0; m < 12; m++ ) {
         for( let d = 0; d < 31; d++ ) {
@@ -133,6 +143,16 @@ customElements.define( 'aa-year', class extends HTMLElement {
             this.$months[m].children[0].children[d].classList.add( 'outside' );
           } else {
             this.$months[m].children[0].children[d].classList.remove( 'outside' );
+          }
+
+          const track = this.week( cell );
+          if( track !== index || d === 0 ) {
+            index = track;
+            this.$months[m].children[0].children[d].classList.add( 'week' );
+            this.$months[m].children[0].children[d].children[0].children[1].textContent = index;
+          } else {
+            this.$months[m].children[0].children[d].classList.remove( 'week' );
+            this.$months[m].children[0].children[d].children[0].children[1].textContent = '';            
           }
 
           if( today.getFullYear() === cell.getFullYear() &&

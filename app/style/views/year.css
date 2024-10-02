@@ -41,6 +41,23 @@ aa-year article div.day p {
   width: 2.25rem;
 }
 
+aa-year article div.day.week p span:first-of-type {
+  display: block; 
+  line-height: 1rem; 
+  margin-top: 0.25rem;
+}
+
+aa-year article div.day.week p span:last-of-type {
+  color: #868686; 
+  display: block;  
+  font-size: 0.75rem; 
+  line-height: 0.75rem; 
+}
+
+aa-year article div.day p span:empty {
+  display: none;
+}
+
 aa-year article div.day.outside {
   background: none;
   border-bottom: none;
@@ -54,6 +71,11 @@ aa-year article div.day.today p {
   background-color: #0082ff;
   color: #ffffff;
   font-weight: 600;
+}
+
+aa-year article div.day.today.week p span:last-of-type { 
+  color: #ffffff;
+  font-weight: 400;
 }
 
 aa-year article > div:first-of-type {
