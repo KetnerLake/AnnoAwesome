@@ -9,6 +9,7 @@ dialog:has( aa-event-details ):has( aa-stack[selected-index='1'] ) {
   box-sizing: border-box;   
   width: 360px;    
   padding: 1rem;
+  -webkit-backdrop-filter: blur( 10px );  
 }
 
 article {
