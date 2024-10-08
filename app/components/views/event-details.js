@@ -9,6 +9,7 @@ customElements.define( 'aa-event-details', class extends HTMLElement {
     this.doCloseClick = this.doCloseClick.bind( this );    
     this.doDeleteClick = this.doDeleteClick.bind( this );
     this.doEditClick = this.doEditClick.bind( this ); 
+    this.doFileClick = this.doFileClick.bind( this );     
     this.doSelectChange = this.doSelectChange.bind( this );
 
     this.$calendar = this.querySelector( 'aa-select' );
@@ -16,12 +17,25 @@ customElements.define( 'aa-event-details', class extends HTMLElement {
     this.$delete = this.querySelector( 'button.danger' );
     this.$edit = this.querySelector( '#event_details_edit' );
     this.$ends = this.querySelector( '#event_details_ends' );
+    this.$files = this.querySelector( 'ul' );
     this.$location = this.querySelector( '#event_details_location' );
     this.$map = this.querySelector( '#event_details_map' );
     this.$notes = this.querySelector( '#event_details_notes' );
     this.$starts = this.querySelector( '#event_details_starts' );
     this.$title = this.querySelector( '#event_details_title' );
     this.$url = this.querySelector( '#event_details_url' );
+  }
+
+  // https://stackoverflow.com/questions/15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript
+  format( bytes, decimals = 2 ) {
+    if( !+bytes ) return '0 Bytes';
+
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB'];
+    const i = Math.floor( Math.log( bytes ) / Math.log( k ) );
+
+    return `${parseFloat((bytes / Math.pow( k, i ) ).toFixed( dm ) )} ${sizes[i]}`;
   }
 
   doCloseClick() {
@@ -42,6 +56,14 @@ customElements.define( 'aa-event-details', class extends HTMLElement {
     this.dispatchEvent( new CustomEvent( 'aa-edit', {
       detail: {
         id: this._data.id
+      }
+    } ) );
+  }
+
+  doFileClick( evt ) {
+    this.dispatchEvent( new CustomEvent( 'aa-file', {
+      detail: {
+        id: evt.currentTarget.getAttribute( 'data-id' )
       }
     } ) );
   }
@@ -135,6 +157,50 @@ customElements.define( 'aa-event-details', class extends HTMLElement {
 
     // Calendar
     this.$calendar.setAttribute( 'selected-item', this._data.calendarId );
+
+    // Attachments
+    if( this._data.hasOwnProperty( 'attachments' ) ) {
+      if( this._data.attachments === null ) {
+        while( this.$files.children.length > 0 ) {
+          this.$files.children[0].removeEventListener( this._touch, this.doFileClick );          
+          this.$files.children[0].remove();
+        }
+
+        this.$files.classList.add( 'hidden' );
+      } else {
+        while( this.$files.children.length > this._data.attachments.length ) {
+          this.$files.children[0].removeEventListener( this._touch, this.doFileClick );                    
+          this.$files.children[0].remove();
+        }
+  
+        while( this.$files.children.length < this._data.attachments.length ) {
+          const item = document.createElement( 'li' );
+          item.addEventListener( this._touch, this.doFileClick );
+          
+          const icon = document.createElement( 'img' );
+          icon.src = './img/file.svg';
+          item.appendChild( icon );
+  
+          const name = document.createElement( 'p' );
+          item.appendChild( name );
+  
+          const size = document.createElement( 'p' );
+          item.appendChild( size );
+  
+          this.$files.appendChild( item );
+        }
+  
+        for( let c = 0; c < this.$files.children.length; c++ ) {
+          this.$files.children[c].setAttribute( 'data-id', this._data.attachments[c].id );
+          this.$files.children[c].children[1].textContent = this._data.attachments[c].name;
+          this.$files.children[c].children[2].textContent = this.format( this._data.attachments[c].size, 2 );
+        }
+
+        this.$files.classList.remove( 'hidden' );
+      }
+    } else {
+      this.$files.classList.add( 'hidden' );
+    }
 
     // URL
     if( this._data.url === null ) {

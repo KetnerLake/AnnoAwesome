@@ -1,3 +1,4 @@
+import( './attachments.js' );
 import( './date-picker.js' );
 import( './input.js' );
 import( './search.js' );

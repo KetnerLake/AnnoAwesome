@@ -669,7 +669,7 @@
             </div>
           </button>
         </div>
-        <button aria-label="Export data" class="filled" id="account_export" type="button">Export data...</button>          
+        <button aria-label="Export the awesome" class="filled" id="account_export" type="button">Export the awesome...</button>          
         <button aria-label="Close account details" id="account_cancel" type="button">Just checking it out</button>
       </section>
     </dialog>
@@ -713,6 +713,7 @@
             </div>
             <small>Allow anyone access to a read-only version of this calendar.</small>
           </div>
+          <button aria-label="Export calendar events" class="filled rounded" id="calendar_form_export" type="button">Export calendar events...</button>
           <button aria-label="Delete calendar" id="calendar_form_delete" type="button">Delete Calendar</button>
         </form>
       </aa-calendar-form>
@@ -775,7 +776,11 @@
                 <select></select>
               </label>
             </aa-select>
-            <button aria-label="Add attachment" class="filled" type="button">Add attachment...</button>        
+            <aa-attachments>
+              <input type="file" />
+              <ul></ul>              
+              <button aria-label="Add attachment" class="filled" type="button">Add attachment...</button>        
+            </aa-attachments>
             <div class="vbox">
               <aa-input id="event_form_url">
                 <label divided>
@@ -797,10 +802,11 @@
         <aa-event-details>
           <div class="hbox">
             <button aria-label="Close" class="slimmed" id="event_details_cancel" type="button">Close</button>
+            <p id="event_details_title">Test Event</p>
             <button aria-label="Edit" class="slimmed" id="event_details_edit" type="button">Edit</button>
           </div>
           <article>
-            <p id="event_details_title" class="label">Test Event</p>          
+            <!-- <p id="event_details_title" class="label">Test Event</p> -->
             <p id="event_details_location">Parker, CO</p>
             <!-- <a href="https://kevinhoyt.com">Parker, CO</a> -->
             <div class="vbox divided dates">
@@ -816,6 +822,7 @@
                 <select></select>
               </label>
             </aa-select>
+            <ul class="divided hidden"></ul>            
             <div class="vbox divided spaced url">
               <p>URL</p>
               <a href="https://kevinhoyt.com" id="event_details_url" target="_blank">https://kevinhoyt.com</a>

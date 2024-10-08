@@ -203,8 +203,16 @@ event_form.addEventListener( 'aa-cancel', () => {
   event_list.removeAttribute( 'selected-item' );
   event_search.removeAttribute( 'selected-item' );
 } );
-event_form.addEventListener( 'aa-delete', () => {
-  db.event.delete( evt.detail.id )
+event_form.addEventListener( 'aa-delete', ( evt ) => {
+  db.attachment.where( {eventId: evt.detail.id } ).toArray()
+  .then( ( data ) => {
+    const keys = data.reduce( ( prev, curr ) => {
+      prev.push( curr.id );
+      return prev;
+    }, [] );
+    return db.attachment.bulkDelete( keys );
+  } )
+  .then( () => db.event.delete( evt.detail.id ) )
   .then( () => {
     if( sort_store === 'desc' ) {
       return db.event.where( 'startsAt' ).between( starts, ends ).reverse().toArray();  
@@ -229,8 +237,23 @@ event_form.addEventListener( 'aa-delete', () => {
     footer.setAttribute( 'count', events.length );
   } );
 } );
-event_form.addEventListener( 'aa-done', () => {
-  db.event.put( event_form.data )
+event_form.addEventListener( 'aa-done', async () => {
+  const event = event_form.data;
+
+  if( event.attachments === null ) {
+    const files = await db.attachment.where( {eventId: event.id} ).toArray();
+    const keys = files.reduce( ( prev, curr ) => {
+      prev.push( curr.id );
+      return prev;
+    }, [] );
+    await db.attachment.bulkDelete( keys );
+  }
+
+  db.attachment.bulkPut( event.attachments === null ? [] : event.attachments )
+  .then( () => {
+    delete event.attachments;
+    return db.event.put( event );
+  } )
   .then( () => {
     blocker( false );
     event_dialog.close();
@@ -289,7 +312,15 @@ event_details.addEventListener( 'aa-close', () => {
   event_dialog.close();
 } );
 event_details.addEventListener( 'aa-delete', ( evt ) => {
-  db.event.delete( evt.detail.id )
+  db.attachment.where( {eventId: evt.detail.id } ).toArray()
+  .then( ( data ) => {
+    const keys = data.reduce( ( prev, curr ) => {
+      prev.push( curr.id );
+      return prev;
+    }, [] );
+    return db.attachment.bulkDelete( keys );
+  } )
+  .then( () => db.event.delete( evt.detail.id ) )
   .then( () => {
     if( sort_store === 'desc' ) {
       return db.event.where( 'startsAt' ).between( starts, ends ).reverse().toArray();  
@@ -314,12 +345,29 @@ event_details.addEventListener( 'aa-delete', ( evt ) => {
   } );
 } );
 event_details.addEventListener( 'aa-edit', ( evt ) => {
+  let event = null;
+
   db.event.get( evt.detail.id )
   .then( ( data ) => {
+    event = structuredClone( data );
+    return db.attachment.where( {eventId: event.id} ).toArray();
+  } )
+  .then( ( data ) => {
+    event.attachments = data.length === 0 ? null : data;
+
     event_form.calendars = calendars;
-    event_form.data = data;
+    event_form.data = event;
     event_stack.setAttribute( 'selected-index', 0 );
     event_form.focus();
+  } );
+} );
+event_details.addEventListener( 'aa-file', ( evt ) => {
+  db.attachment.where( {id: evt.detail.id} ).first()
+  .then( ( data ) => {
+    // https://stackoverflow.com/questions/28197179/javascript-open-pdf-in-new-tab-from-byte-array
+    const file = new Blob( [data.data], {type: data.type} );
+    const url = URL.createObjectURL( file );
+    window.open(url );
   } );
 } );
 
@@ -584,8 +632,16 @@ calendar_details.addEventListener( 'aa-hide', async ( evt ) => {
  */
 
 year_view.addEventListener( 'aa-change', ( evt ) => {
+  let event = null;
+
   db.event.get( evt.detail.id )
-  .then( ( event ) => {
+  .then( ( data ) => {
+    event = structuredClone( data );
+    return db.attachment.where( {eventId: event.id} ).toArray();
+  } )  
+  .then( ( data ) => {
+    event.attachments = data.length === 0 ? null : data;
+
     event_list.setAttribute( 'selected-item', event.id );
     event_details.calendars = calendars;
     event_details.data = event;
@@ -665,9 +721,10 @@ let starts = new Date( year_store, 0, 1 );
 
 // Database
 const db = new Dexie( 'AnnoAwesome' );
-db.version( 5 ).stores( {
+db.version( 7 ).stores( {
   event: 'id, calendarId, startsAt',
-  calendar: 'id'
+  calendar: 'id',
+  attachment: 'id, eventId'
 } );
 
 db.calendar.toCollection().sortBy( 'name' )

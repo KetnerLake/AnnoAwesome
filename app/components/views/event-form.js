@@ -16,6 +16,7 @@ customElements.define( 'aa-event-form', class extends HTMLElement {
     this._touch = ( 'ontouchstart' in document.documentElement ) ? 'touchstart' : 'click';
 
     this.$add = this.querySelector( '#event_form_add' );
+    this.$attach = this.querySelector( 'aa-attachments' );
     this.$calendar = this.querySelector( 'aa-select' );    
     this.$cancel = this.querySelector( '#event_form_cancel' );
     this.$delete = this.querySelector( 'button.danger' );
@@ -153,10 +154,11 @@ customElements.define( 'aa-event-form', class extends HTMLElement {
   }
 
   get data() {
+    const id = this._data === null ? self.crypto.randomUUID() : this._data.id;
     const now = new Date();
 
     return {
-      id: this._data === null ? self.crypto.randomUUID() : this._data.id,
+      id: id,
       createdAt: this._data === null ? now : this._data.createdAt,
       updatedAt: now,
       calendarId: this.$calendar.getAttribute( 'selected-item' ),
@@ -167,7 +169,11 @@ customElements.define( 'aa-event-form', class extends HTMLElement {
       latitude: null,
       longitude: null,
       url: this.$url.hasAttribute( 'value' ) ? this.$url.getAttribute( 'value' ) : null,
-      description: this.$notes.value.trim().length === 0 ? null : this.$notes.value
+      description: this.$notes.value.trim().length === 0 ? null : this.$notes.value,
+      attachments: this.$attach.value === null ? null : this.$attach.value.map( ( file ) => { 
+        file.eventId = id;
+        return file;
+      } )
     };
   }
 
@@ -187,6 +193,7 @@ customElements.define( 'aa-event-form', class extends HTMLElement {
       this.$ends.valueAsDate = new Date();
       this.$ends.children[0].removeAttribute( 'open' );      
       this.$calendar.removeAttribute( 'selected-item' );
+      this.$attach.value = null;
       this.$url.removeAttribute( 'value' );
       this.$notes.value = '';
       this.$delete.classList.add( 'hidden' );
@@ -210,6 +217,10 @@ customElements.define( 'aa-event-form', class extends HTMLElement {
       this.$ends.children[0].removeAttribute( 'open' );
 
       this.$calendar.setAttribute( 'selected-item', this._data.calendarId );
+
+      if( this._data.hasOwnProperty( 'attachments' ) ) {
+        this.$attach.value = this._data.attachments;
+      }
 
       if( this._data.url === null ) {
         this.$url.removeAttribute( 'value' );
