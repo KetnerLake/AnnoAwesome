@@ -541,6 +541,33 @@ calendar_form.addEventListener( 'aa-done', () => {
     footer.setAttribute( 'count', events.length );
   } );
 } );
+calendar_form.addEventListener( 'aa-export', ( evt ) => {
+  let name = null;
+  db.calendar.where( {id: evt.detail.id} ).first()
+  .then( ( data ) => {
+    name = data.name;
+    return db.event.where( {calendarId: evt.detail.id} ).toArray();
+  } )
+  .then( ( data ) => {
+    // https://writtenforcoders.com/blog/javascript-export-to-csv-without-using-a-library
+    const output = data.map( ( event ) => Object.values( event ) );
+    output.unshift( Object.keys( data[0] ) );
+    console.log( output );
+
+    const csv = 'data:text/csv;charset=utf-8,' + output.map( ( row ) => row.join( ',' ) ).join( '\n' );
+    const encoded = encodeURI( csv );
+
+    const link = document.createElement( 'a' );
+    link.setAttribute( 'href', encoded );
+    link.setAttribute( 'download', `${name}.csv` );
+    document.body.appendChild( link );
+    link.click();
+
+    setTimeout( ( link ) => {
+      link.remove();
+    }, 5000, link );    
+  } );
+} );
 
 // Details
 calendar_details.addEventListener( 'aa-active', ( evt ) => {

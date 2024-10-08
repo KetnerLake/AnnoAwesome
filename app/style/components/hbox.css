@@ -8,6 +8,10 @@ div.hbox.centered {
   align-items: center;
 }
 
+div.hbox.concealed {
+  visibility: hidden;
+}
+
 div.hbox.divided {
   border-bottom: solid 1px #e5e5e5;  
 }

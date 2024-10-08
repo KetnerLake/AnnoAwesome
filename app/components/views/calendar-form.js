@@ -10,6 +10,7 @@ customElements.define( 'aa-calendar-form', class extends HTMLElement {
     this.doColorClick = this.doColorClick.bind( this );
     this.doDeleteClick = this.doDeleteClick.bind( this );
     this.doDoneClick = this.doDoneClick.bind( this );
+    this.doExportClick = this.doExportClick.bind( this );
     this.doNameChange = this.doNameChange.bind( this );
 
     this.$cancel = this.querySelector( '#calendar_form_cancel' );
@@ -17,6 +18,7 @@ customElements.define( 'aa-calendar-form', class extends HTMLElement {
     this.$delete = this.querySelector( '#calendar_form_delete' );
     this.$details = this.querySelector( 'details' );
     this.$done = this.querySelector( '#calendar_form_done' );
+    this.$export = this.querySelector( '#calendar_form_export' );
     this.$list = this.querySelector( 'details ul' );
     this.$name = this.querySelector( '#calendar_form_name' );
     this.$public = this.querySelector( '#calendar_form_public' );
@@ -76,6 +78,14 @@ customElements.define( 'aa-calendar-form', class extends HTMLElement {
     this.dispatchEvent( new CustomEvent( 'aa-done' ) );
   }
 
+  doExportClick() {
+    this.dispatchEvent( new CustomEvent( 'aa-export', {
+      detail: {
+        id: this._data.id
+      }
+    } ) );
+  }
+
   doNameChange( evt ) {
     this.$done.disabled = evt.detail.value === null ? true : false;
   }
@@ -92,6 +102,7 @@ customElements.define( 'aa-calendar-form', class extends HTMLElement {
     this.$cancel.addEventListener( this._touch, this.doCancelClick );        
     this.$delete.addEventListener( this._touch, this.doDeleteClick );
     this.$done.addEventListener( this._touch, this.doDoneClick );
+    this.$export.addEventListener( this._touch, this.doExportClick );
     this.$name.addEventListener( 'aa-change', this.doNameChange );
     this._upgrade( 'colors' );    
     this._upgrade( 'data' );
@@ -101,6 +112,7 @@ customElements.define( 'aa-calendar-form', class extends HTMLElement {
     this.$cancel.removeEventListener( this._touch, this.doCancelClick );
     this.$delete.removeEventListener( this._touch, this.doDeleteClick );
     this.$done.removeEventListener( this._touch, this.doDoneClick );    
+    this.$export.removeEventListener( this._touch, this.doExportClick );    
     this.$name.removeEventListener( 'aa-change', this.doNameChange );
   }
 
@@ -190,9 +202,11 @@ customElements.define( 'aa-calendar-form', class extends HTMLElement {
       }
       
       this.$public.checked = false;
+      this.$export.classList.add( 'hidden' );
     } else {
       const color = this._colors.find( ( value ) => value.value === this._data.color ? true : false );
-
+      console.log( this._colors );
+      console.log( this._data.color );
       this.$title.textContent = 'Edit Calendar';
       this.$done.disabled = true;
       this.$name.setAttribute( 'value', this._data.name );
@@ -210,6 +224,7 @@ customElements.define( 'aa-calendar-form', class extends HTMLElement {
       }      
 
       this.$public.checked = this._data.isPublic;
+      this.$export.classList.remove( 'hidden' );      
     }
   }
 } );
