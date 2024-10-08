@@ -297,6 +297,13 @@ event_details.addEventListener( 'aa-change', ( evt ) => {
       value.color = colors[value.calendarId];
       return value;
     } );
+    data.sort( ( a, b ) => {
+      if( a.startsAt.getTime() < b.startsAt.getTime() ) return -1;
+      if( a.startsAt.getTime() > b.startsAt.getTime() ) return 1;
+      if( a.color < b.color ) return -1;
+      if( a.color > b.color ) return 1;
+      return 0;
+    } );
     
     const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
     events = data.filter( ( value ) => active.includes( value.calendarId ) );
@@ -332,6 +339,13 @@ event_details.addEventListener( 'aa-delete', ( evt ) => {
     data = data.map( ( value ) => {
       value.color = colors[value.calendarId];
       return value;
+    } );
+    data.sort( ( a, b ) => {
+      if( a.startsAt.getTime() < b.startsAt.getTime() ) return -1;
+      if( a.startsAt.getTime() > b.startsAt.getTime() ) return 1;
+      if( a.color < b.color ) return -1;
+      if( a.color > b.color ) return 1;
+      return 0;
     } );
 
     const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
@@ -474,6 +488,13 @@ calendar_form.addEventListener( 'aa-delete', ( evt ) => {
     data = data.map( ( value ) => {
       value.color = colors[value.calendarId];
       return value;
+    } );
+    data.sort( ( a, b ) => {
+      if( a.startsAt.getTime() < b.startsAt.getTime() ) return -1;
+      if( a.startsAt.getTime() > b.startsAt.getTime() ) return 1;
+      if( a.color < b.color ) return -1;
+      if( a.color > b.color ) return 1;
+      return 0;
     } );
 
     const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
@@ -764,6 +785,13 @@ db.calendar.toCollection().sortBy( 'name' )
     value.color = colors[value.calendarId];
     return value;
   } );
+  data.sort( ( a, b ) => {
+    if( a.startsAt.getTime() < b.startsAt.getTime() ) return -1;
+    if( a.startsAt.getTime() > b.startsAt.getTime() ) return 1;
+    if( a.color < b.color ) return -1;
+    if( a.color > b.color ) return 1;
+    return 0;
+  } );
 
   const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
   events = data.filter( ( value ) => active.includes( value.calendarId ) );
@@ -836,6 +864,13 @@ function headerChange( evt ) {
         value.color = colors[value.calendarId];
         return value;
       } );
+      data.sort( ( a, b ) => {
+        if( a.startsAt.getTime() < b.startsAt.getTime() ) return -1;
+        if( a.startsAt.getTime() > b.startsAt.getTime() ) return 1;
+        if( a.color < b.color ) return -1;
+        if( a.color > b.color ) return 1;
+        return 0;
+      } );      
     
       const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
       events = data.filter( ( value ) => active.includes( value.calendarId ) );
@@ -850,6 +885,13 @@ function headerChange( evt ) {
       data = data.map( ( value ) => {
         value.color = colors[value.calendarId];
         return value;
+      } );
+      data.sort( ( a, b ) => {
+        if( a.startsAt.getTime() < b.startsAt.getTime() ) return -1;
+        if( a.startsAt.getTime() > b.startsAt.getTime() ) return 1;
+        if( a.color < b.color ) return -1;
+        if( a.color > b.color ) return 1;
+        return 0;
       } );
     
       const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
