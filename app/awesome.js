@@ -285,23 +285,32 @@ event_details.addEventListener( 'aa-change', ( evt ) => {
     data.calendarId = evt.detail.calendarId;
     return db.event.put( data );
   } )
-  .then( () => {
-    if( sort_store === 'desc' ) {
-      return db.event.where( 'startsAt' ).between( starts, ends ).reverse().toArray();  
-    } else {
-      return db.event.where( 'startsAt' ).between( starts, ends ).toArray();      
-    }    
-  } )
+  .then( () => db.event.where( 'startsAt' ).between( starts, ends ).toArray() )
   .then( ( data ) => {
     data = data.map( ( value ) => {
       value.color = colors[value.calendarId];
       return value;
     } );
     data.sort( ( a, b ) => {
-      if( a.startsAt.getTime() < b.startsAt.getTime() ) return -1;
-      if( a.startsAt.getTime() > b.startsAt.getTime() ) return 1;
-      if( a.color < b.color ) return -1;
-      if( a.color > b.color ) return 1;
+      const first = a.startsAt.getFullYear() + '-' + ( a.startsAt.getMonth() + 1 ) + '-' + a.startsAt.getDate();
+      const second = b.startsAt.getFullYear() + '-' + ( b.startsAt.getMonth() + 1 ) + '-' + b.startsAt.getDate();    
+  
+      if( sort_store === 'desc' ) {
+        if( first < second ) return 1;
+        if( first > second ) return -1;        
+      } else {
+        if( first < second ) return -1;
+        if( first > second ) return 1;        
+      }
+  
+      // Pin like colors to the left side
+      // Inverse sort pins colors to the right side
+      if( a.color < b.color ) return 1;
+      if( a.color > b.color ) return -1;
+  
+      if( a.summary < b.summary ) return -1;
+      if( a.summary > b.summary ) return 1;    
+  
       return 0;
     } );
     
@@ -328,23 +337,32 @@ event_details.addEventListener( 'aa-delete', ( evt ) => {
     return db.attachment.bulkDelete( keys );
   } )
   .then( () => db.event.delete( evt.detail.id ) )
-  .then( () => {
-    if( sort_store === 'desc' ) {
-      return db.event.where( 'startsAt' ).between( starts, ends ).reverse().toArray();  
-    } else {
-      return db.event.where( 'startsAt' ).between( starts, ends ).toArray();      
-    }
-  } )
+  .then( () => db.event.where( 'startsAt' ).between( starts, ends ).toArray() )
   .then( ( data ) => {
     data = data.map( ( value ) => {
       value.color = colors[value.calendarId];
       return value;
     } );
     data.sort( ( a, b ) => {
-      if( a.startsAt.getTime() < b.startsAt.getTime() ) return -1;
-      if( a.startsAt.getTime() > b.startsAt.getTime() ) return 1;
-      if( a.color < b.color ) return -1;
-      if( a.color > b.color ) return 1;
+      const first = a.startsAt.getFullYear() + '-' + ( a.startsAt.getMonth() + 1 ) + '-' + a.startsAt.getDate();
+      const second = b.startsAt.getFullYear() + '-' + ( b.startsAt.getMonth() + 1 ) + '-' + b.startsAt.getDate();    
+  
+      if( sort_store === 'desc' ) {
+        if( first < second ) return 1;
+        if( first > second ) return -1;        
+      } else {
+        if( first < second ) return -1;
+        if( first > second ) return 1;        
+      }
+  
+      // Pin like colors to the left side
+      // Inverse sort pins colors to the right side
+      if( a.color < b.color ) return 1;
+      if( a.color > b.color ) return -1;
+  
+      if( a.summary < b.summary ) return -1;
+      if( a.summary > b.summary ) return 1;    
+  
       return 0;
     } );
 
@@ -478,11 +496,7 @@ calendar_form.addEventListener( 'aa-delete', ( evt ) => {
     calendar_details.data = calendars;
     calendar_form.data = null;
 
-    if( sort_store === 'desc' ) {
-      return db.event.where( 'startsAt' ).between( starts, ends ).reverse().toArray();  
-    } else {
-      return db.event.where( 'startsAt' ).between( starts, ends ).toArray();      
-    }
+    return db.event.where( 'startsAt' ).between( starts, ends ).toArray();      
   } )
   .then( ( data ) => {
     data = data.map( ( value ) => {
@@ -490,10 +504,25 @@ calendar_form.addEventListener( 'aa-delete', ( evt ) => {
       return value;
     } );
     data.sort( ( a, b ) => {
-      if( a.startsAt.getTime() < b.startsAt.getTime() ) return -1;
-      if( a.startsAt.getTime() > b.startsAt.getTime() ) return 1;
-      if( a.color < b.color ) return -1;
-      if( a.color > b.color ) return 1;
+      const first = a.startsAt.getFullYear() + '-' + ( a.startsAt.getMonth() + 1 ) + '-' + a.startsAt.getDate();
+      const second = b.startsAt.getFullYear() + '-' + ( b.startsAt.getMonth() + 1 ) + '-' + b.startsAt.getDate();    
+  
+      if( sort_store === 'desc' ) {
+        if( first < second ) return 1;
+        if( first > second ) return -1;        
+      } else {
+        if( first < second ) return -1;
+        if( first > second ) return 1;        
+      }
+  
+      // Pin like colors to the left side
+      // Inverse sort pins colors to the right side
+      if( a.color < b.color ) return 1;
+      if( a.color > b.color ) return -1;
+  
+      if( a.summary < b.summary ) return -1;
+      if( a.summary > b.summary ) return 1;    
+  
       return 0;
     } );
 
@@ -595,16 +624,35 @@ calendar_details.addEventListener( 'aa-active', ( evt ) => {
     calendars = [... data];
     calendar_details.data = calendars;
 
-    if( sort_store === 'desc' ) {
-      return db.event.where( 'startsAt' ).between( starts, ends ).reverse().toArray();  
-    } else {
-      return db.event.where( 'startsAt' ).between( starts, ends ).toArray();      
-    }
+    return db.event.where( 'startsAt' ).between( starts, ends ).toArray();      
   } )
   .then( ( data ) => {
-    for( let d = 0; d < data.length; d++ ) {
-      data[d].color = colors[data[d].calendarId];
-    }
+    data = data.map( ( value ) => {
+      value.color = colors[value.calendarId];
+      return value;
+    } );    
+    data.sort( ( a, b ) => {
+      const first = a.startsAt.getFullYear() + '-' + ( a.startsAt.getMonth() + 1 ) + '-' + a.startsAt.getDate();
+      const second = b.startsAt.getFullYear() + '-' + ( b.startsAt.getMonth() + 1 ) + '-' + b.startsAt.getDate();    
+  
+      if( sort_store === 'desc' ) {
+        if( first < second ) return 1;
+        if( first > second ) return -1;        
+      } else {
+        if( first < second ) return -1;
+        if( first > second ) return 1;        
+      }
+  
+      // Pin like colors to the left side
+      // Inverse sort pins colors to the right side
+      if( a.color < b.color ) return 1;
+      if( a.color > b.color ) return -1;
+  
+      if( a.summary < b.summary ) return -1;
+      if( a.summary > b.summary ) return 1;    
+  
+      return 0;
+    } );
 
     const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
     events = data.filter( ( value ) => active.includes( value.calendarId ) );
@@ -801,11 +849,7 @@ db.calendar.toCollection().sortBy( 'name' )
     return prev;
   }, {} );
 
-  if( sort_store === 'desc' ) {
-    return db.event.where( 'startsAt' ).between( starts, ends ).reverse().toArray();  
-  } else {
-    return db.event.where( 'startsAt' ).between( starts, ends ).toArray();      
-  }
+  return db.event.where( 'startsAt' ).between( starts, ends ).toArray();
 } )
 .then( ( data ) => {
   data = data.map( ( value ) => {
@@ -813,10 +857,25 @@ db.calendar.toCollection().sortBy( 'name' )
     return value;
   } );
   data.sort( ( a, b ) => {
-    if( a.startsAt.getTime() < b.startsAt.getTime() ) return -1;
-    if( a.startsAt.getTime() > b.startsAt.getTime() ) return 1;
-    if( a.color < b.color ) return -1;
-    if( a.color > b.color ) return 1;
+    const first = a.startsAt.getFullYear() + '-' + ( a.startsAt.getMonth() + 1 ) + '-' + a.startsAt.getDate();
+    const second = b.startsAt.getFullYear() + '-' + ( b.startsAt.getMonth() + 1 ) + '-' + b.startsAt.getDate();    
+
+    if( sort_store === 'desc' ) {
+      if( first < second ) return 1;
+      if( first > second ) return -1;        
+    } else {
+      if( first < second ) return -1;
+      if( first > second ) return 1;        
+    }
+
+    // Pin like colors to the left side
+    // Inverse sort pins colors to the right side
+    if( a.color < b.color ) return 1;
+    if( a.color > b.color ) return -1;
+
+    if( a.summary < b.summary ) return -1;
+    if( a.summary > b.summary ) return 1;    
+
     return 0;
   } );
 
@@ -884,49 +943,40 @@ function headerChange( evt ) {
 
   year_view.setAttribute( 'value', year_store );
 
-  if( sort_store === 'desc' ) {
-    db.event.where( 'startsAt' ).between( starts, ends ).reverse().toArray()
-    .then( ( data ) => {
-      data = data.map( ( value ) => {
-        value.color = colors[value.calendarId];
-        return value;
-      } );
-      data.sort( ( a, b ) => {
-        if( a.startsAt.getTime() < b.startsAt.getTime() ) return -1;
-        if( a.startsAt.getTime() > b.startsAt.getTime() ) return 1;
-        if( a.color < b.color ) return -1;
-        if( a.color > b.color ) return 1;
-        return 0;
-      } );      
-    
-      const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
-      events = data.filter( ( value ) => active.includes( value.calendarId ) );
+  db.event.where( 'startsAt' ).between( starts, ends ).toArray()
+  .then( ( data ) => {
+    data = data.map( ( value ) => {
+      value.color = colors[value.calendarId];
+      return value;
+    } );
+    data.sort( ( a, b ) => {
+      const first = a.startsAt.getFullYear() + '-' + ( a.startsAt.getMonth() + 1 ) + '-' + a.startsAt.getDate();
+      const second = b.startsAt.getFullYear() + '-' + ( b.startsAt.getMonth() + 1 ) + '-' + b.startsAt.getDate();    
   
-      year_view.data = events;
-      event_list.data = events;
-      footer.setAttribute( 'count', events.length );
-    } );    
-  } else {
-    db.event.where( 'startsAt' ).between( starts, ends ).toArray()
-    .then( ( data ) => {
-      data = data.map( ( value ) => {
-        value.color = colors[value.calendarId];
-        return value;
-      } );
-      data.sort( ( a, b ) => {
-        if( a.startsAt.getTime() < b.startsAt.getTime() ) return -1;
-        if( a.startsAt.getTime() > b.startsAt.getTime() ) return 1;
-        if( a.color < b.color ) return -1;
-        if( a.color > b.color ) return 1;
-        return 0;
-      } );
-    
-      const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
-      events = data.filter( ( value ) => active.includes( value.calendarId ) );
+      if( sort_store === 'desc' ) {
+        if( first < second ) return 1;
+        if( first > second ) return -1;        
+      } else {
+        if( first < second ) return -1;
+        if( first > second ) return 1;        
+      }
   
-      year_view.data = events;
-      event_list.data = events;
-      footer.setAttribute( 'count', events.length );
-    } );    
-  }
+      // Pin like colors to the left side
+      // Inverse sort pins colors to the right side
+      if( a.color < b.color ) return 1;
+      if( a.color > b.color ) return -1;
+  
+      if( a.summary < b.summary ) return -1;
+      if( a.summary > b.summary ) return 1;    
+  
+      return 0;
+    } );
+  
+    const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
+    events = data.filter( ( value ) => active.includes( value.calendarId ) );
+
+    year_view.data = events;
+    event_list.data = events;
+    footer.setAttribute( 'count', events.length );
+  } );    
 }      
