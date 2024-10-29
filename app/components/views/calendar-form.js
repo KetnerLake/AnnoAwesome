@@ -8,6 +8,7 @@ customElements.define( 'aa-calendar-form', class extends HTMLElement {
 
     this.doCancelClick = this.doCancelClick.bind( this );
     this.doColorClick = this.doColorClick.bind( this );
+    this.doCopyClick = this.doCopyClick.bind( this );    
     this.doDeleteClick = this.doDeleteClick.bind( this );
     this.doDoneClick = this.doDoneClick.bind( this );
     this.doExportClick = this.doExportClick.bind( this );
@@ -15,6 +16,7 @@ customElements.define( 'aa-calendar-form', class extends HTMLElement {
 
     this.$cancel = this.querySelector( '#calendar_form_cancel' );
     this.$colors = this.querySelector( 'summary' );
+    this.$copy = this.querySelector( '#calendar_url button' );
     this.$delete = this.querySelector( '#calendar_form_delete' );
     this.$details = this.querySelector( 'details' );
     this.$done = this.querySelector( '#calendar_form_done' );
@@ -24,10 +26,32 @@ customElements.define( 'aa-calendar-form', class extends HTMLElement {
     this.$public = this.querySelector( '#calendar_form_public' );
     this.$template = document.querySelector( '#color_picker_renderer' );
     this.$title = this.querySelector( '#calendar_form_title' );
+    this.$url = this.querySelector( '#calendar_url p:last-of-type' );
   }
 
   focus() {
     this.$name.focus();
+  }
+
+  async tiny( value ) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode( value );
+    const buffer = await window.crypto.subtle.digest( 'SHA-1', data );
+    const hashArray = Array.from( new Uint8Array( buffer) );
+    const hashHex = hashArray.map( ( byte ) => byte.toString( 16 ).padStart( 2, '0' ) ).join( '' );
+    const shortHexDigest = hashHex.substring( 0, 6 );          
+
+    const alphabet = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';        
+    let randomInt = Math.floor( Math.random() * Math.pow( 62, 6 ) );
+    let converted = '';
+
+    while( randomInt > 0 ) {
+      const digit = randomInt % 62;
+      converted = alphabet[digit] + converted;
+      randomInt = Math.floor( randomInt / 62 );
+    }
+
+    return converted.substring( 0, 2 ) + shortHexDigest;
   }
 
   doCancelClick() {
@@ -61,6 +85,10 @@ customElements.define( 'aa-calendar-form', class extends HTMLElement {
         value: color
       }
     } ) );
+  }
+
+  doCopyClick() {
+    navigator.clipboard.writeText( `https://annoawesome.com/app?calendar=${this._data.url}` );
   }
 
   doDeleteClick() {
@@ -100,6 +128,7 @@ customElements.define( 'aa-calendar-form', class extends HTMLElement {
 
   connectedCallback() {
     this.$cancel.addEventListener( this._touch, this.doCancelClick );        
+    this.$copy.addEventListener( this._touch, this.doCopyClick );        
     this.$delete.addEventListener( this._touch, this.doDeleteClick );
     this.$done.addEventListener( this._touch, this.doDoneClick );
     this.$export.addEventListener( this._touch, this.doExportClick );
@@ -110,6 +139,7 @@ customElements.define( 'aa-calendar-form', class extends HTMLElement {
 
   disconnectedCallback() {
     this.$cancel.removeEventListener( this._touch, this.doCancelClick );
+    this.$copy.removeEventListener( this._touch, this.doCopyClick );            
     this.$delete.removeEventListener( this._touch, this.doDeleteClick );
     this.$done.removeEventListener( this._touch, this.doDoneClick );    
     this.$export.removeEventListener( this._touch, this.doExportClick );    
@@ -165,16 +195,18 @@ customElements.define( 'aa-calendar-form', class extends HTMLElement {
   }
 
   get data() {
+    const id = this._data === null ? self.crypto.randomUUID() : this._data.id;
     const now = new Date();
 
     return {
-      id: this._data === null ? self.crypto.randomUUID() : this._data.id,
+      id: id,
       createdAt: this._data === null ? now : this._data.createdAt,
       updatedAt: now,
       name: this.$name.getAttribute( 'value' ) === null ? null : this.$name.getAttribute( 'value' ),
       color: this.$colors.getAttribute( 'data-color' ),
       isShared: false,
       isPublic: this.$public.checked,
+      url: this.$url.textContent,
       isActive: this._data === null ? true : this._data.isActive
     };    
   }
@@ -202,11 +234,11 @@ customElements.define( 'aa-calendar-form', class extends HTMLElement {
       }
       
       this.$public.checked = false;
+      this.tiny().then( ( data ) => this.$url.textContent = data );
       this.$export.classList.add( 'hidden' );
     } else {
       const color = this._colors.find( ( value ) => value.value === this._data.color ? true : false );
-      console.log( this._colors );
-      console.log( this._data.color );
+
       this.$title.textContent = 'Edit Calendar';
       this.$done.disabled = true;
       this.$name.setAttribute( 'value', this._data.name );
@@ -224,6 +256,7 @@ customElements.define( 'aa-calendar-form', class extends HTMLElement {
       }      
 
       this.$public.checked = this._data.isPublic;
+      this.$url.textContent = this._data.url;      
       this.$export.classList.remove( 'hidden' );      
     }
   }

@@ -60,9 +60,7 @@ customElements.define( 'aa-event-form', class extends HTMLElement {
     if( !response ) return;    
     
     this.dispatchEvent( new CustomEvent( 'aa-delete', {
-      detail: {
-        id: this._data.id
-      }
+      detail: this._data
     } ) );
   }
 

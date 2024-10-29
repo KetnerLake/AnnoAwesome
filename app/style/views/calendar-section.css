@@ -5,6 +5,7 @@ aa-calendar-section {
 }
 
 aa-calendar-section div button {
+  font-family: 'IBM Plex Sans', sans-serif;
   font-size: 0.875rem;
   line-height: 1rem;
   margin-left: auto;

@@ -46,9 +46,7 @@ customElements.define( 'aa-event-details', class extends HTMLElement {
     const response = confirm( 'Are you sure you want to delete this event?' );
     if( !response ) return;    
     this.dispatchEvent( new CustomEvent( 'aa-delete', {
-      detail: {
-        id: this._data.id
-      }
+      detail: this._data 
     } ) );
   }
 

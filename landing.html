@@ -10,6 +10,7 @@
 
     <link rel="icon" type="image/x-icon" href="img/favicon.png">
     <link rel="stylesheet" href="awesome.css">
+    <link rel="stylesheet" href="./app/style/components/public/anno-awesome.css">
 
   </head>
   <body>
@@ -44,9 +45,9 @@
       <article>
         <header>
           <a id="taste">
-            <h3>You deserve to have an awesome year.</h3>
+            <h3>Have an awesome year.</h3>
           </a>
-          <h5>Every calendar has a year view, but that view only ever shows a calendar and nothing else about your life.</h5>
+          <h5>Visualizing your whole year opens the door for magic shit to happen.</h5>
         </header>
         <ul>
           <li><span>Work:</span> Keep track of your accomplishments.</li>
@@ -62,39 +63,47 @@
       </article>
     </section>
 
-    <section id="steps">
-      <article class="thirds">
+    <section>
+      <article>
         <div>
-          <h6>01</h6>
-          <h5>Download the app</h5>
-          <p>Free to download and free to use for a unlimited number of entries. Works offline. Go <a href="#premium">Premium</a> for more features.</p>      
+          <h5>Typical Year View</h5>
+          <p>All the days, none of the events.</p>    
+          <img />  
         </div>
         <div>
-          <h6>02</h6>
-          <h5>Pick your tastes</h5>
-          <p>Only interested in one taste? Pick only that one. Change your selection(s) at any time. No account required.</p>    
-        </div>
-        <div>
-          <h6>03</h6>
-          <h5>Savor the experience</h5>
-          <p>Was it the '98 or '99 that you liked? Where did you find it? Do you have any on-hand? Track your inventory.</p>            
+          <h5>Anno Awesome Year View</h5>
+          <p>All the days, all of the events.</p>    
+          <img />  
         </div>      
       </article>
     </section>
 
-    <section id="innovation">
-      <article class="split">
+    <section>
+      <article>
         <header>
-          <a id="view">
-            <h3>Innovative visualization</h3>
-          </a>
-          <h5>Develop your palatte by rating sixteen (or more!) different aspects of the tastes you most enjoy on a scale from zero to five.</h5>
-          <a href="#download">Go to App</a>
+          <h3>Embedded Public Sharing</h3>
+          <h5>Put the Anno Awesome year view into your own web page.</h5>
+          <p>This code:</p>
+          <pre>
+  &lt;link src=&quot;https://annoawesome.com/app/style/components/public/anno-awesome.css&quot; rel=&quot;stylesheet&quot;&gt;
+  &lt;script src=&quot;https://annoawesome.com/app/components/public/anno-awesome.js&quot; type=&quot;module&quot;&gt;&lt;/script&gt;
+  &lt;anno-awesome calendar=&quot;BFdef5a0&quot; hide-navigation&gt;&lt;/anno-awesome&gt;
+          </pre>
         </header>
-        <!-- <div style="background-color: #f5f5f5; height: 320px; width: 320px;"></div> -->
-        <tb-wheel></tb-wheel>
+        <p>This year:</p>
+        <anno-awesome calendar="BFdef5a0" hide-navigation style="max-height: 480px;"></anno-awesome>
       </article>
     </section>
+
+    <section>
+      <article>
+        <header>
+          <h3>Standalone Public Sharing</h3>
+          <h5>A read-only version of Anno Awesome for anybody to view.</h5>
+          <a href="">View public calendar</a>
+        </header>
+      </article>      
+    </section>      
 
     <section id="features">
       <article>
@@ -106,45 +115,45 @@
         <div class="thirds">
           <div>
             <img src="img/add-file.svg" />
-            <h5>Unlimited Entries</h5>
-            <p>Taste all the things, all the time, and never skip a beat. Create an unlimited number of entries.</p>                                       
+            <h5>Unlimited Calendars</h5>
+            <p>You take on different roles in different settings. Create a calendar for each role or function. Control the visibility of each.</p>                                       
           </div>                
           <div>
             <img src="img/photo.svg" />
-            <h5>Attach a Photo</h5>
-            <p>It has been said that a picture is worth a thousand words. Attach a photo to each entry. View them all in the photo view.</p>                                       
+            <h5>Unlimited Events</h5>
+            <p>There are 365 days in a year, and countless ways to divide it. Create unlimited events across unlimited calendars.</p>                                       
           </div>
           <div>
             <img src="img/location.svg" />          
-            <h5>Location Tagging</h5>
-            <p>Knowing where you had that favorite taste can help you find it again down the road. Location tagging to the rescue!</p>                           
+            <h5>Color Coding</h5>
+            <p>Use a color selected to represent a specific calendar, or use a predefined color representing the month. Switch with a click.</p>                           
           </div>          
           <div>
             <img src="img/offline.svg" />          
-            <h5>Offline Support</h5>
-            <p>No connection? No problem! Offline support lets you record your favorite tastes no matter what the network status.</p>                           
+            <h5>Event List</h5>
+            <p>View events in a single, vertical list alongside the year view. Selecting an event from one view, maps to the other view.</p>                           
           </div>
           <div>
             <img src="img/photo-album.svg" />
-            <h5>Photo View</h5>
-            <p>Take a trip down memory lane in the photo view. When you search your tastes, the photos are filtered to jog those memories.</p>                           
-          </div>                              
+            <h5>Search Events</h5>
+            <p>Search event names and notes for any string. Matches are filtered in the event list and the year view. It is awesome!</p>                           
+          </div>                            
           <div>
             <img src="img/map.svg" />
-            <h5>Map View</h5>
-            <p>Find the nearby places you had those flavor experiences so you can go there again and try some more tastes.</p>                           
+            <h5>Detail Oriented</h5>
+            <p>More robust than a spreadsheet, you can add details for location, link, attachments, and more to go along with your events.</p>                           
             <p></p>                           
           </div>                    
+          <div>            
+            <img src="img/share.svg" />
+            <h5>Privacy</h5>
+            <p>All your data is kept local on your device unless you specifically enable event sharing or sync. Backup/sync data is encrypted.</p>                           
+          </div>                      
           <div>
             <img src="img/collection.svg" />
-            <h5>Personal Collection</h5>
-            <p>Liqour cabinet? Tea nook? Wine cellar? The fridge? Keep track of what you have on-hand using personal collections.</p>                           
-          </div>          
-          <div>
-            <img src="img/share.svg" />
-            <h5>Social Media Sharing</h5>
-            <p>Nobody is an island, entire of itself. Share your experiences on social media including photos and flavor profile.</p>                           
-          </div>                                        
+            <h5>Mobile and Desktop</h5>
+            <p>Anno Awesome is designed to work with the browser on desktop and tablet devices.</p>                           
+          </div>                                                  
           <div>
             <img src="img/browser.svg" />
             <h5>Secure and Flexible</h5>
@@ -152,7 +161,7 @@
           </div>                                                  
         </div>
         <footer>
-          <h5>Unlock even more features with a <a href="#premium">Premium</a> subscription.</h5>
+          <h5>Consider buying me a coffee to help fund premium features.<br>Supporters also get early access to new versions.</h5>
         </footer>
       </article>
     </section>
@@ -179,10 +188,10 @@
         </header>
         <div class="thirds">
           <div>
-            <img src="img/cloud.svg" />
-            <h5>Cloud Backup</h5>
-            <p>Broke your phone? Made an upgrade? Securely backup all your content to the cloud for safe keeping.</p>                                       
-          </div>        
+            <img src="img/location.svg" />          
+            <h5>Public Calendars</h5>
+            <p>Make individual calendars publicly visible - to the world. </p>                           
+          </div>          
           <div>
             <img src="img/responsive.svg" />
             <h5>Multiple Devices</h5>
@@ -250,6 +259,8 @@
     <footer>
       <p>Copyright &copy; 2024</p>
     </footer>
+
+    <script src="./app/components/public/anno-awesome.js" type="module"></script>
 
   </body>
 </html>

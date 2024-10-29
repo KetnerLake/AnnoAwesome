@@ -1,0 +1,14 @@
+{
+  "name": "annoawesome",
+  "version": "1.0.0",
+  "description": "View your entire year in one place.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "parkerkrhoyt@gmail.com",
+  "license": "MIT",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.677.0"
+  }
+}

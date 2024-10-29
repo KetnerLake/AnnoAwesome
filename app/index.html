@@ -704,13 +704,20 @@
             <button aria-label="Add person" type="button">Add person</button>
             <small>Private sharing requires all parties have a paid account.</small>            
           </div>
-          <div class="vbox">
+          <div id="calendar_public" class="vbox">
             <div class="hbox rounded">
               <p>Public calendar</p>
               <label class="toggle">
                 <input id="calendar_form_public" type="checkbox" />
               </label>              
             </div>
+            <div class="hbox centered filled rounded" id="calendar_url">
+              <p>https://annoawesome.com/app?calendar=</p>
+              <p>myH@s$</p>
+              <button aria-label="Copy to clipboard" class="icon" type="button">
+                <img src="./img/copy.svg" />
+              </button>
+            </div>            
             <small>Allow anyone access to a read-only version of this calendar.</small>
           </div>
           <button aria-label="Export calendar events" class="filled rounded" id="calendar_form_export" type="button">Export calendar events...</button>

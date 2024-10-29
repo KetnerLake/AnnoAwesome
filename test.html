@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>Public Test</title>
+
+  <link href="/app/style/components/public/anno-awesome.css" rel="stylesheet" />
+
+  <style>
+    anno-awesome {
+      height: 480px;      
+      width: 640px;
+    }
+  </style>
+
+</head>
+<body>
+
+  <button id="hello" type="button">Hello</button>
+  <button id="add" type="button">Add</button>
+  <button id="delete" type="button">Delete</button>
+  <button id="read" type="button">Read</button>
+
+  <anno-awesome calendar="BFdef5a0" hide-navigation interactive></anno-awesome>
+
+  <script src="/app/components/public/anno-awesome.js" type="module"></script>
+
+  <script>
+    const hello = document.querySelector( '#hello' );
+    hello.addEventListener( 'click', () => {
+      fetch( '/api/hello' )
+      .then( ( response ) => response.text() )
+      .then( ( data ) => {
+        console.log( data );
+      } );
+    } );
+
+    const add = document.querySelector( '#add' );
+    add.addEventListener( 'click', () => {
+      fetch( '/api/public', {
+        cache: 'no-store',
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify( {
+          id: '010fdb6a-bc9e-4e9d-b468-baf0eac59e82',
+          createdAt: '2024-09-27T19:52:40.447Z',
+          updatedAt: '2024-09-27T19:52:40.447Z',
+          name: 'Trident',
+          color: '#cc73e1',
+          isShared: false,
+          isPublic: true,
+          url: 'Qtea5ce3',
+          events: [{
+            id: 'bf627475-50fd-4d67-83f3-d422a185cb3a',
+            createdAt: '2024-09-27T19:52:40.447Z',
+            updatedAt: '2024-09-27T19:52:40.447Z',
+            calendarId: '010fdb6a-bc9e-4e9d-b468-baf0eac59e82',
+            startsAt: '2024-01-06T19:52:40.447Z',
+            endsAt: '2024-01-06T19:52:40.447Z',
+            summary: 'Birthday',
+            location: 'Parker, CO',
+            latitude: null,
+            longitude: null,
+            url: 'https://kevinhoyt.com',
+            description: 'One more trip around the Sun.'
+          }, {
+            id: '01a39b4e-d043-4e7d-8a1a-09ce4c970ec5',
+            createdAt: '2024-09-27T19:52:40.447Z',
+            updatedAt: '2024-09-27T19:52:40.447Z',
+            calendarId: '010fdb6a-bc9e-4e9d-b468-baf0eac59e82',
+            startsAt: '2024-10-01T19:52:40.447Z',
+            endsAt: '2024-10-02T19:52:40.447Z',
+            summary: 'Day Trip',
+            location: 'Parker, CO',
+            latitude: null,
+            longitude: null,
+            url: 'https://kevinhoyt.com',
+            description: 'I took a day trip.'
+          }]                     
+        } )        
+      } )
+      .then( ( response ) => response.json() )
+      .then( ( data ) => console.log( data ) );
+    } );
+
+    const remove = document.querySelector( '#delete' );
+    remove.addEventListener( 'click', () => {
+      fetch( '/api/public', {
+        method: 'DELETE',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },    
+        body: JSON.stringify( {url: 'Qtea5ce3'} )
+      } )
+      .then( ( response ) => response.json() )
+      .then( ( data ) => console.log( data ) );      
+    } );
+
+    const read = document.querySelector( '#read' );
+    read.addEventListener( 'click', () => {
+      fetch( 'https://annoawesome-public.s3.us-west-2.amazonaws.com/Qtea5ce3.json', {cache: 'no-store'} )
+      .then( ( response ) => response.json() )
+      .then( ( data ) => console.log( data.events[0].endsAt ) );      
+    } );
+
+    const awesome = document.querySelector( 'anno-awesome' );
+    awesome.addEventListener( 'aa-event', ( evt ) => console.log( evt.detail ) );
+    const params = new URLSearchParams( window.location.search );
+    const calendar = params.get( 'calendar' );
+
+    if( calendar !== null ) {
+      awesome.calendar = calendar;
+    } else {
+      console.log( 'No calendar specified' );
+    }
+  </script>
+
+</body>
+</html> 

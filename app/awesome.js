@@ -204,6 +204,7 @@ event_form.addEventListener( 'aa-cancel', () => {
   event_search.removeAttribute( 'selected-item' );
 } );
 event_form.addEventListener( 'aa-delete', ( evt ) => {
+  console.log( 'FORM DELETE' );
   db.attachment.where( {eventId: evt.detail.id } ).toArray()
   .then( ( data ) => {
     const keys = data.reduce( ( prev, curr ) => {
@@ -235,6 +236,8 @@ event_form.addEventListener( 'aa-delete', ( evt ) => {
     blocker( false );
     event_dialog.close();
     footer.setAttribute( 'count', events.length );
+
+    publicCalendarAdd( evt.detail.calendarId );
   } );
 } );
 event_form.addEventListener( 'aa-done', async () => {
@@ -275,6 +278,8 @@ event_form.addEventListener( 'aa-done', async () => {
     year_view.data = events;
     event_list.data = events;
     footer.setAttribute( 'count', events.length  );
+
+    publicCalendarAdd( event.calendarId );
   } );
 } );
 
@@ -322,6 +327,8 @@ event_details.addEventListener( 'aa-change', ( evt ) => {
     event_list.data = events;
     event_list.setAttribute( 'selected-item', evt.detail.id );
     footer.setAttribute( 'count', events.length );
+
+    publicCalendarAdd( evt.detail.calendarId );
   } );
 } );
 event_details.addEventListener( 'aa-close', () => {
@@ -374,6 +381,8 @@ event_details.addEventListener( 'aa-delete', ( evt ) => {
     blocker( false );
     event_dialog.close();
     footer.setAttribute( 'count', events.length );
+
+    publicCalendarAdd( evt.detail.calendarId );
   } );
 } );
 event_details.addEventListener( 'aa-edit', ( evt ) => {
@@ -474,10 +483,12 @@ calendar_form.addEventListener( 'aa-delete', ( evt ) => {
   calendar_dialog.close();
 
   const id = evt.detail.id;
+  let url = null;
 
   db.event.where( {calendarId: id} ).toArray()
   .then( ( data ) => {
     const keys = data.map( ( value ) => value.id );
+    url = data.url;
     return db.event.bulkDelete( keys );
   } )
   .then( () => {
@@ -532,9 +543,15 @@ calendar_form.addEventListener( 'aa-delete', ( evt ) => {
     event_list.data = events;
     year_view.data = events;
     footer.setAttribute( 'count', events.length );
+
+    return publicCalendarDelete( url );
   } );
 } );
 calendar_form.addEventListener( 'aa-done', () => {
+  const id = calendar_form.data.id;  
+  const isPublic = calendar_form.data.isPublic;
+  const url = calendar_form.data.url;
+
   blocker( false );
   calendar_dialog.close();
 
@@ -551,16 +568,35 @@ calendar_form.addEventListener( 'aa-done', () => {
     calendars = [... data];
     calendar_details.data = calendars;
 
-    if( sort_store === 'desc' ) {
-      return db.event.where( 'startsAt' ).between( starts, ends ).reverse().toArray();  
-    } else {
-      return db.event.where( 'startsAt' ).between( starts, ends ).toArray();      
-    }
+    return db.event.where( 'startsAt' ).between( starts, ends ).toArray();      
   } )
   .then( ( data ) => {
-    for( let d = 0; d < data.length; d++ ) {
-      data[d].color = colors[data[d].calendarId];
-    }    
+    data = data.map( ( value ) => {
+      value.color = colors[value.calendarId];
+      return value;
+    } );    
+    data.sort( ( a, b ) => {
+      const first = a.startsAt.getFullYear() + '-' + ( a.startsAt.getMonth() + 1 ) + '-' + a.startsAt.getDate();
+      const second = b.startsAt.getFullYear() + '-' + ( b.startsAt.getMonth() + 1 ) + '-' + b.startsAt.getDate();    
+  
+      if( sort_store === 'desc' ) {
+        if( first < second ) return 1;
+        if( first > second ) return -1;        
+      } else {
+        if( first < second ) return -1;
+        if( first > second ) return 1;        
+      }
+  
+      // Pin like colors to the left side
+      // Inverse sort pins colors to the right side
+      if( a.color < b.color ) return 1;
+      if( a.color > b.color ) return -1;
+  
+      if( a.summary < b.summary ) return -1;
+      if( a.summary > b.summary ) return 1;    
+  
+      return 0;
+    } );
 
     const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
     events = data.filter( ( value ) => active.includes( value.calendarId ) );
@@ -568,6 +604,12 @@ calendar_form.addEventListener( 'aa-done', () => {
     event_list.data = events;
     year_view.data = events;
     footer.setAttribute( 'count', events.length );
+
+    if( isPublic ) {
+      return publicCalendarAdd( id );
+    } else {
+      return publicCalendarDelete( url );      
+    }
   } );
 } );
 calendar_form.addEventListener( 'aa-export', ( evt ) => {
@@ -828,6 +870,7 @@ db.calendar.toCollection().sortBy( 'name' )
   if( data.length === 0 ) {
     const id = self.crypto.randomUUID();
     const now = Date.now();
+    const url = await tiny( crypto.randomUUID() );
     await db.calendar.put( {
       id: id,
       createdAt: new Date( now ),
@@ -836,7 +879,8 @@ db.calendar.toCollection().sortBy( 'name' )
       color: '#1badf8',
       isShared: false,
       isPublic: false,
-      isActive: true
+      isActive: true,
+      url: url
     } );
     data = await db.calendar.toArray();
   }
@@ -980,3 +1024,67 @@ function headerChange( evt ) {
     footer.setAttribute( 'count', events.length );
   } );    
 }      
+
+function publicCalendarAdd( id ) {
+  let record = null;
+
+  return db.calendar.where( {id: id} ).first()
+  .then( ( data ) => {
+    if( data.isPublic ) {
+      record = structuredClone( data );
+      return db.event.where( {calendarId: id} ).toArray();      
+    }
+  } )
+  .then( ( data ) => {
+    data = data.map( ( value ) => {
+      value.color = colors[value.calendarId];
+      return value;
+    } );    
+
+    record.events = [... data];
+
+    return fetch( '/api/public', {
+      cache: 'no-store',
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify( record )
+    } )
+    .then( ( response ) => response.json() );
+  } );
+}
+
+function publicCalendarDelete( url ) {
+  return fetch( '/api/public', {
+    method: 'DELETE',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },    
+    body: JSON.stringify( {url: url} )
+  } )
+  .then( ( response ) => response.json() );
+}
+
+async function tiny( value ) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode( value );
+  const buffer = await window.crypto.subtle.digest( 'SHA-1', data );
+  const hashArray = Array.from( new Uint8Array( buffer) );
+  const hashHex = hashArray.map( ( byte ) => byte.toString( 16 ).padStart( 2, '0' ) ).join( '' );
+  const shortHexDigest = hashHex.substring( 0, 6 );          
+
+  const alphabet = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';        
+  let randomInt = Math.floor( Math.random() * Math.pow( 62, 6 ) );
+  let converted = '';
+
+  while( randomInt > 0 ) {
+    const digit = randomInt % 62;
+    converted = alphabet[digit] + converted;
+    randomInt = Math.floor( randomInt / 62 );
+  }
+
+  return converted.substring( 2, '0' ) + shortHexDigest;
+}
