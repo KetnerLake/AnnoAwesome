@@ -24,9 +24,9 @@ customElements.define( 'aa-calendar-details', class extends HTMLElement {
 
   doColorsClick( evt ) {
     if( evt.target.checked ) {
-      this.setAttribute( 'use-colors', '' );
+      this.setAttribute( 'use-calendar-color', '' );
     } else {
-      this.removeAttribute( 'use-colors' );
+      this.removeAttribute( 'use-calendar-color' );
     }
 
     this.dispatchEvent( new CustomEvent( 'aa-colors', {
@@ -71,13 +71,13 @@ customElements.define( 'aa-calendar-details', class extends HTMLElement {
 
   static get observedAttributes() {
     return [
-      'use-colors'
+      'use-calendar-color'
     ];
   }
 
   attributeChangedCallback( name, old, value ) {
-    if( name === 'use-colors' ) {
-      if( this.hasAttribute( 'use-colors' ) ) {
+    if( name === 'use-calendar-color' ) {
+      if( this.hasAttribute( 'use-calendar-color' ) ) {
         this.$colors.children[0].checked = true;
       } else {
         this.$colors.children[0].checked = false;        

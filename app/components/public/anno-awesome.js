@@ -316,7 +316,7 @@ export default class AAEmbed extends HTMLElement {
           const year = this.year === null ? new Date().getFullYear() : this.year;
           for( let c = 0; c < this.$article.children.length; c++ ) {
             this.$article.children[c].color = data.color;            
-            this.$article.children[c].useCalendarColors = this.useCalendarColors;            
+            this.$article.children[c].useCalendarColor = this.useCalendarColor;            
             this.$article.children[c].data = this._data.events.filter( ( value ) => value.startsAt.getFullYear() === year && value.startsAt.getMonth() === c ? true : false );
           }
         } );
@@ -324,11 +324,13 @@ export default class AAEmbed extends HTMLElement {
       }
     }
 
+    const year = this.year === null ? new Date().getFullYear() : this.year;
+    this.$year.textContent = year;
+    
     const formatter = new Intl.DateTimeFormat( navigator.language, {
       month: 'long'
     } );
-    const year = this.year === null ? new Date().getFullYear() : this.year;
-
+    
     for( let m = 0; m < 12; m++ ) {
       this.$header.children[m].textContent = formatter.format( new Date( year, m, 1 ) );
       this.$article.children[m].month = m;
@@ -357,7 +359,7 @@ export default class AAEmbed extends HTMLElement {
     this._upgrade( 'hideNavigation' );    
     this._upgrade( 'interactive' );    
     this._upgrade( 'storage' );    
-    this._upgrade( 'useCalendarColors' );    
+    this._upgrade( 'useCalendarColor' );    
     this._upgrade( 'year' );        
     this._render();
   }
@@ -372,7 +374,7 @@ export default class AAEmbed extends HTMLElement {
       'hide-navigation',
       'interactive',
       'storage',
-      'use-calendar-colors',
+      'use-calendar-color',
       'year'
     ];
   }
@@ -529,23 +531,23 @@ export default class AAEmbed extends HTMLElement {
     }
   }  
 
-  get useCalendarColors() {
-    return this.hasAttribute( 'use-calendar-colors' );
+  get useCalendarColor() {
+    return this.hasAttribute( 'use-calendar-color' );
   }
 
-  set useCalendarColors( value ) {
+  set useCalendarColor( value ) {
     if( value !== null ) {
       if( typeof value === 'boolean' ) {
         value = value.toString();
       }
 
       if( value === 'false' ) {
-        this.removeAttribute( 'use-calendar-colors' );
+        this.removeAttribute( 'use-calendar-color' );
       } else {
-        this.setAttribute( 'use-calendar-colors', '' );
+        this.setAttribute( 'use-calendar-color', '' );
       }
     } else {
-      this.removeAttribute( 'use-calendar-colors' );
+      this.removeAttribute( 'use-calendar-color' );
     }
   }    
 

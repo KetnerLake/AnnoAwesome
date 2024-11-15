@@ -8,23 +8,28 @@
 
     <title>Anno Awesome</title>
 
-    <link rel="icon" type="image/x-icon" href="img/favicon.png">
-    <link rel="stylesheet" href="awesome.css">
-    <link rel="stylesheet" href="./app/style/components/public/anno-awesome.css">
+    <link rel="icon" type="image/x-icon" href="/img/trident.svg">
+    <link rel="stylesheet" href="/awesome.css">
+    <link rel="stylesheet" href="/app/style/components/public/anno-awesome.css">
+
+    <style>
+      anno-awesome {
+        max-height: 480px;
+      }
+    </style>
 
   </head>
   <body>
 
     <nav>
       <div id="logo">
-        <img src="img/logo-icon.svg" />
+        <img src="img/trident.svg" />
       </div>
       <ul>
-        <li><a href="#taste">Taste</a></li>
-        <li><a href="#view">Visualize</a></li>
+        <li><a href="#visualize">Visualize</a></li>
+        <li><a href="#embed">Embed</a></li>
+        <li><a href="#public">Share</a></li>
         <li><a href="#features">Features</a></li>
-        <li><a href="#reviews">Reviews</a></li>
-        <li><a href="#premium">Premium</a></li>
       </ul>
       <div>
         <a href="/app">Go to App</a>
@@ -41,21 +46,21 @@
       </article>
     </section>
 
-    <section id="uses">
+    <section id="visualize">
       <article>
         <header>
-          <a id="taste">
+          <a id="visualize">
             <h3>Have an awesome year.</h3>
           </a>
-          <h5>Visualizing your whole year opens the door for magic shit to happen.</h5>
+          <h5>Visualizing your whole year opens the door for magic to happen.</h5>
         </header>
         <ul>
-          <li><span>Work:</span> Keep track of your accomplishments.</li>
-          <li><span>Events:</span> Get the big picture of deadlines.</li>
-          <li><span>Meals:</span> What is for dinner? Done.</li>
-          <li><span>Education:</span> Plan class schedules and assignments.</li>            
-          <li><span>Property:</span> Track availability. Know when to service.</li>
-          <li><span>Health:</span> Record daily health metrics.</li>
+          <li>Keep track of your work accomplishments.</li>
+          <li>Get the big picture of event planning.</li>
+          <li>What is for dinner? Meal planning made easy.</li>
+          <li>Plan education class schedules and assignments.</li>            
+          <li>Track property availability. Know when to service.</li>
+          <li>Record personal daily health metrics.</li>
         </ul>
         <footer>
           <h5>Have another way that a year view helps you? <a href="mailto: parkerkrhoyt@gmail.com">Let me know!</a></h5>
@@ -78,29 +83,33 @@
       </article>
     </section>
 
-    <section>
+    <section id="embed">
       <article>
         <header>
-          <h3>Embedded Public Sharing</h3>
+          <a id="embed">
+            <h3>Embedded Public Sharing</h3>
+          </a>            
           <h5>Put the Anno Awesome year view into your own web page.</h5>
           <p>This code:</p>
           <pre>
   &lt;link src=&quot;https://annoawesome.com/app/style/components/public/anno-awesome.css&quot; rel=&quot;stylesheet&quot;&gt;
   &lt;script src=&quot;https://annoawesome.com/app/components/public/anno-awesome.js&quot; type=&quot;module&quot;&gt;&lt;/script&gt;
-  &lt;anno-awesome calendar=&quot;BFdef5a0&quot; hide-navigation&gt;&lt;/anno-awesome&gt;
+  &lt;anno-awesome calendar=&quot;BFdef5a0&quot; year=&quot;2023&quot;&gt;&lt;/anno-awesome&gt;
           </pre>
         </header>
         <p>This year:</p>
-        <anno-awesome calendar="BFdef5a0" hide-navigation style="max-height: 480px;"></anno-awesome>
+        <anno-awesome calendar="BFdef5a0" year="2023"></anno-awesome>
       </article>
     </section>
 
-    <section>
+    <section id="public">
       <article>
         <header>
-          <h3>Standalone Public Sharing</h3>
+          <a id="public">
+            <h3>Standalone Public Sharing</h3>
+          </a>
           <h5>A read-only version of Anno Awesome for anybody to view.</h5>
-          <a href="">View public calendar</a>
+          <a href="https://annoawesome.com/app?calendar=ABC123">View a public calendar</a>
         </header>
       </article>      
     </section>      
@@ -178,6 +187,7 @@
       </article>
     </section>
 
+    <!--
     <section id="premium">
       <article>
         <header>
@@ -235,6 +245,7 @@
         </div>
       </article>   
     </section>
+    -->
 
     <section id="download">
       <article>
@@ -242,7 +253,7 @@
           <a id="download">
             <h3>Get started now and put those taste buds to use!</h3>
           </a>
-          <h5>Free to use on a single device.</h5>
+          <h5>Free to use. Buy me a coffee.</h5>
         </header>
         <div class="center">
           <a href="/app">Go to App</a>        

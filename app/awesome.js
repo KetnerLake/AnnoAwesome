@@ -36,27 +36,36 @@ const year_view = document.querySelector( 'aa-year' );
  */
 
 navigation.addEventListener( 'aa-account', () => {
-  event_search.data = null;
-  right.classList.add( 'hidden' );
-  year_view.data = events;
-  footer.setAttribute( 'count' , events.length );
-  blocker( true );
-  account_dialog.showModal();
-  account_form.focus();
+  browseEvent( year_store, sort_store )
+  .then( ( data ) => {
+    event_search.data = null;
+    right_panel.classList.add( 'hidden' );
+    year_view.data = data;
+    footer.setAttribute( 'count' , data.length );
+    blocker( true );
+    account_dialog.showModal();
+    account_form.focus();
+  } );
 } );
 navigation.addEventListener( 'aa-calendar', ( evt ) => controlsChange( evt ) );
 navigation.addEventListener( 'aa-event', ( evt ) => controlsChange( evt ) );  
 navigation.addEventListener( 'aa-add', () => {
-  event_search.data = null;
-  right_panel.classList.add( 'hidden' );
-  year_view.data = events;
-  footer.setAttribute( 'count', events.length );
-  event_form.data = null;
-  event_form.calendars = calendars;
-  event_stack.setAttribute( 'selected-index', 0 );
-  blocker( true );
-  event_dialog.showModal();
-  event_form.focus();
+  browseEvent( year_store, sort_store )
+  .then( ( data ) => {
+    year_view.data = data;
+    event_search.data = null;
+    right_panel.classList.add( 'hidden' );
+    footer.setAttribute( 'count', events.length );    
+    return browseCalendar( 'asc' );
+  } )
+  .then( ( data ) => {
+    event_form.data = null;
+    event_form.calendars = data;
+    event_stack.setAttribute( 'selected-index', 0 );   
+    blocker( true );
+    event_dialog.showModal();
+    event_form.focus();
+  } );
 } );    
 navigation.addEventListener( 'aa-search', () => {
   event_search.data = events;
@@ -105,8 +114,8 @@ header.addEventListener( 'aa-previous', ( evt ) => headerChange( evt ) );
 header.addEventListener( 'aa-next', ( evt ) => headerChange( evt ) );
 header.addEventListener( 'aa-today', ( evt ) => {
   const today = new Date();
-  year_view.children[0].scrollTo( {
-    left: ( today.getMonth() * 236 ) - ( year_view.clientWidth / 2 ),
+  year_view.scrollTo( {
+    left: ( today.getMonth() * 240 ) - ( year_view.clientWidth / 2 ),
     top: ( today.getDate() * 40 ) - ( year_view.clientHeight / 2 ),
     behavior: 'smooth'
   } );
@@ -114,7 +123,7 @@ header.addEventListener( 'aa-today', ( evt ) => {
   headerChange( evt );
 } );
 header.addEventListener( 'aa-year', () => {
-  year_view.children[0].scrollTo( {
+  year_view.scrollTo( {
     left: 0, 
     top: 0, 
     behavior: 'smooth'
@@ -141,20 +150,9 @@ account_form.addEventListener( 'aa-demo', () => {
   account_dialog.close();
 } );
 account_form.addEventListener( 'aa-export', () => {
-  const output = {
-    calendars: [],
-    events: []
-  };
-
-  db.calendar.toArray() 
+  browseCalendar( 'asc', true, true )
   .then( ( data ) => {
-    output.calendars = [... data];
-    return db.event.toArray();
-  } )
-  .then( ( data ) => {
-    output.events = [... data];
-
-    const blob = new Blob( [JSON.stringify( output )], {type: 'application/json'} ); 
+    const blob = new Blob( [JSON.stringify( data )], {type: 'application/json'} ); 
     const link = document.createElement( 'a' );
     link.setAttribute( 'href', window.URL.createObjectURL( blob ) );
     link.setAttribute( 'download', 'awesome.json' );
@@ -167,12 +165,17 @@ account_form.addEventListener( 'aa-export', () => {
   } );
 } );
 account_form.addEventListener( 'aa-sign-in', ( evt ) => {
-  alert( 'Not yet available.' );
+  const response = confirm( 'Individual accounts not yet available. Help fund feature development. Buy me a coffee?' );
+
+  if( response ) {
+    window.open( '/app/sign-up.html', '_blank' );
+  }
+
   console.log( 'SIGN IN' );
   console.log( evt.detail );
 } );
 account_form.addEventListener( 'aa-sign-up', () => {
-  window.open( './sign-up.html', '_blank' );
+  window.open( '/app/sign-up.html', '_blank' );
   blocker( false );        
   account_dialog.close();
 } );      
@@ -189,9 +192,9 @@ event_dialog.addEventListener( TOUCH, ( evt ) => {
 } );
 event_dialog.addEventListener( 'close', () => {
   blocker( false );
-  year_view.removeAttribute( 'selected-item' );    
-  event_list.removeAttribute( 'selected-item' );
-  event_search.removeAttribute( 'selected-index' );  
+  // year_view.removeAttribute( 'selected-item' );    
+  // event_list.removeAttribute( 'selected-item' );
+  // event_search.removeAttribute( 'selected-item' );  
 } );
 
 // Form
@@ -199,236 +202,105 @@ event_form.addEventListener( 'aa-cancel', () => {
   blocker( false );
   event_dialog.close();
   event_form.data = null;
-  year_view.removeAttribute( 'selected-item' );
-  event_list.removeAttribute( 'selected-item' );
-  event_search.removeAttribute( 'selected-item' );
+  // year_view.removeAttribute( 'selected-item' );
+  // event_list.removeAttribute( 'selected-item' );
+  // event_search.removeAttribute( 'selected-item' );
 } );
 event_form.addEventListener( 'aa-delete', ( evt ) => {
-  console.log( 'FORM DELETE' );
-  db.attachment.where( {eventId: evt.detail.id } ).toArray()
+  deleteEvent( evt.detail.id )
+  .then( () => browseEvent( year_store, sort_store ) )
   .then( ( data ) => {
-    const keys = data.reduce( ( prev, curr ) => {
-      prev.push( curr.id );
-      return prev;
-    }, [] );
-    return db.attachment.bulkDelete( keys );
-  } )
-  .then( () => db.event.delete( evt.detail.id ) )
-  .then( () => {
-    if( sort_store === 'desc' ) {
-      return db.event.where( 'startsAt' ).between( starts, ends ).reverse().toArray();  
-    } else {
-      return db.event.where( 'startsAt' ).between( starts, ends ).toArray();      
-    }
-  } )
-  .then( ( data ) => {
-    if( color_store ) {
-      for( let d = 0; d < data.length; d++ ) {
-        data[d].color = colors[data[d].calendarId];
-      }
-    }
-
-    const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
-    events = data.filter( ( value ) => active.includes( value.calendarId ) );
-
-    year_view.data = events;
-    event_list.data = events;
+    year_view.data = data;
+    event_list.data = data;
     blocker( false );
     event_dialog.close();
-    footer.setAttribute( 'count', events.length );
-
-    publicCalendarAdd( evt.detail.calendarId );
+    footer.setAttribute( 'count', data.length );
   } );
 } );
-event_form.addEventListener( 'aa-done', async () => {
-  const event = event_form.data;
-
-  if( event.attachments === null ) {
-    const files = await db.attachment.where( {eventId: event.id} ).toArray();
-    const keys = files.reduce( ( prev, curr ) => {
-      prev.push( curr.id );
-      return prev;
-    }, [] );
-    await db.attachment.bulkDelete( keys );
-  }
-
-  db.attachment.bulkPut( event.attachments === null ? [] : event.attachments )
-  .then( () => {
-    delete event.attachments;
-    return db.event.put( event );
-  } )
-  .then( () => {
-    blocker( false );
-    event_dialog.close();
-
-    if( sort_store === 'desc' ) {
-      return db.event.where( 'startsAt' ).between( starts, ends ).reverse().toArray();  
-    } else {
-      return db.event.where( 'startsAt' ).between( starts, ends ).toArray();      
-    }
-  } )
+event_form.addEventListener( 'aa-done', () => {
+  editEvent( event_form.data )
+  .then( () => browseEvent( year_store, sort_store ) )
   .then( ( data ) => {
-    for( let d = 0; d < data.length; d++ ) {
-      data[d].color = colors[data[d].calendarId];
-    }
-
-    const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
-    events = data.filter( ( value ) => active.includes( value.calendarId ) );
-
-    year_view.data = events;
-    event_list.data = events;
-    footer.setAttribute( 'count', events.length  );
-
-    publicCalendarAdd( event.calendarId );
+    year_view.data = data;
+    event_list.data = data;    
+    blocker( false );
+    event_dialog.close();    
+    footer.setAttribute( 'count', data.length  );
   } );
 } );
 
 // Details
 event_details.addEventListener( 'aa-change', ( evt ) => {
-  db.event.get( evt.detail.id )
+  readEvent( evt.detail.id )
   .then( ( data ) => {
     data.calendarId = evt.detail.calendarId;
-    return db.event.put( data );
+    return editEvent( data );
   } )
-  .then( () => db.event.where( 'startsAt' ).between( starts, ends ).toArray() )
+  .then( () => browseEvent( year_store, sort_store ) )
   .then( ( data ) => {
-    data = data.map( ( value ) => {
-      value.color = colors[value.calendarId];
-      return value;
-    } );
-    data.sort( ( a, b ) => {
-      const first = a.startsAt.getFullYear() + '-' + ( a.startsAt.getMonth() + 1 ) + '-' + a.startsAt.getDate();
-      const second = b.startsAt.getFullYear() + '-' + ( b.startsAt.getMonth() + 1 ) + '-' + b.startsAt.getDate();    
-  
-      if( sort_store === 'desc' ) {
-        if( first < second ) return 1;
-        if( first > second ) return -1;        
-      } else {
-        if( first < second ) return -1;
-        if( first > second ) return 1;        
-      }
-  
-      // Pin like colors to the left side
-      // Inverse sort pins colors to the right side
-      if( a.color < b.color ) return 1;
-      if( a.color > b.color ) return -1;
-  
-      if( a.summary < b.summary ) return -1;
-      if( a.summary > b.summary ) return 1;    
-  
-      return 0;
-    } );
-    
-    const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
-    events = data.filter( ( value ) => active.includes( value.calendarId ) );
-    
-    year_view.data = events;
-    year_view.setAttribute( 'selected-item', evt.detail.id );
-    event_list.data = events;
+    year_view.data = data;
+    // year_view.setAttribute( 'selected-item', evt.detail.id );
+    event_list.data = data;
     event_list.setAttribute( 'selected-item', evt.detail.id );
-    footer.setAttribute( 'count', events.length );
-
-    publicCalendarAdd( evt.detail.calendarId );
+    footer.setAttribute( 'count', data.length );
   } );
 } );
 event_details.addEventListener( 'aa-close', () => {
   event_dialog.close();
 } );
 event_details.addEventListener( 'aa-delete', ( evt ) => {
-  db.attachment.where( {eventId: evt.detail.id } ).toArray()
+  deleteEvent( evt.detail.id )
+  .then( () => browseEvent( year_store, sort_store ) )
   .then( ( data ) => {
-    const keys = data.reduce( ( prev, curr ) => {
-      prev.push( curr.id );
-      return prev;
-    }, [] );
-    return db.attachment.bulkDelete( keys );
-  } )
-  .then( () => db.event.delete( evt.detail.id ) )
-  .then( () => db.event.where( 'startsAt' ).between( starts, ends ).toArray() )
-  .then( ( data ) => {
-    data = data.map( ( value ) => {
-      value.color = colors[value.calendarId];
-      return value;
-    } );
-    data.sort( ( a, b ) => {
-      const first = a.startsAt.getFullYear() + '-' + ( a.startsAt.getMonth() + 1 ) + '-' + a.startsAt.getDate();
-      const second = b.startsAt.getFullYear() + '-' + ( b.startsAt.getMonth() + 1 ) + '-' + b.startsAt.getDate();    
-  
-      if( sort_store === 'desc' ) {
-        if( first < second ) return 1;
-        if( first > second ) return -1;        
-      } else {
-        if( first < second ) return -1;
-        if( first > second ) return 1;        
-      }
-  
-      // Pin like colors to the left side
-      // Inverse sort pins colors to the right side
-      if( a.color < b.color ) return 1;
-      if( a.color > b.color ) return -1;
-  
-      if( a.summary < b.summary ) return -1;
-      if( a.summary > b.summary ) return 1;    
-  
-      return 0;
-    } );
-
-    const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
-    events = data.filter( ( value ) => active.includes( value.calendarId ) );
-
-    year_view.data = events;
-    event_list.data = events;
+    year_view.data = data;
+    event_list.data = data;
     blocker( false );
     event_dialog.close();
-    footer.setAttribute( 'count', events.length );
-
-    publicCalendarAdd( evt.detail.calendarId );
+    footer.setAttribute( 'count', data.length );
   } );
 } );
 event_details.addEventListener( 'aa-edit', ( evt ) => {
-  let event = null;
-
-  db.event.get( evt.detail.id )
+  browseCalendar( 'asc' )
   .then( ( data ) => {
-    event = structuredClone( data );
-    return db.attachment.where( {eventId: event.id} ).toArray();
+    event_form.calendars = data;
+    return readEvent( evt.detail.id );
   } )
   .then( ( data ) => {
-    event.attachments = data.length === 0 ? null : data;
-
-    event_form.calendars = calendars;
-    event_form.data = event;
+    event_form.data = data;
     event_stack.setAttribute( 'selected-index', 0 );
     event_form.focus();
   } );
 } );
 event_details.addEventListener( 'aa-file', ( evt ) => {
-  db.attachment.where( {id: evt.detail.id} ).first()
+  readAttachment( evt.detail.id )
   .then( ( data ) => {
     // https://stackoverflow.com/questions/28197179/javascript-open-pdf-in-new-tab-from-byte-array
     const file = new Blob( [data.data], {type: data.type} );
     const url = URL.createObjectURL( file );
-    window.open(url );
+    window.open( url );
   } );
 } );
 
 // List
 event_list.addEventListener( 'aa-add', () => {
-  event_form.data = null;
-  event_form.calendars = calendars;
-  event_stack.setAttribute( 'selected-index', 0 );
-  blocker( true );
-  event_dialog.showModal();
-  event_form.focus();
+  console.log( 'EVENT_LIST_ADD' );
+  browseCalendar( 'asc' )
+  .then( ( data ) => {
+    event_form.data = null;
+    event_form.calendars = data;
+    event_stack.setAttribute( 'selected-index', 0 );
+    blocker( true );
+    event_dialog.showModal();
+    event_form.focus();
+  } )
 } );    
 event_list.addEventListener( 'aa-change', ( evt ) => {
   year_view.selectedItem = evt.detail.id;
   event_search.selectedItem = evt.detail.id;
-
-  db.event.get( evt.detail.id )
-  .then( ( event ) => {
+  readEvent( evt.detail.id )
+  .then( ( data ) => {
     event_details.calendars = calendars;
-    event_details.data = event;
+    event_details.data = data;
     event_stack.setAttribute( 'selected-index', 1 );
     blocker( true );
     event_dialog.showModal();
@@ -437,26 +309,8 @@ event_list.addEventListener( 'aa-change', ( evt ) => {
 event_list.addEventListener( 'aa-sort', () => {
   sort_store = sort_store === 'asc' ? 'desc' : 'asc';
   window.localStorage.setItem( 'awesome_sort', sort_store );
-
-  if( sort_store === 'desc' ) {
-    db.event.where( 'startsAt' ).between( starts, ends ).reverse().toArray()
-    .then( ( data ) => {
-      const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
-      events = data.filter( ( value ) => active.includes( value.calendarId ) );
-
-      events = [... events];
-      event_list.data = events;    
-    } );
-  } else {
-    db.event.where( 'startsAt' ).between( starts, ends ).toArray()
-    .then( ( data ) => {
-      const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
-      events = data.filter( ( value ) => active.includes( value.calendarId ) );
-
-      events = [... events];
-      event_list.data = events;  
-    } );
-  }
+  browseEvent( year_store, sort_store )
+  .then( ( data ) => event_list.data = data );
 } );
 
 /*
@@ -481,155 +335,59 @@ calendar_form.addEventListener( 'aa-cancel', () => {
 calendar_form.addEventListener( 'aa-delete', ( evt ) => {
   blocker( false );
   calendar_dialog.close();
+  calendar_form.data = null;  
 
-  const id = evt.detail.id;
-  let url = null;
-
-  db.event.where( {calendarId: id} ).toArray()
+  deleteCalendar( evt.detail.id )
+  .then( () => browseCalendar( 'asc' ) )
   .then( ( data ) => {
-    const keys = data.map( ( value ) => value.id );
-    url = data.url;
-    return db.event.bulkDelete( keys );
-  } )
-  .then( () => {
-    return db.calendar.delete( id );
-  } )
-  .then( () => {
-    return db.calendar.toCollection().sortBy( 'name' );     
+    calendar_details.data = data;
+    return browseEvent( year_store, sort_store );
   } )
   .then( ( data ) => {
-    colors = data.reduce( ( prev, curr ) => {
-      prev[curr.id] = curr.color;
-      return prev;
-    }, {} );      
-
-    calendars = [... data];
-    calendar_details.data = calendars;
-    calendar_form.data = null;
-
-    return db.event.where( 'startsAt' ).between( starts, ends ).toArray();      
-  } )
-  .then( ( data ) => {
-    data = data.map( ( value ) => {
-      value.color = colors[value.calendarId];
-      return value;
-    } );
-    data.sort( ( a, b ) => {
-      const first = a.startsAt.getFullYear() + '-' + ( a.startsAt.getMonth() + 1 ) + '-' + a.startsAt.getDate();
-      const second = b.startsAt.getFullYear() + '-' + ( b.startsAt.getMonth() + 1 ) + '-' + b.startsAt.getDate();    
-  
-      if( sort_store === 'desc' ) {
-        if( first < second ) return 1;
-        if( first > second ) return -1;        
-      } else {
-        if( first < second ) return -1;
-        if( first > second ) return 1;        
-      }
-  
-      // Pin like colors to the left side
-      // Inverse sort pins colors to the right side
-      if( a.color < b.color ) return 1;
-      if( a.color > b.color ) return -1;
-  
-      if( a.summary < b.summary ) return -1;
-      if( a.summary > b.summary ) return 1;    
-  
-      return 0;
-    } );
-
-    const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
-    events = data.filter( ( value ) => active.includes( value.calendarId ) );
-    
-    event_list.data = events;
-    year_view.data = events;
-    footer.setAttribute( 'count', events.length );
-
-    return publicCalendarDelete( url );
+    event_list.data = data;
+    year_view.data = data;
+    footer.setAttribute( 'count', data.length );    
   } );
 } );
 calendar_form.addEventListener( 'aa-done', () => {
-  const id = calendar_form.data.id;  
-  const isPublic = calendar_form.data.isPublic;
-  const url = calendar_form.data.url;
-
   blocker( false );
   calendar_dialog.close();
 
-  db.calendar.put( calendar_form.data )
-  .then( () => {
-    return db.calendar.toCollection().sortBy( 'name' );
+  addCalendar( calendar_form.data )
+  .then( () => browseCalendar( 'asc' ) )
+  .then( ( data ) => {
+    calendar_details.data = data;
+    return browseEvent( year_store, sort_store );
   } )
   .then( ( data ) => {
-    colors = data.reduce( ( prev, curr ) => {
-      prev[curr.id] = curr.color;
-      return prev;
-    }, {} );  
-
-    calendars = [... data];
-    calendar_details.data = calendars;
-
-    return db.event.where( 'startsAt' ).between( starts, ends ).toArray();      
-  } )
-  .then( ( data ) => {
-    data = data.map( ( value ) => {
-      value.color = colors[value.calendarId];
-      return value;
-    } );    
-    data.sort( ( a, b ) => {
-      const first = a.startsAt.getFullYear() + '-' + ( a.startsAt.getMonth() + 1 ) + '-' + a.startsAt.getDate();
-      const second = b.startsAt.getFullYear() + '-' + ( b.startsAt.getMonth() + 1 ) + '-' + b.startsAt.getDate();    
-  
-      if( sort_store === 'desc' ) {
-        if( first < second ) return 1;
-        if( first > second ) return -1;        
-      } else {
-        if( first < second ) return -1;
-        if( first > second ) return 1;        
-      }
-  
-      // Pin like colors to the left side
-      // Inverse sort pins colors to the right side
-      if( a.color < b.color ) return 1;
-      if( a.color > b.color ) return -1;
-  
-      if( a.summary < b.summary ) return -1;
-      if( a.summary > b.summary ) return 1;    
-  
-      return 0;
-    } );
-
-    const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
-    events = data.filter( ( value ) => active.includes( value.calendarId ) );
-    
-    event_list.data = events;
-    year_view.data = events;
-    footer.setAttribute( 'count', events.length );
-
-    if( isPublic ) {
-      return publicCalendarAdd( id );
-    } else {
-      return publicCalendarDelete( url );      
-    }
+    event_list.data = data;
+    year_view.data = data;
+    footer.setAttribute( 'count', data.length );
   } );
 } );
 calendar_form.addEventListener( 'aa-export', ( evt ) => {
   let name = null;
-  db.calendar.where( {id: evt.detail.id} ).first()
+
+  readCalendar( evt.detail.id )
   .then( ( data ) => {
     name = data.name;
-    return db.event.where( {calendarId: evt.detail.id} ).toArray();
+    return browseEvent( year_store, sort_store, false, false, evt.detail.id );
   } )
   .then( ( data ) => {
-    // https://writtenforcoders.com/blog/javascript-export-to-csv-without-using-a-library
-    const output = data.map( ( event ) => Object.values( event ) );
-    output.unshift( Object.keys( data[0] ) );
-    console.log( output );
+    const keys = Object.keys( data[0] );
+    let output = keys.join( ',' ) + '\n';
 
-    const csv = 'data:text/csv;charset=utf-8,' + output.map( ( row ) => row.join( ',' ) ).join( '\n' );
-    const encoded = encodeURI( csv );
+    for( let d = 0; d < data.length; d++ ) {
+      let row = '';
+      for( let v = 0; v < keys.length; v++ ) {
+        row = row + data[d][keys[v]] + ',';
+      }
+      output = output + row.substring( 0, row.length - 1 ) + '\n';
+    }
 
+    const blob = new Blob( [output], {type: 'text/csv'} );
     const link = document.createElement( 'a' );
-    link.setAttribute( 'href', encoded );
+    link.setAttribute( 'href', window.URL.createObjectURL( blob ) );
     link.setAttribute( 'download', `${name}.csv` );
     document.body.appendChild( link );
     link.click();
@@ -715,18 +473,18 @@ calendar_details.addEventListener( 'aa-add', () => {
 calendar_details.addEventListener( 'aa-colors', ( evt ) => {
   if( evt.detail.checked ) {
     window.localStorage.setItem( 'awesome_colors', true );
-    event_list.setAttribute( 'use-colors', '' );
-    year_view.setAttribute( 'use-colors', '' );
-    event_search.setAttribute( 'use-colors', '' );
+    event_list.setAttribute( 'use-calendar-color', '' );
+    year_view.setAttribute( 'use-calendar-color', '' );
+    event_search.setAttribute( 'use-calendar-color', '' );
   } else {
     window.localStorage.removeItem( 'awesome_colors' );
-    event_list.removeAttribute( 'use-colors' );
-    year_view.removeAttribute( 'use-colors' );
-    event_search.removeAttribute( 'use-colors', '' );
+    event_list.removeAttribute( 'use-calendar-color' );
+    year_view.removeAttribute( 'use-calendar-color' );
+    event_search.removeAttribute( 'use-calendar-color', '' );
   }
 } );
 calendar_details.addEventListener( 'aa-info', ( evt ) => {
-  db.calendar.get( evt.detail.id )
+  readCalendar( evt.detail.id )
   .then( ( data ) => {
     calendar_form.colors = COLORS;
     calendar_form.data = data;
@@ -770,26 +528,21 @@ calendar_details.addEventListener( 'aa-hide', async ( evt ) => {
  */
 
 year_view.addEventListener( 'aa-change', ( evt ) => {
-  let event = null;
-
-  db.event.get( evt.detail.id )
+  browseCalendar( 'asc' )
   .then( ( data ) => {
-    event = structuredClone( data );
-    return db.attachment.where( {eventId: event.id} ).toArray();
-  } )  
+    event_details.calendars = data;
+    return readEvent( evt.detail.id );
+  } )
   .then( ( data ) => {
-    event.attachments = data.length === 0 ? null : data;
-
-    event_list.setAttribute( 'selected-item', event.id );
-    event_details.calendars = calendars;
-    event_details.data = event;
+    event_list.setAttribute( 'selected-item', data.id );
+    event_details.data = data;
     event_stack.setAttribute( 'selected-index', 1 );
     blocker( true );
     event_dialog.showModal();
   } );
 } );
 year_view.addEventListener( 'aa-month', () => {  
-  year_view.children[0].scrollTo( {
+  year_view.scrollTo( {
     top: 0, 
     behavior: 'smooth'
   } );
@@ -804,15 +557,15 @@ let color_store = window.localStorage.getItem( 'awesome_colors' );
 color_store = color_store === null ? false : true;
 
 if( color_store ) {
-  calendar_details.setAttribute( 'use-colors', '' );
-  event_list.setAttribute( 'use-colors', '' );
-  year_view.setAttribute( 'use-colors', '' );
-  event_search.setAttribute( 'use-colors', '' );
+  calendar_details.setAttribute( 'use-calendar-color', '' );
+  event_list.setAttribute( 'use-calendar-color', '' );
+  year_view.setAttribute( 'use-calendar-color', '' );
+  event_search.setAttribute( 'use-calendar-color', '' );
 } else {
-  calendar_details.removeAttribute( 'use-colors' );  
-  event_list.removeAttribute( 'use-colors' );  
-  year_view.removeAttribute( 'use-colors' );
-  event_search.removeAttribute( 'use-colors', '' );  
+  calendar_details.removeAttribute( 'use-calendar-color' );  
+  event_list.removeAttribute( 'use-calendar-color' );  
+  year_view.removeAttribute( 'use-calendar-color' );
+  event_search.removeAttribute( 'use-calendar-color', '' );  
 }
 
 // Drawer
@@ -859,13 +612,13 @@ let starts = new Date( year_store, 0, 1 );
 
 // Database
 const db = new Dexie( 'AnnoAwesome' );
-db.version( 7 ).stores( {
+db.version( 8 ).stores( {
   event: 'id, calendarId, startsAt',
-  calendar: 'id',
+  calendar: 'id, publicAt, sharedAt',
   attachment: 'id, eventId'
 } );
 
-db.calendar.toCollection().sortBy( 'name' )
+browseCalendar( 'asc' )
 .then( async ( data ) => {
   if( data.length === 0 ) {
     const id = self.crypto.randomUUID();
@@ -877,9 +630,10 @@ db.calendar.toCollection().sortBy( 'name' )
       updatedAt: new Date( now ),
       name: 'Calendar',
       color: '#1badf8',
-      isShared: false,
+      sharedAt: null,
       isPublic: false,
       isActive: true,
+      isShared: false,
       url: url
     } );
     data = await db.calendar.toArray();
@@ -893,46 +647,16 @@ db.calendar.toCollection().sortBy( 'name' )
     return prev;
   }, {} );
 
-  return db.event.where( 'startsAt' ).between( starts, ends ).toArray();
+  return browseEvent( year_store, sort_store );
 } )
 .then( ( data ) => {
-  data = data.map( ( value ) => {
-    value.color = colors[value.calendarId];
-    return value;
-  } );
-  data.sort( ( a, b ) => {
-    const first = a.startsAt.getFullYear() + '-' + ( a.startsAt.getMonth() + 1 ) + '-' + a.startsAt.getDate();
-    const second = b.startsAt.getFullYear() + '-' + ( b.startsAt.getMonth() + 1 ) + '-' + b.startsAt.getDate();    
-
-    if( sort_store === 'desc' ) {
-      if( first < second ) return 1;
-      if( first > second ) return -1;        
-    } else {
-      if( first < second ) return -1;
-      if( first > second ) return 1;        
-    }
-
-    // Pin like colors to the left side
-    // Inverse sort pins colors to the right side
-    if( a.color < b.color ) return 1;
-    if( a.color > b.color ) return -1;
-
-    if( a.summary < b.summary ) return -1;
-    if( a.summary > b.summary ) return 1;    
-
-    return 0;
-  } );
-
-  const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
-  events = data.filter( ( value ) => active.includes( value.calendarId ) );
-
   event_list.colors = COLORS;
-  event_list.data = events;  
+  event_list.data = data;  
   year_view.colors = COLORS;
-  year_view.data = events;
+  year_view.data = data;
   event_search.colors = COLORS;
-  event_search.data = events;
-  footer.setAttribute( 'count', events.length );
+  event_search.data = data;
+  footer.setAttribute( 'count', data.length );
 } );      
 
 /* 
@@ -961,8 +685,6 @@ function controlsChange( evt ) {
 
   event_search.data = null;
   right_panel.classList.add( 'hidden' );
-  year_view.data = events;
-  footer.setAttribute( 'count', events.length );
 
   if( calendar === true && event === false ) {
     left_stack.setAttribute( 'selected-index', 0 );
@@ -977,6 +699,12 @@ function controlsChange( evt ) {
     left_stack.setAttribute( 'selected-index', 0 );
     window.localStorage.removeItem( 'awesome_drawer' );    
   } 
+
+  browseEvent( year_store, sort_store )
+  .then( ( data ) => {
+    year_view.data = data;
+    footer.setAttribute( 'count', data.length );
+  } );  
 }      
 
 function headerChange( evt ) {
@@ -1025,49 +753,6 @@ function headerChange( evt ) {
   } );    
 }      
 
-function publicCalendarAdd( id ) {
-  let record = null;
-
-  return db.calendar.where( {id: id} ).first()
-  .then( ( data ) => {
-    if( data.isPublic ) {
-      record = structuredClone( data );
-      return db.event.where( {calendarId: id} ).toArray();      
-    }
-  } )
-  .then( ( data ) => {
-    data = data.map( ( value ) => {
-      value.color = colors[value.calendarId];
-      return value;
-    } );    
-
-    record.events = [... data];
-
-    return fetch( '/api/public', {
-      cache: 'no-store',
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify( record )
-    } )
-    .then( ( response ) => response.json() );
-  } );
-}
-
-function publicCalendarDelete( url ) {
-  return fetch( '/api/public', {
-    method: 'DELETE',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    },    
-    body: JSON.stringify( {url: url} )
-  } )
-  .then( ( response ) => response.json() );
-}
-
 async function tiny( value ) {
   const encoder = new TextEncoder();
   const data = encoder.encode( value );
@@ -1087,4 +772,317 @@ async function tiny( value ) {
   }
 
   return converted.substring( 2, '0' ) + shortHexDigest;
+}
+
+/*
+ * Data access
+ */
+
+// Attachment
+function readAttachment( id ) {
+  return db.attachment.get( id );
+}
+
+// Calendar
+function browseCalendar( sort = null, events = false, attachments = false ) {
+  return db.calendar.toArray() 
+  .then( async ( data ) => {
+    if( sort !== null ) {
+      data.sort( ( a, b ) => {
+        if( sort === 'desc' ) {
+          if( a.name > b.name ) return -1;
+          if( a.name < b.name ) return 1;
+        } else {
+          if( a.name > b.name ) return 1;
+          if( a.name < b.name ) return -1;          
+        }
+
+        return 0;
+      } );
+    }
+
+    if( events ) {
+      for( let d = 0; d < data.length; d++ ) {
+        data[d].events = await db.event.where( {calendarId: data[d].id} ).toArray();
+
+        if( data[d].events.length === 0 ) {
+          data[d].events = null;
+        } else {
+          if( attachments ) {
+            for( let e = 0; e < data[d].events.length; e++ ) {
+              data[d].events[e].attachments = await db.attachment.where( {eventId: data[d].id} ).toArray();
+              
+              if( data[d].events[e].attachments.length === 0 ) {
+                data[d].events[e].attachments = null;
+              }
+            }
+          }
+        }        
+      }
+    }
+      
+    return data;
+  } );
+}
+
+function readCalendar( id, events = false, attachments = false ) {
+  let response = null;
+
+  return db.calendar.get( id )
+  .then( ( data ) => {
+    response = structuredClone( data );
+
+    if( events ) {
+      return db.event.where( {calendarId: response.id} ).toArray();
+    }
+      
+    return response;
+  } )
+  .then( async ( data ) => {
+    if( !Array.isArray( data ) ) return response;
+
+    if( attachments ) {
+      for( let d = 0; d < data.length; d++ ) {
+        attach = await db.attachment.where( {eventId: data[d].id} ).toArray();
+        data[d].attachments = attach.length === 0 ? null : [... attach];
+      }  
+    }
+
+    response.events = data.length === 0 ? [] : [... data];
+    
+    return response;
+  } );
+}
+
+function editCalendar( calendar ) {
+  return db.calendar.put( calendar )
+  .then( () => editPublicCalendar( calendar.id) );
+}
+
+function addCalendar( calendar ) {
+  return db.calendar.put( calendar )
+  .then( () => editPublicCalendar( calendar.id ) );
+}
+
+function deleteCalendar( id ) {
+  let isPublic = false;
+  let url = null;
+
+  return db.calendar.get( id )
+  .then( ( data ) => {
+    url = data.url;
+    isPublic = data.isPublic;
+    return db.event.where( {calendarId: id} ).toArray();
+  } )
+  .then( async ( data ) => {
+    for( let d = 0; d < data.length; d++ ) {
+      await deleteEvent( data[d].id );
+    }
+
+    return db.calendar.delete( id );
+  } )
+  .then( () => {
+    return isPublic ? deletePublicCalendar( url ) : null;
+  } );
+}
+
+// Event
+function browseEvent( year = null, sort = null, active = true, reverse = false, calendar = null, search = null ) {
+  let activated = [];
+  let calendars = [];
+  let starts = null;
+  let ends = null;
+
+  if( year !== null ) {
+    starts = new Date( year, 0, 1 );
+    ends = new Date( year + 1, 0, 1 );
+  }
+
+  return db.calendar.toArray()
+  .then( ( data ) => {
+    calendars = [... data];
+    activated = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
+
+    if( year === null ) {
+      return db.event.toArray();
+    } else {
+      return db.event.where( 'startsAt' ).between( starts, ends ).toArray();
+    }
+  } )
+  .then( ( data ) => {
+    if( active ) {
+      data = data.filter( ( value ) => activated.includes( value.calendarId ) );
+    }
+
+    for( let d = 0; d < data.length; d++ ) {
+      data[d].color = calendars.reduce( ( value, curr ) => data[d].calendarId === curr.id ? curr.color : value );
+    }
+
+    if( sort !== null ) {
+      data.sort( ( a, b ) => {
+        if( sort === 'desc' ) {
+          if( a.startsAt < b.startsAt ) return 1;
+          if( a.startsAt > b.startsAt ) return -1;          
+        } else {
+          if( a.startsAt < b.startsAt ) return -1;
+          if( a.startsAt > b.startsAt ) return 1;                    
+        }
+
+        return 0;
+      } );
+
+      /*
+      data.sort( ( a, b ) => {
+        const first = a.startsAt.getFullYear() + '-' + ( a.startsAt.getMonth() + 1 ) + '-' + a.startsAt.getDate();
+        const second = b.startsAt.getFullYear() + '-' + ( b.startsAt.getMonth() + 1 ) + '-' + b.startsAt.getDate();    
+    
+        if( sort === 'desc' ) {
+          if( first < second ) return 1;
+          if( first > second ) return -1;        
+        } else {
+          if( first < second ) return -1;
+          if( first > second ) return 1;        
+        }
+    
+        // Pin like colors to the left side
+        // Inverse sort pins colors to the right side
+        if( a.color < b.color ) return 1;
+        if( a.color > b.color ) return -1;
+    
+        if( a.summary < b.summary ) return -1;
+        if( a.summary > b.summary ) return 1;    
+    
+        return 0;
+      } );      
+      */
+    }
+
+    if( calendar !== null ) {
+      data = data.filter( ( value ) => value.calendarId === calendar ? true : false );
+    }
+
+    if( search !== null ) {
+      data = data.filter( ( value ) => {
+        const query = search.toLowerCase();
+        let match = false;
+  
+        if( value.summary !== null ) {
+          if( value.summary.toLowerCase().indexOf( query ) >= 0 ) match = true;
+        }
+    
+        if( value.description !== null ) {
+          if( value.description.toLowerCase().indexOf( query ) >= 0 ) match = true;
+        }
+    
+        return match;
+      } );
+    }
+
+    return reverse ? data.reverse() : data;
+  } );
+}
+
+function readEvent( id ) { 
+  let event = null;
+  return db.event.get( id )
+  .then( ( data ) => {
+    event = structuredClone( data );
+    return db.calendar.get( event.calendarId );
+  } )
+  .then( ( data ) => {
+    event.color = data.color;
+    return db.attachment.where( {eventId: event.id} ).toArray();
+  } )
+  .then( ( data ) => {
+    event.attachments = data.length === 0 ? null : [... data];
+    return event;
+  } );
+}
+
+function editEvent( event ) {
+  return db.attachment.where( {eventId: event.id} ).toArray()
+  .then( ( data ) => db.attachment.bulkDelete( data.map( ( value ) => value.id ) ) )
+  .then( () => db.attachment.bulkPut( event.attachments === null ? [] : event.attachments ) )
+  .then( () => {
+    delete event.attachments;
+    return db.event.put( event );
+  } )
+  .then( () => editPublicCalendar( event.calendarId ) )
+  .then( ( data ) => {
+    return data;
+  } );
+}
+
+function addEvent( event ) {
+  return db.attachment.bulkPut( event.attachments )
+  .then( () => {
+    delete event.attachments;
+    return db.event.put( event );
+  } )
+  .then( () => editPublicCalendar( event.calendarId ) );
+}  
+
+function deleteEvent( id ) {
+  let calendar = null;
+
+  return db.event.get( id )
+  .then( ( data ) => {
+    calendar = data.calendarId;
+    return db.attachment.where( {eventId: id} ).toArray();
+  } )
+  .then( ( data ) => {
+    data = data.map( ( value ) => value.id );
+    return db.attachment.bulkDelete( data );
+  } )
+  .then( () => db.event.delete( id ) )
+  .then( () => editPublicCalendar( calendar ) );
+}  
+
+// External
+function editPublicCalendar( id ) {
+  const calendar = null;
+
+  return db.calendar.get( id )
+  .then( ( data ) => {
+    if( data.isPublic ) {
+      calendar = structuredClone( data );
+      return db.event.where( {calendarId: calendar.id} );
+    } else {
+      return null;
+    }
+  } )
+  .then( ( data ) => {
+    if( data === null ) return null;
+
+    calendar.events = [... data];
+    calendar.events = calendar.events.map( ( value ) => {
+      value.color = calendar.color;
+      return value;
+    } );      
+
+    return fetch( '/api/public', {
+      cache: 'no-store',
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify( calendar )
+    } );
+  } )
+  .then( ( response ) => {
+    return response === null ? null : response.json();
+  } );
+}
+
+function deletePublicCalendar( url ) {
+  return fetch( '/api/public', {
+    method: 'DELETE',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },    
+    body: JSON.stringify( {url: url} )
+  } )
+  .then( ( response ) => response.json() );
 }

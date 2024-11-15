@@ -77,15 +77,15 @@ customElements.define( 'aa-event-list', class extends HTMLElement {
 
   static get observedAttributes () {
     return [
-      'use-colors'
+      'use-calendar-color'
     ];
   }   
   
   attributeChangedCallback( name, oldValue, newValue ) {
-    if( name === 'use-colors' ) {
+    if( name === 'use-calendar-color' ) {
       for( let c = 0; c < this.$list.children.length; c++ ) {
         let color = this.$list.children[c].getAttribute( 'data-month-color' );
-        if( this.hasAttribute( 'use-colors' ) ) {
+        if( this.hasAttribute( 'use-calendar-color' ) ) {
           color = this.$list.children[c].getAttribute( 'data-calendar-color' );
         }        
 
@@ -144,7 +144,7 @@ customElements.define( 'aa-event-list', class extends HTMLElement {
       */
 
       let color = this._colors[index % this._colors.length].value;
-      if( this.hasAttribute( 'use-colors' ) ) {
+      if( this.hasAttribute( 'use-calendar-color' ) ) {
         color = this._data[c].color;
       }
 

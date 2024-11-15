@@ -10,15 +10,20 @@ export default async ( req, ctx ) => {
   } );
 
   if( req.method === 'POST' ) {
+    const responses = []
     const body = await req.json();
-    const command = new PutObjectCommand( {
-      Bucket: process.env.AWS_S3_BUCKET,
-      Key: `${body.url}.json`,
-      Body: JSON.stringify( body ),
-      ACL: 'public-read'
-    } );
-    const data = await client.send( command );
-    return new Response( JSON.stringify( data ) );
+    for( let b = 0; b < body.length; b++ ) {
+      const command = new PutObjectCommand( {
+        Bucket: process.env.AWS_S3_BUCKET,
+        Key: `${body[b].url}.json`,
+        Body: JSON.stringify( body[b] ),
+        ACL: 'public-read'
+      } );
+      data = await client.send( command );
+      responses.push( data );
+    }
+
+    return new Response( JSON.stringify( responses ) );    
   }
 
   if( req.method === 'DELETE' ) {

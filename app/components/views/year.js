@@ -2,31 +2,47 @@ customElements.define( 'aa-year', class extends HTMLElement {
   constructor() {
     super();
 
-    this.doDayClick = this.doDayClick.bind( this );
+    this.CELL_HEIGHT = 40;
+    this.CELL_WIDTH = 240;
+
+    this.doEventClick = this.doEventClick.bind( this );
     this.doMonthClick = this.doMonthClick.bind( this );
 
-    this._colors = [];
+    this._colors = [
+      {name: 'Red', value: '#ff2968'},
+      {name: 'Orange', value: '#ff9500'},
+      {name: 'Yellow', value: '#ffcc02'},
+      {name: 'Green', value: '#63da38'},
+      {name: 'Blue', value: '#1badf8'},
+      {name: 'Purple', value: '#cc73e1'}
+    ];
     this._data = [];
     this._touch = ( 'ontouchstart' in document.documentElement ) ? 'touchstart' : 'click';    
 
-    this.$headers = this.querySelectorAll( 'h5' );
-    this.$months = this.querySelectorAll( 'article' );
+    this.$canvas = this.querySelector( 'canvas' );
+    this.$context = this.$canvas.getContext( '2d' );
+    this.$headers = this.querySelectorAll( 'header button' );
+    this.$sheet = this.querySelector( 'article' );
 
-    for( let h = 0; h < this.$headers.length; h++ ) {
-      this.$headers[h].setAttribute( 'data-month', h );      
+    const formatter = new Intl.DateTimeFormat( navigator.language, {
+      month: 'long'
+    } );
+    const year = this.hasAttribute( 'value' ) ? parseInt( this.getAttribute( 'value' ) ) : new Date().getFullYear();
+    for( let m = 0; m < 12; m++ ) {
+      this.$headers[m].setAttribute( 'data-month', m );
+      this.$headers[m].textContent = formatter.format( new Date( year, m, 1 ) );
     }
+
+    this.draw();
   }
 
-  doDayClick( evt ) {
+  doEventClick( evt ) {
     this.dispatchEvent( new CustomEvent( 'aa-change', {
-      bubbles: true,
-      cancelable: false,
-      composed: true,
       detail: {
         id: evt.currentTarget.getAttribute( 'data-id' )
       }
     } ) );
-  }
+  }        
 
   doMonthClick( evt ) {
     const month = parseInt( evt.target.getAttribute( 'data-month' ) );
@@ -36,23 +52,122 @@ customElements.define( 'aa-year', class extends HTMLElement {
         width: evt.target.clientWidth
       }
     } ) );
-  }
+  }        
 
-  collides( a, b ) {
-    return a.bottom > b.top && a.top < b.bottom;
-  }
-
-  pack( columns, width ) {
-    let n = columns.length;
-
-    for( let i = 0; i < n; i++ ) {
-      let column = columns[i];
-      for( let j = 0; j < column.length; j++ ) {
-        const button = column[j];
-        button.element.style.left = `${( i / n ) * 100}%`;
-        button.element.style.width = `${( width / n - 1 )}px`;
-      }
+  draw( year = null ) {
+    if( year === null ) {
+      year = this.hasAttribute( 'value' ) ? parseInt( this.getAttribute( 'value' ) ) : new Date().getFullYear();
     }
+
+    const today = new Date();
+    let index = 0;
+
+    for( let m = 0; m < 12; m++ ) {
+      for( let d = 0; d < 31; d++ ) {
+        const current = new Date( year, m, d + 1 );
+        const date = d + 1;
+        const month = m;
+
+        let isToday = false;
+        if( today.getFullYear() === current.getFullYear() &&
+          today.getMonth() === current.getMonth() &&
+          today.getDate() === current.getDate() ) {
+          isToday = true;
+        }             
+
+        const days = new Date( year, m + 1, 0 );          
+        const isOutside = ( d + 1 ) > days.getDate() ? true : false;
+
+        const track = this.week( current );
+        let week = null;
+        if( track !== index || d === 0 ) {
+          index = track;
+          week = index;
+        }
+
+        const weekend = current.getDay();
+
+        const row = date - 1;                        
+
+        if( isOutside ) {
+          this.$context.fillStyle = '#ffffff';
+        } else {
+          this.$context.fillStyle = weekend === 0 || weekend === 6 ? '#f5f5f5' : '#ffffff';
+        }              
+
+        this.$context.beginPath();
+        this.$context.rect( 
+          month * this.CELL_WIDTH, 
+          row * this.CELL_HEIGHT, 
+          this.CELL_WIDTH, 
+          this.CELL_HEIGHT 
+        );
+        this.$context.fill();              
+
+        this.$context.beginPath();
+        this.$context.fillStyle = isToday ? '#0082ff' : 'rgba( 0, 0, 0, 0 )';
+        this.$context.ellipse(
+          ( month * this.CELL_WIDTH ) + 21,
+          ( row * this.CELL_HEIGHT ) + 20,
+          18, 
+          18,
+          0, 
+          -3.14,
+          3.14
+        );
+        this.$context.fill();              
+
+        this.$context.fillStyle = isToday || isOutside ? '#ffffff' : '#272727';
+        this.$context.font = `${isToday ? 600 : 400} 16px IBM Plex Sans`;
+        this.$context.textAlign = 'center';
+        this.$context.textBaseline = week === null ? 'middle' : 'top';
+        this.$context.fillText( 
+          date, 
+          ( month * this.CELL_WIDTH ) + 21, 
+          ( row * this.CELL_HEIGHT ) + ( week === null ? 22 : 8 ) 
+        );       
+        
+        if( week !== null && isOutside === false ) {
+          this.$context.fillStyle = isToday ? '#ffffff' : '#868686';
+          this.$context.font = '12px IBM Plex Sans';
+          this.$context.textAlign = 'center';
+          this.$context.textBaseline = 'top';
+          this.$context.fillText( 
+            week, 
+            ( month * this.CELL_WIDTH ) + 21, 
+            ( row * this.CELL_HEIGHT ) + 23 
+          );            
+        }
+
+        this.$context.strokeStyle = '#e5e5e5';                      
+
+        if( date < 31 && isOutside === false ) {
+          this.$context.beginPath();
+          this.$context.moveTo( 
+            month * this.CELL_WIDTH, 
+            ( row * this.CELL_HEIGHT ) + this.CELL_HEIGHT - 0.50
+          );
+          this.$context.lineTo( 
+            ( month * this.CELL_WIDTH ) + this.CELL_WIDTH, 
+            ( row * this.CELL_HEIGHT ) + this.CELL_HEIGHT - 0.50
+          );
+          this.$context.stroke();
+        }   
+        
+        if( month < 11 ) {
+          this.$context.beginPath();
+          this.$context.moveTo( 
+            ( month * this.CELL_WIDTH ) + this.CELL_WIDTH - 0.50, 
+            row * this.CELL_HEIGHT
+          );
+          this.$context.lineTo( 
+            ( month * this.CELL_WIDTH ) + this.CELL_WIDTH - 0.50, 
+            ( row * this.CELL_HEIGHT ) + this.CELL_HEIGHT
+          );        
+          this.$context.stroke();
+        }
+      }
+    }          
   }
 
   // https://stackoverflow.com/questions/6117814/get-week-of-year-in-javascript-like-in-php/6117889#6117889
@@ -61,7 +176,7 @@ customElements.define( 'aa-year', class extends HTMLElement {
     date.setUTCDate( date.getUTCDate() + 4 - ( date.getUTCDay() || 7 ) );
     const yearStart = new Date( Date.UTC( date.getUTCFullYear(), 0, 1 ) );
     return Math.ceil( ( ( ( date - yearStart ) / 86400000 ) + 1 ) / 7 );
-  }
+  }        
 
   _upgrade( property ) {
     if( this.hasOwnProperty( property ) ) {
@@ -89,81 +204,42 @@ customElements.define( 'aa-year', class extends HTMLElement {
   static get observedAttributes () {
     return [
       'selected-item',
-      'use-colors',
+      'use-calendar-color',
       'value'
     ];
   }   
-  
+
   attributeChangedCallback( name, oldValue, newValue ) {
     if( name === 'selected-item' ) {
-      const events = this.querySelectorAll( 'button' );
+      const events = this.$sheet.querySelectorAll( 'button' );
       const item = this.hasAttribute( 'selected-item' ) ? this.getAttribute( 'selected-item' ) : null;
 
-      for( let e = 0; e < events.length; e++ ) {
-        events[e].blur();
+      for( let e = 0; e < events.length; e++ ) {              
+        if( item !== null ) {
+          if( events[e].getAttribute( 'data-id' ) === item ) {
+            events[e].focus();
+            break;
+          }
+        }
       }      
-      
-      if( item !== null ) {
-        const event = this.querySelector( `button[data-id='${item}']` );
-        event.focus();
-      }
     }
 
-    if( name === 'use-colors' ) {
-      const events = this.querySelectorAll( 'button' );
-      for( let e = 0; e < events.length; e++ ) {
-        let color = events[e].getAttribute( 'data-month-color' );
-        if( this.hasAttribute( 'use-colors' ) ) {
-          color = events[e].getAttribute( 'data-calendar-color' );
+    if( name === 'use-calendar-color' ) {
+      for( let c = 0; c < this.$sheet.children.length; c++ ) {
+        let color = this.$sheet.children[c].getAttribute( 'data-month-color' );
+        if( this.hasAttribute( 'use-calendar-color' ) ) {
+          color = this.$sheet.children[c].getAttribute( 'data-calendar-color' );
         }        
 
-        events[e].style.setProperty( '--event-active-background-color', color );        
-        events[e].style.setProperty( '--event-inactive-color', `hsl( from ${color} h s calc( l - 20 ) )` );                
-        events[e].style.setProperty( '--event-inactive-background-color', color + '4d' );                      
+        this.$sheet.children[c].style.setProperty( '--event-active-background-color', color );        
+        this.$sheet.children[c].style.setProperty( '--event-inactive-color', `hsl( from ${color} h s calc( l - 20 ) )` );                
+        this.$sheet.children[c].style.setProperty( '--event-inactive-background-color', color + '4d' );                      
       }
     }
 
     if( name === 'value' ) {
-      const today = new Date();
       const year = this.hasAttribute( 'value' ) ? parseInt( this.getAttribute( 'value' ) ) : new Date().getFullYear();
-
-      let index = 0;
-
-      for( let m = 0; m < 12; m++ ) {
-        for( let d = 0; d < 31; d++ ) {
-          const cell = new Date( year, m, d + 1 );
-
-          this.$months[m].children[0].children[d].setAttribute( 'weekend', cell.getDay() )
-          this.$months[m].children[0].children[d].setAttribute( 'date', d + 1 );
-          this.$months[m].children[0].children[d].setAttribute( 'month', m );          
-          this.$months[m].children[0].children[d].setAttribute( 'year', year );
-
-          const days = new Date( year, m + 1, 0 );          
-          if( ( d + 1 ) > days.getDate() ) {
-            this.$months[m].children[0].children[d].classList.add( 'outside' );
-          } else {
-            this.$months[m].children[0].children[d].classList.remove( 'outside' );
-          }
-
-          const track = this.week( cell );
-          if( track !== index || d === 0 ) {
-            index = track;
-            this.$months[m].children[0].children[d].classList.add( 'week' );
-            this.$months[m].children[0].children[d].children[0].children[1].textContent = index;
-          } else {
-            this.$months[m].children[0].children[d].classList.remove( 'week' );
-            this.$months[m].children[0].children[d].children[0].children[1].textContent = '';            
-          }
-
-          if( today.getFullYear() === cell.getFullYear() &&
-              today.getMonth() === cell.getMonth() &&
-              today.getDate() === cell.getDate() ) {
-            this.$months[m].children[0].children[d].classList.add( 'today' );
-          } else {
-            this.$months[m].children[0].children[d].classList.remove( 'today' );
-          }          
-        }
-      }        
+      this.draw( year );
     }
   }
 
@@ -173,126 +249,73 @@ customElements.define( 'aa-year', class extends HTMLElement {
 
   set colors( value ) {
     this._colors = value === null ? [] : [... value];
-  }
+  }        
 
   get data() {
     return this._data.length === 0 ? null : this._data;
   }
 
-  set data( value ) {
-    this._data = value === null ? [] : [... value];
+  set data( value ) {        
+    this._data = value === null ? [] : [... value];  
 
-    // Width to use for stacking
-    const width = this.$months[0].children[1].clientWidth;      
+    while( this.$sheet.children.length > this._data.length ) {
+      this.$sheet.children[0].removeEventListener( this._touch, this.doEventClick );
+      this.$sheet.children[0].remove();
+    }
 
-    // For each calendar month
-    for( let m = 0; m < this.$months.length; m++ ) {
+    while( this.$sheet.children.length < this._data.length ) {
+      const element = document.createElement( 'button' );
+      const summary = document.createElement( 'span' );
+      const location = document.createElement( 'span' );
 
-      // Events just for this month
-      const events = this._data.filter( ( value ) => value.startsAt.getMonth() === m ? true : false );      
+      element.appendChild( summary );
+      element.appendChild( location );
+      element.addEventListener( this._touch, this.doEventClick );                        
 
-      // Remove excess
-      while( this.$months[m].children[1].children.length > events.length ) {
-        this.$months[m].children[1].children[0].removeEventListener( this._touch, this.doDayClick );
-        this.$months[m].children[1].children[0].remove();
-      }
+      this.$sheet.appendChild( element );
+    }
 
-      // Add needed
-      while( this.$months[m].children[1].children.length < events.length ) {
-        const button = document.createElement( 'button' );
-        button.addEventListener( this._touch, this.doDayClick );        
-        
-        const label = document.createElement( 'span' );
-        button.appendChild( label );
+    const year = this.hasAttribute( 'value' ) ? parseInt( this.getAttribute( 'value' ) ) : new Date().getFullYear();          
+    let index = 0;
 
-        const location = document.createElement( 'span' );
-        button.appendChild( location );
+    for( let m = 0; m < 12; m++ ) {
+      let color = this._colors[m % this._colors.length].value;                                  
 
-        this.$months[m].children[1].appendChild( button );
-      }
-
-      let color = this._colors[m % this._colors.length].value;              
-
-      // Populate and decorate
-      for( let c = 0; c < this.$months[m].children[1].children.length; c++ ) {
-        const top = ( ( events[c].startsAt.getDate() - 1 ) * 40 );
-        const height = ( ( events[c].endsAt.getDate() - events[c].startsAt.getDate() ) * 40 ) + 39;        
-
-        if( this.hasAttribute( 'use-colors' ) ) {
-          color = events[c].color;
-        }
-
-        this.$months[m].children[1].children[c].setAttribute( 'data-id', events[c].id );
-        this.$months[m].children[1].children[c].setAttribute( 'data-calendar-color', events[c].color );          
-        this.$months[m].children[1].children[c].setAttribute( 'data-month-color', this._colors[m % this._colors.length].value );                  
-
-        this.$months[m].children[1].children[c].style.setProperty( '--event-active-color', '#ffffff' );
-        this.$months[m].children[1].children[c].style.setProperty( '--event-active-background-color', color );        
-        this.$months[m].children[1].children[c].style.setProperty( '--event-inactive-color', `hsl( from ${color} h s calc( l - 20 ) )` );                
-        this.$months[m].children[1].children[c].style.setProperty( '--event-inactive-background-color', color + '4d' );                
-
-        this.$months[m].children[1].children[c].style.top = `${top}px`;
-        this.$months[m].children[1].children[c].style.height = `${height}px`;        
-
-        this.$months[m].children[1].children[c].ariaLabel = events[c].summary;
-        this.$months[m].children[1].children[c].children[0].textContent = events[c].summary;
-        this.$months[m].children[1].children[c].children[1].textContent = events[c].location === null ? '' : events[c].location;
-      }
-
-      let columns = [];
-      let last = null;
-
-      // Map button positions
-      let buttons = Array.from( this.$months[m].children[1].children );
-      buttons = buttons.map( ( value ) => {
-        return {
-          element: value,
-          top: parseInt( value.style.top ),
-          bottom: parseInt( value.style.top ) + parseInt( value.style.height )
-        };
-      } );      
-
-      // Sort buttons based on fit
-      buttons.sort( function( a, b ) {
-        if( a.top < b.top ) return -1;
-        if( a.top > b.top ) return 1;
-        if( a.bottom < b.bottom ) return -1;
-        if( a.bottom > b.bottom ) return 1;
-        return 0;
+      const month = this._data.filter( ( value ) => value.startsAt.getMonth() === m && value.startsAt.getFullYear() === year ? true : false );
+      month.map( ( value ) => {
+        value.start = value.startsAt.getDate();
+        value.duration = ( value.endsAt.getDate() - value.startsAt.getDate() ) + 1;
+        return value;
+      } );
+      const tiles = calendarTiler.tileAppointments( month, {
+        delineator: 'duration',
+        usesDuration: true
       } );
 
-      // Pack buttons to columns
-      buttons.forEach( ( value ) => {
-        if( last !== null && value.top >= last ) {
-          this.pack( columns, width );
-          columns = [];
-          last = null;
-        }
-  
-        let placed = false;
-  
-        for( let c = 0; c < columns.length; c++ ) {
-          let column = columns[c];
-          if( !this.collides( column[column.length - 1], value ) ) {
-            column.push( value );
-            placed = true;
-            break;
-          }
-        }
-  
-        if( !placed ) {
-          columns.push( [value] );
-        }
-  
-        if( last === null || value.bottom > last ) {
-          last = value.bottom;
-        }
-      } );      
+      for( let a = 0; a < tiles.sortedAppointments.length; a++ ) {
+        const left = ( m * this.CELL_WIDTH ) + 43;
+        const column = this.CELL_WIDTH - 44;              
 
-      // Place buttons in columns
-      if( columns.length > 0 ) {
-        this.pack( columns, width );
-      }      
+        const event = this.$sheet.children[index];
+        event.setAttribute( 'data-id', tiles.sortedAppointments[a].id );
+        event.setAttribute( 'data-calendar-color', tiles.sortedAppointments[a].color );
+        event.setAttribute( 'data-month-color', color );              
+        event.children[0].textContent = tiles.sortedAppointments[a].summary;
+        event.style.left = ( left + ( column * tiles.positions[a].x ) ) + 'px';
+        event.style.width = ( column * tiles.positions[a].dx ) + 'px';
+        event.style.top = ( ( tiles.positions[a].y - 1 ) * this.CELL_HEIGHT ) + 'px';
+        event.style.height = ( ( tiles.positions[a].dy * this.CELL_HEIGHT ) - 1 ) + 'px';
+
+        if( this.hasAttribute( 'use-calendar-color' ) ) {
+          color = tiles.sortedAppointments[a].color;
+        }
+
+        event.style.setProperty( '--event-active-background-color', color );        
+        event.style.setProperty( '--event-inactive-color', `hsl( from ${color} h s calc( l - 20 ) )` );                
+        event.style.setProperty( '--event-inactive-background-color', color + '4d' );                      
+
+        index = index + 1;
+      }
     }
   }
 } );

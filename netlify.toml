@@ -2,5 +2,6 @@
   directory = "functions/"
 
 [dev]
+  autoLaunch = false
+  port = 8000  
   publish = "."
-  port = 8000

@@ -1,4 +1,132 @@
 aa-year {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  position: relative;
+}
+
+aa-year article {
+  background: transparent;
+}
+
+aa-year canvas {
+  display: block;
+  height: 1240px;
+  image-rendering: crisp-edges;
+  width: 2880px;
+}      
+
+aa-year header {
+  display: flex;
+  flex-direction: row;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+aa-year section {
+  display: block;
+  position: relative;
+}      
+
+aa-year section article {
+  height: 1240px;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 2880px;
+  z-index: 10;
+}
+
+aa-year article button {
+  align-items: flex-start;
+  background: none;
+  background-color: var( --event-inactive-background-color );        
+  border: none;
+  border-left-color: var( --event-active-background-color );        
+  border-left-width: 4px;
+  border-left-style: solid;        
+  border-radius: 4px;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  justify-content: flex-start;
+  margin: 0;
+  outline: none;
+  overflow: hidden;
+  padding: 2px 4px 0 4px;
+  position: absolute;
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;              
+}      
+
+aa-year article button span {
+  box-sizing: border-box;
+  color: var( --event-inactive-color );        
+  font-family: 'IBM Plex Sans', serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 16px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-rendering: optimizeLegibility;
+  white-space: nowrap;
+  width: 100%;
+}
+
+aa-year article button span:last-of-type {
+  font-weight: 400;
+}
+
+aa-year article button:focus {      
+  background-color: var( --event-active-background-color ); 
+}
+
+aa-year article button:focus span {      
+  color: #ffffff;
+}
+
+aa-year header button {
+  background: none;
+  background-color: #f4f4f4;
+  border: none;
+  border-bottom: solid 1px #c7c7c7;
+  border-right: solid 1px #e5e5e5;
+  border-radius: 0;
+  box-sizing: border-box;
+  color: #272727;
+  cursor: pointer;
+  display: block;
+  height: 37px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 16px;
+  line-height: 36px;
+  margin: 0;
+  min-width: 240px;
+  outline: none;
+  padding: 0 0 1px 0;
+  text-rendering: optimizeLegibility;
+  width: 240px;
+  -webkit-tap-highlight-color: transparent;              
+}
+
+aa-year header button:last-of-type {      
+  border-right: none;
+}
+
+aa-year header button:hover {      
+  color: #0082ff;
+}
+
+aa-year[hide-headers] header {
+  display: none;
+}
+
+/*
+aa-year {
   background-color: #ffffff; 
   flex-basis: 0;
   flex-grow: 1;
@@ -155,3 +283,4 @@ aa-year section {
   overflow: auto;
   transform-origin: top left;
 }
+*/

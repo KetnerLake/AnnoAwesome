@@ -4,16 +4,36 @@ customElements.define( 'aa-footer', class extends HTMLElement {
 
     this._touch = ( 'ontouchstart' in document.documentElement ) ? 'touchstart' : 'click';
 
+    this.doFullChange = this.doFullChange.bind( this );
+    this.doFullClick = this.doFullClick.bind( this );
     this.doScaleClick = this.doScaleClick.bind( this );
 
     this.$count = this.querySelector( 'p:last-of-type' );
-    this.$full = this.querySelector( 'button:nth-of-type( 3 )' );
-    this.$horizontal = this.querySelector( 'button:nth-of-type( 2 )' );    
+    // this.$fit = this.querySelector( 'button:nth-of-type( 3 )' );
+    this.$full = this.querySelector( 'button' );
+    // this.$horizontal = this.querySelector( 'button:nth-of-type( 2 )' );    
     this.$link = this.querySelector( 'a' );
-    this.$vertical = this.querySelector( 'button:nth-of-type( 1 )' );        
+    // this.$vertical = this.querySelector( 'button:nth-of-type( 1 )' );        
+  }
+
+  doFullChange() {
+    if( document.fullscreenElement ) {
+      this.$full.children[0].src = '/app/img/fullscreen-exit.svg';
+    } else if( document.exitFullscreen ) {
+      this.$full.children[0].src = '/app/img/fullscreen.svg';      
+    }    
+  }
+
+  doFullClick() {
+    if( document.fullscreenElement ) {
+      document.exitFullscreen();
+    } else if( document.exitFullscreen ) {
+      document.documentElement.requestFullscreen();
+    }
   }
 
   doScaleClick( evt ) {
+    /*
     if( evt.currentTarget === this.$vertical ) {
       this.setAttribute( 'sized', 'vertical' );
     } else if( evt.currentTarget === this.$horizontal ) {
@@ -21,6 +41,7 @@ customElements.define( 'aa-footer', class extends HTMLElement {
     } else {
       this.setAttribute( 'sized', 'full' );
     }
+    */
 
     this.dispatchEvent( new CustomEvent( 'aa-scale', {
       detail: {
@@ -30,15 +51,23 @@ customElements.define( 'aa-footer', class extends HTMLElement {
   }
 
   connectedCallback() {
+    document.addEventListener( 'fullscreenchange', this.doFullChange );
+    this.$full.addEventListener( this._touch, this.doFullClick );
+    /*
     this.$vertical.addEventListener( this._touch, this.doScaleClick );
     this.$horizontal.addEventListener( this._touch, this.doScaleClick );
     this.$full.addEventListener( this._touch, this.doScaleClick );    
+    */
   }
 
   disconnectedCallback() {
+    document.removeEventListener( 'fullscreenchange', this.doFullChange );    
+    this.$full.removeEventListener( this._touch, this.doFullClick );
+    /*
     this.$vertical.removeEventListener( this._touch, this.doScaleClick );
     this.$horizontal.removeEventListener( this._touch, this.doScaleClick );
     this.$full.removeEventListener( this._touch, this.doScaleClick );        
+    */
   }
 
   static get observedAttributes () {
@@ -63,9 +92,11 @@ customElements.define( 'aa-footer', class extends HTMLElement {
     if( name === 'disabled' ) {
       const disabled = this.hasAttribute( 'disabled' );
 
+      /*
       this.$vertical.disabled = disabled;
       this.$horizontal.disabled = disabled;
       this.$full.disabled = disabled;            
+      */
 
       if( disabled ) {
         this.$link.classList.add( 'disabled' );
@@ -74,6 +105,7 @@ customElements.define( 'aa-footer', class extends HTMLElement {
       }
     }
 
+    /*
     if( name === 'sized' ) {
       const sized = newValue === null ? 'full' : newValue;
       
@@ -97,5 +129,6 @@ customElements.define( 'aa-footer', class extends HTMLElement {
           break;
       }
     }
+    */
   }
 } );
