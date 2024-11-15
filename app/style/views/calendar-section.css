@@ -43,4 +43,7 @@ aa-calendar-section ul li:last-of-type {
 aa-calendar-section ul li p {
   flex-basis: 0;
   flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

@@ -129,9 +129,13 @@ aa-event-details article aa-select label {
 }
 
 aa-event-details article aa-select label:has( select ) p:last-of-type {
-  flex-basis: 0;
-  flex-grow: 0;
+  flex-basis: unset;
+  flex-grow: unset;
+  max-width: 50%;
+  overflow: hidden;
   padding: 0 0.75rem 0 0.75rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 aa-event-details article div.notes p {
