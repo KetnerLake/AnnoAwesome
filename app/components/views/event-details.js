@@ -4,10 +4,13 @@ customElements.define( 'aa-event-details', class extends HTMLElement {
 
     this._calendars = [];
     this._data = null;
+    this._daleteAt = null;
+    this._timer = null;
     this._touch = ( 'ontouchstart' in document.documentElement ) ? 'touchstart' : 'click';
 
     this.doCloseClick = this.doCloseClick.bind( this );    
-    this.doDeleteClick = this.doDeleteClick.bind( this );
+    this.doDeleteDown = this.doDeleteDown.bind( this );
+    this.doDeleteUp = this.doDeleteUp.bind( this );    
     this.doEditClick = this.doEditClick.bind( this ); 
     this.doFileClick = this.doFileClick.bind( this );     
     this.doSelectChange = this.doSelectChange.bind( this );
@@ -42,6 +45,30 @@ customElements.define( 'aa-event-details', class extends HTMLElement {
     this.dispatchEvent( new CustomEvent( 'aa-close' ) );
   }
 
+  doDeleteDown() {
+    window.addEventListener( ( 'ontouchstart' in document.documentElement ) ? 'touchend' : 'mouseup', this.doDeleteUp );
+
+    this._deleteAt = Date.now();
+    this._timer = setTimeout( () => {
+      this.dispatchEvent( new CustomEvent( 'aa-delete', {
+        detail: this._data
+      } ) );
+    }, 3000 );
+  }
+
+  doDeleteUp() {
+    if( this._deleteAt !== null ) {
+      if( this._timer !== null ) {
+        clearTimeout( this._timer );
+        this._timer = null;
+      }
+
+      window.removeEventListener( ( 'ontouchstart' in document.documentElement ) ? 'touchend' : 'mouseup', this.doDeleteUp );      
+      this._deleteAt = null;
+    }
+  }
+
+  /*
   doDeleteClick() {
     const response = confirm( 'Are you sure you want to delete this event?' );
     if( !response ) return;    
@@ -49,6 +76,7 @@ customElements.define( 'aa-event-details', class extends HTMLElement {
       detail: this._data 
     } ) );
   }
+  */
 
   doEditClick() {
     this.dispatchEvent( new CustomEvent( 'aa-edit', {
@@ -86,7 +114,7 @@ customElements.define( 'aa-event-details', class extends HTMLElement {
   connectedCallback() {
     this.$calendar.addEventListener( 'aa-change', this.doSelectChange );
     this.$close.addEventListener( this._touch, this.doCloseClick );
-    this.$delete.addEventListener( this._touch, this.doDeleteClick );
+    this.$delete.addEventListener( ( 'ontouchstart' in document.documentElement ) ? 'touchstart' : 'mousedown', this.doDeleteDown );    
     this.$edit.addEventListener( this._touch, this.doEditClick );
     this._upgrade( 'calendars' );
     this._upgrade( 'data' );
@@ -95,7 +123,7 @@ customElements.define( 'aa-event-details', class extends HTMLElement {
   disconnectedCallback() {
     this.$calendar.removeEventListener( 'aa-change', this.doSelectChange );  
     this.$close.removeEventListener( this._touch, this.doCloseClick );
-    this.$delete.removeEventListener( this._touch, this.doDeleteClick );  
+    this.$delete.removeEventListener( ( 'ontouchstart' in document.documentElement ) ? 'touchstart' : 'mousedown', this.doDeleteDown );        
     this.$edit.removeEventListener( this._touch, this.doEditClick );  
   }  
 

@@ -121,10 +121,12 @@ customElements.define( 'aa-year', class extends HTMLElement {
         this.$context.font = `${isToday ? 600 : 400} 16px IBM Plex Sans`;
         this.$context.textAlign = 'center';
         this.$context.textBaseline = week === null ? 'middle' : 'top';
+        const fix = this.$context.measureText( date ).fontBoundingBoxDescent; 
+        // const fix = this.$context.measureText( date ).actualBoundingBoxDescent / 2;        
         this.$context.fillText( 
           date, 
           ( month * this.CELL_WIDTH ) + 21, 
-          ( row * this.CELL_HEIGHT ) + ( week === null ? 22 : 8 ) 
+          ( row * this.CELL_HEIGHT ) + ( week === null ? 22 : 8 )
         );       
         
         if( week !== null && isOutside === false ) {

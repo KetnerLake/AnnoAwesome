@@ -4,7 +4,8 @@ customElements.define( 'aa-event-form', class extends HTMLElement {
 
     this.doAddClick = this.doAddClick.bind( this );
     this.doCancelClick = this.doCancelClick.bind( this );
-    this.doDeleteClick = this.doDeleteClick.bind( this );
+    this.doDeleteDown = this.doDeleteDown.bind( this );
+    this.doDeleteUp = this.doDeleteUp.bind( this );
     this.doEndsChange = this.doEndsChange.bind( this );    
     this.doEndsToggle = this.doEndsToggle.bind( this );
     this.doStartsChange = this.doStartsChange.bind( this );    
@@ -13,6 +14,8 @@ customElements.define( 'aa-event-form', class extends HTMLElement {
 
     this._calendars = [];
     this._data = null;
+    this._deleteAt = null;
+    this._timer = null; 
     this._touch = ( 'ontouchstart' in document.documentElement ) ? 'touchstart' : 'click';
 
     this.$add = this.querySelector( '#event_form_add' );
@@ -55,13 +58,27 @@ customElements.define( 'aa-event-form', class extends HTMLElement {
     } ) );
   }
 
-  doDeleteClick() {
-    const response = confirm( 'Are you sure you want to delete this event?' );
-    if( !response ) return;    
-    
-    this.dispatchEvent( new CustomEvent( 'aa-delete', {
-      detail: this._data
-    } ) );
+  doDeleteDown() {
+    window.addEventListener( ( 'ontouchstart' in document.documentElement ) ? 'touchend' : 'mouseup', this.doDeleteUp );
+
+    this._deleteAt = Date.now();
+    this._timer = setTimeout( () => {
+      this.dispatchEvent( new CustomEvent( 'aa-delete', {
+        detail: this._data
+      } ) );
+    }, 3000 );
+  }
+
+  doDeleteUp() {
+    if( this._deleteAt !== null ) {
+      if( this._timer !== null ) {
+        clearTimeout( this._timer );
+        this._timer = null;
+      }
+
+      window.removeEventListener( ( 'ontouchstart' in document.documentElement ) ? 'touchend' : 'mouseup', this.doDeleteUp );      
+      this._deleteAt = null;
+    }
   }
 
   doEndsChange() {
@@ -128,7 +145,7 @@ customElements.define( 'aa-event-form', class extends HTMLElement {
     this.$starts.children[0].addEventListener( 'toggle', this.doStartsToggle );
     this.$ends.addEventListener( 'aa-change', this.doEndsChange );    
     this.$ends.children[0].addEventListener( 'toggle', this.doEndsToggle );
-    this.$delete.addEventListener( this._touch, this.doDeleteClick );
+    this.$delete.addEventListener( ( 'ontouchstart' in document.documentElement ) ? 'touchstart' : 'mousedown', this.doDeleteDown );
   }
 
   disconnectedCallback() {
@@ -139,7 +156,7 @@ customElements.define( 'aa-event-form', class extends HTMLElement {
     this.$starts.children[0].removeEventListener( 'toggle', this.doStartsToggle );
     this.$ends.removeEventListener( 'aa-change', this.doEndsChange );    
     this.$ends.children[0].removeEventListener( 'toggle', this.doEndsToggle );    
-    this.$delete.removeEventListener( this._touch, this.doDeleteClick );    
+    this.$delete.removeEventListener( ( 'ontouchstart' in document.documentElement ) ? 'touchstart' : 'mousedown', this.doDeleteDown );
   }  
 
   get calendars() {

@@ -4,12 +4,15 @@ customElements.define( 'aa-calendar-form', class extends HTMLElement {
 
     this._colors = [];
     this._data = null;
+    this._deleteAt = null;
+    this._timer = null;
     this._touch = ( 'ontouchstart' in document.documentElement ) ? 'touchstart' : 'click';
 
     this.doCancelClick = this.doCancelClick.bind( this );
     this.doColorClick = this.doColorClick.bind( this );
     this.doCopyClick = this.doCopyClick.bind( this );    
-    this.doDeleteClick = this.doDeleteClick.bind( this );
+    this.doDeleteDown = this.doDeleteDown.bind( this );
+    this.doDeleteUp = this.doDeleteUp.bind( this );    
     this.doDoneClick = this.doDoneClick.bind( this );
     this.doExportClick = this.doExportClick.bind( this );
     this.doNameChange = this.doNameChange.bind( this );
@@ -91,15 +94,29 @@ customElements.define( 'aa-calendar-form', class extends HTMLElement {
     navigator.clipboard.writeText( `https://annoawesome.com/app?calendar=${this._data.url}` );
   }
 
-  doDeleteClick() {
-    const response = confirm( 'Are you sure you want to delete this calendar?' );
-    if( !response ) return;
-        
-    this.dispatchEvent( new CustomEvent( 'aa-delete', {
-      detail: {
-        id: this._data.id
+  doDeleteDown() {
+    window.addEventListener( ( 'ontouchstart' in document.documentElement ) ? 'touchend' : 'mouseup', this.doDeleteUp );
+
+    this._deleteAt = Date.now();
+    this._timer = setTimeout( () => {
+      this.dispatchEvent( new CustomEvent( 'aa-delete', {
+        detail: {
+          id: this._data.id
+        }
+      } ) );
+    }, 3000 );
+  }
+
+  doDeleteUp() {
+    if( this._deleteAt !== null ) {
+      if( this._timer !== null ) {
+        clearTimeout( this._timer );
+        this._timer = null;
       }
-    } ) );
+
+      window.removeEventListener( ( 'ontouchstart' in document.documentElement ) ? 'touchend' : 'mouseup', this.doDeleteUp );      
+      this._deleteAt = null;
+    }
   }
 
   doDoneClick() {
@@ -129,7 +146,7 @@ customElements.define( 'aa-calendar-form', class extends HTMLElement {
   connectedCallback() {
     this.$cancel.addEventListener( this._touch, this.doCancelClick );        
     this.$copy.addEventListener( this._touch, this.doCopyClick );        
-    this.$delete.addEventListener( this._touch, this.doDeleteClick );
+    this.$delete.addEventListener( ( 'ontouchstart' in document.documentElement ) ? 'touchstart' : 'mousedown', this.doDeleteDown );
     this.$done.addEventListener( this._touch, this.doDoneClick );
     this.$export.addEventListener( this._touch, this.doExportClick );
     this.$name.addEventListener( 'aa-change', this.doNameChange );
@@ -140,7 +157,7 @@ customElements.define( 'aa-calendar-form', class extends HTMLElement {
   disconnectedCallback() {
     this.$cancel.removeEventListener( this._touch, this.doCancelClick );
     this.$copy.removeEventListener( this._touch, this.doCopyClick );            
-    this.$delete.removeEventListener( this._touch, this.doDeleteClick );
+    this.$delete.removeEventListener( ( 'ontouchstart' in document.documentElement ) ? 'touchstart' : 'mousedown', this.doDeleteDown );    
     this.$done.removeEventListener( this._touch, this.doDoneClick );    
     this.$export.removeEventListener( this._touch, this.doExportClick );    
     this.$name.removeEventListener( 'aa-change', this.doNameChange );

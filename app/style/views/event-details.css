@@ -78,6 +78,28 @@ aa-event-details > button:last-of-type {
   margin: 1rem 0 0 0;
 }
 
+aa-event-details > button.danger:active {
+  animation: 3s waitforit ease-out forwards;  
+  background-image: linear-gradient( 
+    to right, 
+    rgba( 255, 0, 0, 0.20 ) 0, 
+    rgba( 255, 0, 0, 0.20 ) 50%,
+    white 50%, 
+    white 100%  
+  );
+  background-size: 200% 100%;
+  background-position: 0;
+}
+
+@keyframes waitforit {
+  from {
+    background-position: 100%;
+  }
+  to {
+    background-position: 0;
+  }
+}
+
 aa-event-details article a.hidden,
 aa-event-details article div.hidden,
 aa-event-details article p.hidden {

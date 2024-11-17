@@ -33,6 +33,28 @@ aa-event-form form {
   padding: 0 1rem 1rem 1rem;
 }
 
+aa-event-form form > button.danger:active {
+  animation: 3s waitforit ease-out forwards;  
+  background-image: linear-gradient( 
+    to right, 
+    rgba( 255, 0, 0, 0.20 ) 0, 
+    rgba( 255, 0, 0, 0.20 ) 50%,
+    white 50%, 
+    white 100%  
+  );
+  background-size: 200% 100%;
+  background-position: 0;
+}
+
+@keyframes waitforit {
+  from {
+    background-position: 100%;
+  }
+  to {
+    background-position: 0;
+  }
+}
+
 aa-event-form form div.vbox { 
   background-color: #ffffff;
   border-radius: 4px;
