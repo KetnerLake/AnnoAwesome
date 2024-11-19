@@ -306,8 +306,6 @@ customElements.define( 'aa-year', class extends HTMLElement {
       this.$sheet.appendChild( element );
     }
 
-    console.log( this.$sheet.children.length + ' : ' + this._data.length );        
-
     const year = this.hasAttribute( 'value' ) ? parseInt( this.getAttribute( 'value' ) ) : new Date().getFullYear();          
     let index = 0;
 
