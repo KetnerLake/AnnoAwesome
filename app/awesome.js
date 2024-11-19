@@ -441,52 +441,14 @@ calendar_details.addEventListener( 'aa-active', ( evt ) => {
 
     return db.calendar.bulkPut( data );      
   } )
-  .then( () => {
-    return db.calendar.toCollection().sortBy( 'name' );
+  .then( () => browseCalendar( 'asc' ) )
+  .then( ( data ) => {
+    calendar_details.data = data;
+    return browseEvent( null, sort_store );      
   } )
   .then( ( data ) => {
-    colors = data.reduce( ( prev, curr ) => {
-      prev[curr.id] = curr.color;
-      return prev;
-    }, {} );      
-
-    calendars = [... data];
-    calendar_details.data = calendars;
-
-    return db.event.where( 'startsAt' ).between( starts, ends ).toArray();      
-  } )
-  .then( ( data ) => {
-    data = data.map( ( value ) => {
-      value.color = colors[value.calendarId];
-      return value;
-    } );    
-    data.sort( ( a, b ) => {
-      const first = a.startsAt.getFullYear() + '-' + ( a.startsAt.getMonth() + 1 ) + '-' + a.startsAt.getDate();
-      const second = b.startsAt.getFullYear() + '-' + ( b.startsAt.getMonth() + 1 ) + '-' + b.startsAt.getDate();    
-  
-      if( sort_store === 'desc' ) {
-        if( first < second ) return 1;
-        if( first > second ) return -1;        
-      } else {
-        if( first < second ) return -1;
-        if( first > second ) return 1;        
-      }
-  
-      // Pin like colors to the left side
-      // Inverse sort pins colors to the right side
-      if( a.color < b.color ) return 1;
-      if( a.color > b.color ) return -1;
-  
-      if( a.summary < b.summary ) return -1;
-      if( a.summary > b.summary ) return 1;    
-  
-      return 0;
-    } );
-
-    const active = calendars.filter( ( value ) => value.isActive ).map( ( value ) => value.id );
-    events = data.filter( ( value ) => active.includes( value.calendarId ) );
-
-    event_list.data = events;  
+    event_list.data = data;  
+    const events = data.filter( ( value ) => value.startsAt.getFullYear() === year_store ? true : false );
     year_view.data = events;
     footer.setAttribute( 'count', events.length );
   } );
@@ -513,17 +475,19 @@ calendar_details.addEventListener( 'aa-colors', ( evt ) => {
   }
 } );
 calendar_details.addEventListener( 'aa-info', ( evt ) => {
-  readCalendar( evt.detail.id )
+  browseCalendar( 'asc' )
   .then( ( data ) => {
-    calendar_form.colors = COLORS;
-    calendar_form.data = data;
-
-    if( calendars.length > 1 ) {
+    if( data.length > 1 ) {
       calendar_form.setAttribute( 'can-delete', '' );
     } else {
       calendar_form.removeAttribute( 'can-delete' );
     }
-    
+
+    return readCalendar( evt.detail.id );
+  } )
+  .then( ( data ) => {
+    calendar_form.colors = COLORS;
+    calendar_form.data = data;
     blocker( true );
     calendar_dialog.showModal();
     calendar_form.focus();
@@ -619,13 +583,6 @@ if( year_store === null ) {
 header.setAttribute( 'year', year_store );
 year_view.setAttribute( 'value', year_store );
 
-// Variables
-let calendars = [];
-let colors = null;
-let ends = new Date( year_store + 1, 0, 1 );
-let events = [];
-let starts = new Date( year_store, 0, 1 );
-
 // Database
 const db = new Dexie( 'AnnoAwesome' );
 db.version( 8 ).stores( {
@@ -640,7 +597,7 @@ browseCalendar( 'asc' )
     const id = self.crypto.randomUUID();
     const now = Date.now();
     const url = await tiny( crypto.randomUUID() );
-    await db.calendar.put( {
+    await editCalendar( {
       id: id,
       createdAt: new Date( now ),
       updatedAt: new Date( now ),
@@ -652,28 +609,22 @@ browseCalendar( 'asc' )
       isShared: false,
       url: url
     } );
-    data = await db.calendar.toArray();
+    data = await browseCalendar( 'asc' );
   }
 
-  calendars = [... data];
-  calendar_details.data = calendars;
-
-  colors = calendars.reduce( ( prev, curr ) => {
-    prev[curr.id] = curr.color;
-    return prev;
-  }, {} );
+  calendar_details.data = data;
 
   return browseEvent( null, sort_store );
 } )
 .then( ( data ) => {
   event_list.colors = COLORS;
   event_list.data = data;  
-  year_view.colors = COLORS;
   const events = data.filter( ( value ) => value.startsAt.getFullYear() === year_store ? true : false );
+  year_view.colors = COLORS;  
   year_view.data = events;
+  footer.setAttribute( 'count', events.length );  
   event_search.colors = COLORS;
   event_search.data = null;
-  footer.setAttribute( 'count', events.length );
 } );      
 
 /* 
