@@ -34,7 +34,7 @@ aa-event-form form {
 }
 
 aa-event-form form > button.danger:active {
-  animation: 3s waitforit ease-out forwards;  
+  animation: 2s waitforit ease-out forwards;  
   background-image: linear-gradient( 
     to right, 
     rgba( 255, 0, 0, 0.20 ) 0, 

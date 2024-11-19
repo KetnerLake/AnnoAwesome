@@ -17,19 +17,23 @@ customElements.define( 'aa-event-list', class extends HTMLElement {
     this.$template = document.querySelector( '#event_list_renderer' );
   }
 
+  show( id = null ) {
+    if( id !== null ) {
+      const event = this.$list.querySelector( `li[data-id="${id}"]` );
+      event.scrollIntoView( {
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'center'
+      } );
+    }
+  }
+
   doAddClick() {
     this.dispatchEvent( new CustomEvent( 'aa-add' ) );    
   }
 
   doItemClick( evt ) {
-    for( let c = 0; c < this.$list.children.length; c++ ) {
-      if( this.$list.children[c].getAttribute( 'data-id' ) === evt.currentTarget.getAttribute( 'data-id' ) ) {
-        this.$list.children[c].classList.add( 'selected' );
-      } else {
-        this.$list.children[c].classList.remove( 'selected' );
-      }
-    }
-
+    this.setAttribute( 'selected-item', evt.currentTarget.getAttribute( 'data-id' ) );
     this.dispatchEvent( new CustomEvent( 'aa-change', {
       bubbles: true,
       cancelable: false,
@@ -77,11 +81,22 @@ customElements.define( 'aa-event-list', class extends HTMLElement {
 
   static get observedAttributes () {
     return [
+      'selected-item',
       'use-calendar-color'
     ];
   }   
   
   attributeChangedCallback( name, oldValue, newValue ) {
+    if( name === 'selected-item' ) {
+      for( let c = 0; c < this.$list.children.length; c++ ) {
+        if( this.$list.children[c].getAttribute( 'data-id' ) === newValue ) {
+          this.$list.children[c].classList.add( 'selected' );
+        } else {
+          this.$list.children[c].classList.remove( 'selected' );
+        }
+      }      
+    }
+
     if( name === 'use-calendar-color' ) {
       for( let c = 0; c < this.$list.children.length; c++ ) {
         let color = this.$list.children[c].getAttribute( 'data-month-color' );

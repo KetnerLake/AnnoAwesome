@@ -79,7 +79,7 @@ aa-event-details > button:last-of-type {
 }
 
 aa-event-details > button.danger:active {
-  animation: 3s waitforit ease-out forwards;  
+  animation: 2s waitforit ease-out forwards;  
   background-image: linear-gradient( 
     to right, 
     rgba( 255, 0, 0, 0.20 ) 0, 

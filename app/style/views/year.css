@@ -81,11 +81,21 @@ aa-year article button span:last-of-type {
   font-weight: 400;
 }
 
+/*
 aa-year article button:focus {      
   background-color: var( --event-active-background-color ); 
 }
 
 aa-year article button:focus span {      
+  color: #ffffff;
+}
+*/
+
+aa-year article button.selected {
+  background-color: var( --event-active-background-color ); 
+}
+
+aa-year article button.selected span {
   color: #ffffff;
 }
 

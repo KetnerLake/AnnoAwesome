@@ -42,7 +42,11 @@ customElements.define( 'aa-event-details', class extends HTMLElement {
   }
 
   doCloseClick() {
-    this.dispatchEvent( new CustomEvent( 'aa-close' ) );
+    this.dispatchEvent( new CustomEvent( 'aa-close', {
+      detail: {
+        id: this._data === null ? null : this._data.id
+      }
+    } ) );
   }
 
   doDeleteDown() {
@@ -53,7 +57,7 @@ customElements.define( 'aa-event-details', class extends HTMLElement {
       this.dispatchEvent( new CustomEvent( 'aa-delete', {
         detail: this._data
       } ) );
-    }, 3000 );
+    }, 2000 );
   }
 
   doDeleteUp() {

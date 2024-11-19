@@ -37,6 +37,7 @@ customElements.define( 'aa-year', class extends HTMLElement {
   }
 
   doEventClick( evt ) {
+    this.setAttribute( 'selected-item', evt.currentTarget.getAttribute( 'data-id' ) );
     this.dispatchEvent( new CustomEvent( 'aa-change', {
       detail: {
         id: evt.currentTarget.getAttribute( 'data-id' )
@@ -172,6 +173,35 @@ customElements.define( 'aa-year', class extends HTMLElement {
     }          
   }
 
+  show( id = null ) {
+    if( id === 'top' ) {
+      year_view.scrollTo( {
+        top: 0, 
+        behavior: 'smooth'
+      } );
+    } else if( id === 'start' ) {
+      year_view.scrollTo( {
+        left: 0, 
+        top: 0, 
+        behavior: 'smooth'
+      } );
+    } else if( id === 'today' ) {      
+      const today = new Date();
+      year_view.scrollTo( {
+        left: ( today.getMonth() * 240 ) - ( year_view.clientWidth / 2 ),
+        top: ( today.getDate() * 40 ) - ( year_view.clientHeight / 2 ),
+        behavior: 'smooth'
+      } );
+    } else {
+      const event = this.$sheet.querySelector( `button[data-id="${id}"]` );
+      event.scrollIntoView( {
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'center'
+      } );
+    }
+  }
+
   // https://stackoverflow.com/questions/6117814/get-week-of-year-in-javascript-like-in-php/6117889#6117889
   week( date ) {
     date = new Date( Date.UTC( date.getFullYear(), date.getMonth(), date.getDate() ) );
@@ -217,11 +247,10 @@ customElements.define( 'aa-year', class extends HTMLElement {
       const item = this.hasAttribute( 'selected-item' ) ? this.getAttribute( 'selected-item' ) : null;
 
       for( let e = 0; e < events.length; e++ ) {              
-        if( item !== null ) {
-          if( events[e].getAttribute( 'data-id' ) === item ) {
-            events[e].focus();
-            break;
-          }
+        if( events[e].getAttribute( 'data-id' ) === item ) {
+          events[e].classList.add( 'selected' );
+        } else {
+          events[e].classList.remove( 'selected' );            
         }
       }      
     }
@@ -277,6 +306,8 @@ customElements.define( 'aa-year', class extends HTMLElement {
       this.$sheet.appendChild( element );
     }
 
+    console.log( this.$sheet.children.length + ' : ' + this._data.length );        
+
     const year = this.hasAttribute( 'value' ) ? parseInt( this.getAttribute( 'value' ) ) : new Date().getFullYear();          
     let index = 0;
 
@@ -297,7 +328,6 @@ customElements.define( 'aa-year', class extends HTMLElement {
       for( let a = 0; a < tiles.sortedAppointments.length; a++ ) {
         const left = ( m * this.CELL_WIDTH ) + 43;
         const column = this.CELL_WIDTH - 44;              
-
         const event = this.$sheet.children[index];
         event.setAttribute( 'data-id', tiles.sortedAppointments[a].id );
         event.setAttribute( 'data-calendar-color', tiles.sortedAppointments[a].color );

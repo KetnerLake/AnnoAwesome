@@ -104,7 +104,7 @@ customElements.define( 'aa-calendar-form', class extends HTMLElement {
           id: this._data.id
         }
       } ) );
-    }, 3000 );
+    }, 2000 );
   }
 
   doDeleteUp() {

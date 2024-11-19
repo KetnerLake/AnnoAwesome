@@ -66,7 +66,7 @@ customElements.define( 'aa-event-form', class extends HTMLElement {
       this.dispatchEvent( new CustomEvent( 'aa-delete', {
         detail: this._data
       } ) );
-    }, 3000 );
+    }, 2000 );
   }
 
   doDeleteUp() {
