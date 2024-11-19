@@ -69,42 +69,39 @@ navigation.addEventListener( 'aa-add', () => {
   } );
 } );    
 navigation.addEventListener( 'aa-search', () => {
-  event_search.data = events;
-  footer.setAttribute( 'count', events.length );
+  event_search.data = null;
+  // footer.setAttribute( 'count', data.length );    
   left_panel.classList.add( 'hidden' );
   right_panel.classList.remove( 'hidden' );
-  window.localStorage.removeItem( 'awesome_drawer' );
+  window.localStorage.removeItem( 'awesome_drawer' );   
 } );
 navigation.addEventListener( 'aa-change', ( evt ) => {
-  if( evt.detail.value !== null ) {
-    const filtered = events.filter( ( value ) => {
-      const query = evt.detail.value.toLowerCase();
-      let match = false;
-
-      if( value.summary !== null ) {
-        if( value.summary.toLowerCase().indexOf( query ) >= 0 ) match = true;
-      }
-  
-      if( value.description !== null ) {
-        if( value.description.toLowerCase().indexOf( query ) >= 0 ) match = true;
-      }
-  
-      return match;
+  if( evt.detail.value === null ) {
+    browseEvent( year_store, sort_store )
+    .then( ( data ) => {
+      year_view.data = data;
+      footer.setAttribute( 'count', data.length );             
+      event_search.data = null;      
     } );
-
-    year_view.data = filtered;
-    event_search.data = filtered;
-    footer.setAttribute( 'count', filtered.length );
   } else {
-    event_search.data = events;
-    footer.setAttribute( 'count', events.length );
+    browseEvent( null, sort_store, true, false, null, evt.detail.value )
+    .then( ( data ) => {
+      const events = data.filter( ( value ) => value.startsAt.getFullYear() === year_store ? true : false );
+      year_view.data = events;
+      footer.setAttribute( 'count', events.length );       
+      event_search.data = data;
+    } );
   }
 } );
 navigation.addEventListener( 'aa-cancel', () => {
-  event_search.data = events;
+  event_search.data = null;
   right_panel.classList.add( 'hidden' );
-  year_view.data = events;
-  footer.setAttribute( 'count', events.length );
+
+  browseEvent( year_store, sort_store )
+  .then( ( data ) => {
+    year_view.data = data;
+    footer.setAttribute( 'count', data.length );
+  } );
 } );
 
 /*
