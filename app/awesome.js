@@ -56,7 +56,7 @@ navigation.addEventListener( 'aa-add', () => {
     year_view.removeAttribute( 'selected-item' );
     event_search.data = null;
     right_panel.classList.add( 'hidden' );
-    footer.setAttribute( 'count', events.length );    
+    footer.setAttribute( 'count', data.length );    
     return browseCalendar( 'asc' );
   } )
   .then( ( data ) => {
@@ -108,12 +108,12 @@ navigation.addEventListener( 'aa-cancel', () => {
  * Header 
  */ 
 
-header.addEventListener( 'aa-previous', ( evt ) => headerChange( evt ) );
-header.addEventListener( 'aa-next', ( evt ) => headerChange( evt ) );
+header.addEventListener( 'aa-previous', ( evt ) => headerChange( evt.detail.year ) );
+header.addEventListener( 'aa-next', ( evt ) => headerChange( evt.detail.year ) );
 header.addEventListener( 'aa-today', ( evt ) => {
+  year_view.setAttribute( 'value', evt.detail.year );  
   year_view.show( 'today' );
-  year_view.value = evt.detail.year;
-  headerChange( evt );
+  headerChange( evt.detail.year );
 } );
 header.addEventListener( 'aa-year', () => {
   year_view.show( 'start' );
@@ -211,6 +211,7 @@ event_form.addEventListener( 'aa-done', () => {
   editEvent( event )
   .then( () => browseEvent( null, sort_store ) )
   .then( ( data ) => {
+    // TODO: What to display in case of calendar being hidden/inactive
     event_list.data = data;
     event_list.setAttribute( 'selected-item', event.id );    
 
@@ -223,8 +224,12 @@ event_form.addEventListener( 'aa-done', () => {
     const events = data.filter( ( value ) => value.startsAt.getFullYear() === year_store ? true : false );
     year_view.setAttribute( 'value', year_store );
     year_view.data = events;
-    year_view.setAttribute( 'selected-item', event.id );
-    year_view.show( event.id );
+
+    if( events.length > 0 ) {
+      year_view.setAttribute( 'selected-item', event.id );
+      year_view.show( event.id );
+    }
+
     footer.setAttribute( 'count', events.length  );        
     blocker( false );
     event_dialog.close();    
@@ -471,7 +476,7 @@ calendar_details.addEventListener( 'aa-colors', ( evt ) => {
     window.localStorage.removeItem( 'awesome_colors' );
     event_list.removeAttribute( 'use-calendar-color' );
     year_view.removeAttribute( 'use-calendar-color' );
-    event_search.removeAttribute( 'use-calendar-color', '' );
+    event_search.removeAttribute( 'use-calendar-color' );
   }
 } );
 calendar_details.addEventListener( 'aa-info', ( evt ) => {
@@ -526,6 +531,42 @@ year_view.addEventListener( 'aa-change', ( evt ) => {
 } );
 year_view.addEventListener( 'aa-month', () => {  
   year_view.show( 'top' );
+} );
+
+/*
+ * Search 
+ */
+
+event_search.addEventListener( 'aa-change', ( evt ) => {
+  readEvent( evt.detail.id )
+  .then( ( data ) => {
+    // event_details.data = data;
+    // event_stack.setAttribute( 'selected-index', 1 );
+    // blocker( true );
+    // event_dialog.showModal();      
+
+    if( data.startsAt.getFullYear() !== year_store ) {
+      year_store = data.startsAt.getFullYear();
+      window.localStorage.setItem( 'awesome_year', year_store );
+      year_view.setAttribute( 'value', year_store );
+
+      return browseEvent( year_store, sort_store );          
+    } else {
+      year_view.setAttribute( 'selected-item', evt.detail.id );
+      year_view.show( evt.detail.id );      
+    }
+  } )
+  .then( ( data ) => {
+    header.setAttribute( 'year', year_store );    
+
+    if( data !== null ) {
+      year_view.data = data;
+      footer.setAttribute( 'count', data.length );
+    }
+
+    year_view.setAttribute( 'selected-item', evt.detail.id );
+    year_view.show( evt.detail.id );
+  } );
 } );
 
 /*
@@ -675,18 +716,22 @@ function controlsChange( evt ) {
   } );  
 }      
 
-function headerChange( evt ) {
-  window.localStorage.setItem( 'awesome_year', evt.detail.starts.getFullYear() );
-  year_store = evt.detail.starts.getFullYear();
-  // starts = new Date( evt.detail.starts.getFullYear(), 0, 1 );
-  // ends = new Date( evt.detail.ends.getFullYear(), 0, 1 );
-
+function headerChange( year ) {
+  year_store = year;
+  window.localStorage.setItem( 'awesome_year', year_store );
+ 
+  header.setAttribute( 'year', year_store );
   year_view.setAttribute( 'value', year_store );
+  
+  const selected = year_view.hasAttribute( 'selected-item' ) ? year_view.getAttribute( 'selected-item' ) : null;
 
   browseEvent( year_store, sort_store )
   .then( ( data ) => {
-    // event_list.data = events;    
-    year_view.data = data;
+    year_view.data = data;    
+    if( selected !== null ) {
+      year_view.setAttribute( 'selected-item', selected );
+    }
+
     footer.setAttribute( 'count', data.length );
   } );   
 }      

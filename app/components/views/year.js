@@ -34,6 +34,7 @@ customElements.define( 'aa-year', class extends HTMLElement {
     }
 
     this.draw();
+    this.show( 'today', 'instant' );
   }
 
   doEventClick( evt ) {
@@ -173,29 +174,33 @@ customElements.define( 'aa-year', class extends HTMLElement {
     }          
   }
 
-  show( id = null ) {
+  show( id = null, behavior = 'smooth' ) {
     if( id === 'top' ) {
       year_view.scrollTo( {
         top: 0, 
-        behavior: 'smooth'
+        behavior: behavior
       } );
     } else if( id === 'start' ) {
       year_view.scrollTo( {
         left: 0, 
         top: 0, 
-        behavior: 'smooth'
+        behavior: behavior
       } );
     } else if( id === 'today' ) {      
+      const year = this.hasAttribute( 'value' ) ? parseInt( this.getAttribute( 'value' ) ) : new Date().getFullYear();      
       const today = new Date();
-      year_view.scrollTo( {
-        left: ( today.getMonth() * 240 ) - ( year_view.clientWidth / 2 ),
-        top: ( today.getDate() * 40 ) - ( year_view.clientHeight / 2 ),
-        behavior: 'smooth'
-      } );
+
+      if( year === today.getFullYear() ) {
+        year_view.scrollTo( {
+          left: ( today.getMonth() * 240 ) - ( year_view.clientWidth / 2 ),
+          top: ( today.getDate() * 40 ) - ( year_view.clientHeight / 2 ),
+          behavior: behavior
+        } );
+      }
     } else {
       const event = this.$sheet.querySelector( `button[data-id="${id}"]` );
       event.scrollIntoView( {
-        behavior: 'smooth',
+        behavior: behavior,
         block: 'center',
         inline: 'center'
       } );
@@ -219,7 +224,6 @@ customElements.define( 'aa-year', class extends HTMLElement {
   }
 
   connectedCallback() {    
-    this._upgrade( 'colors' );    
     this._upgrade( 'data' );
 
     for( let h = 0; h < this.$headers.length; h++ ) {
@@ -258,6 +262,7 @@ customElements.define( 'aa-year', class extends HTMLElement {
     if( name === 'use-calendar-color' ) {
       for( let c = 0; c < this.$sheet.children.length; c++ ) {
         let color = this.$sheet.children[c].getAttribute( 'data-month-color' );
+
         if( this.hasAttribute( 'use-calendar-color' ) ) {
           color = this.$sheet.children[c].getAttribute( 'data-calendar-color' );
         }        
@@ -273,14 +278,6 @@ customElements.define( 'aa-year', class extends HTMLElement {
       this.draw( year );
     }
   }
-
-  get colors() {
-    return this._colors.length === 0 ? null : this._colors;
-  }
-
-  set colors( value ) {
-    this._colors = value === null ? [] : [... value];
-  }        
 
   get data() {
     return this._data.length === 0 ? null : this._data;
@@ -310,8 +307,6 @@ customElements.define( 'aa-year', class extends HTMLElement {
     let index = 0;
 
     for( let m = 0; m < 12; m++ ) {
-      let color = this._colors[m % this._colors.length].value;                                  
-
       const month = this._data.filter( ( value ) => value.startsAt.getMonth() === m && value.startsAt.getFullYear() === year ? true : false );
       month.map( ( value ) => {
         value.start = value.startsAt.getDate();
@@ -324,6 +319,8 @@ customElements.define( 'aa-year', class extends HTMLElement {
       } );
 
       for( let a = 0; a < tiles.sortedAppointments.length; a++ ) {
+        let color = this._colors[m % this._colors.length].value;                                  
+
         const left = ( m * this.CELL_WIDTH ) + 43;
         const column = this.CELL_WIDTH - 44;              
         const event = this.$sheet.children[index];
