@@ -4,13 +4,17 @@ customElements.define( 'aa-event-form', class extends HTMLElement {
 
     this.doAddClick = this.doAddClick.bind( this );
     this.doCancelClick = this.doCancelClick.bind( this );
+    this.doCalendarChange = this.doCalendarChange.bind( this );
     this.doDeleteDown = this.doDeleteDown.bind( this );
     this.doDeleteUp = this.doDeleteUp.bind( this );
     this.doEndsChange = this.doEndsChange.bind( this );    
     this.doEndsToggle = this.doEndsToggle.bind( this );
+    this.doLocationChange = this.doLocationChange.bind( this );    
+    this.doNotesChange = this.doNotesChange.bind( this );        
     this.doStartsChange = this.doStartsChange.bind( this );    
     this.doStartsToggle = this.doStartsToggle.bind( this );
     this.doTitleChange = this.doTitleChange.bind( this );
+    this.doUrlChange = this.doUrlChange.bind( this );        
 
     this._calendars = [];
     this._data = null;
@@ -42,12 +46,30 @@ customElements.define( 'aa-event-form', class extends HTMLElement {
     this.$title.focus();
   }
 
+  validate() {
+    let result = true;
+
+    if( !this.$title.hasAttribute( 'value' ) ) {
+      result = false;
+    }
+
+    if( this.$ends.valueAsDate.getTime() < this.$starts.valueAsDate.getTime() ) {
+      result = false;
+    }
+
+    return result;
+  }
+
   doAddClick() {
     if( this._data === null ) {
       this.dispatchEvent( new CustomEvent( 'aa-done' ) );
     } else {
       this.dispatchEvent( new CustomEvent( 'aa-done' ) );
     }
+  }
+
+  doCalendarChange() {    
+    this.$add.disabled = !this.validate();        
   }
 
   doCancelClick() {
@@ -104,6 +126,8 @@ customElements.define( 'aa-event-form', class extends HTMLElement {
       this.$ends.removeAttribute( 'invalid' );
       this.$add.disabled = false;          
     }
+
+    this.$add.disabled = !this.validate();    
   }
 
   doEndsToggle( evt ) {
@@ -112,8 +136,17 @@ customElements.define( 'aa-event-form', class extends HTMLElement {
     }
   }
 
+  doLocationChange() {
+    this.$add.disabled = !this.validate();
+  }  
+
+  doNotesChange() {
+    this.$add.disabled = !this.validate();
+  }    
+
   doStartsChange( evt ) {
     this.$ends.valueAsDate = new Date( this.$starts.valueAsDate.getTime() );
+    this.$add.disabled = !this.validate();    
   }
 
   doStartsToggle( evt ) {
@@ -122,9 +155,13 @@ customElements.define( 'aa-event-form', class extends HTMLElement {
     }
   }
 
-  doTitleChange( evt ) {
-    this.$add.disabled = evt.detail.value === null ? true : false;
+  doTitleChange() {
+    this.$add.disabled = !this.validate();
   }
+
+  doUrlChange() {
+    this.$add.disabled = !this.validate();
+  }    
 
   _upgrade( property ) {
     if( this.hasOwnProperty( property ) ) {
@@ -141,10 +178,14 @@ customElements.define( 'aa-event-form', class extends HTMLElement {
     this.$add.addEventListener( this._touch, this.doAddClick );
     this.$cancel.addEventListener( this._touch, this.doCancelClick );
     this.$title.addEventListener( 'aa-change', this.doTitleChange );
+    this.$location.addEventListener( 'aa-change', this.doLocationChange );    
     this.$starts.addEventListener( 'aa-change', this.doStartsChange );
     this.$starts.children[0].addEventListener( 'toggle', this.doStartsToggle );
     this.$ends.addEventListener( 'aa-change', this.doEndsChange );    
     this.$ends.children[0].addEventListener( 'toggle', this.doEndsToggle );
+    this.$calendar.addEventListener( 'aa-change', this.doCalendarChange );            
+    this.$url.addEventListener( 'aa-change', this.doUrlChange );        
+    this.$notes.addEventListener( 'input', this.doNotesChange );            
     this.$delete.addEventListener( ( 'ontouchstart' in document.documentElement ) ? 'touchstart' : 'mousedown', this.doDeleteDown );
   }
 
@@ -152,10 +193,14 @@ customElements.define( 'aa-event-form', class extends HTMLElement {
     this.$add.removeEventListener( this._touch, this.doAddClick );    
     this.$cancel.removeEventListener( this._touch, this.doCancelClick );
     this.$title.removeEventListener( 'aa-change', this.doTitleChange );    
+    this.$location.removeventListener( 'aa-change', this.doLocationChange );        
     this.$starts.removeEventListener( 'aa-change', this.doStartsChange );
     this.$starts.children[0].removeEventListener( 'toggle', this.doStartsToggle );
     this.$ends.removeEventListener( 'aa-change', this.doEndsChange );    
-    this.$ends.children[0].removeEventListener( 'toggle', this.doEndsToggle );    
+    this.$ends.children[0].removeEventListener( 'toggle', this.doEndsToggle );   
+    this.$calendar.removeEventListener( 'aa-change', this.doCalendarChange );                
+    this.$url.removeEventListener( 'aa-change', this.doUrlChange );             
+    this.$notes.removeEventListener( 'input', this.doNotesChange );                
     this.$delete.removeEventListener( ( 'ontouchstart' in document.documentElement ) ? 'touchstart' : 'mousedown', this.doDeleteDown );
   }  
 

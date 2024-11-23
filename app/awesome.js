@@ -154,17 +154,11 @@ account_form.addEventListener( 'aa-export', () => {
   } );
 } );
 account_form.addEventListener( 'aa-sign-in', ( evt ) => {
-  const response = confirm( 'Individual accounts not yet available. Help fund feature development. Buy me a coffee?' );
-
-  if( response ) {
-    window.open( '/app/sign-up.html', '_blank' );
-  }
-
-  console.log( 'SIGN IN' );
-  console.log( evt.detail );
+  const response = confirm( 'Individual accounts not yet available. Sponsor feature development. Learn more?' );
+  if( response ) window.open( 'https://patreon.com/krhoyt', '_blank' );
 } );
 account_form.addEventListener( 'aa-sign-up', () => {
-  window.open( '/app/sign-up.html', '_blank' );
+  window.open( 'https://patreon.com/krhoyt', '_blank' );
   blocker( false );        
   account_dialog.close();
 } );      
@@ -430,6 +424,10 @@ calendar_form.addEventListener( 'aa-export', ( evt ) => {
       link.remove();
     }, 5000, link );    
   } );
+} );
+calendar_form.addEventListener( 'aa-sign-up', () => {
+  const result = confirm( 'Not yet available. You can sponsor additional development. Learn more?' );
+  if( result ) window.open( 'https://patreon.com/krhoyt', '_blank' );
 } );
 
 // Details

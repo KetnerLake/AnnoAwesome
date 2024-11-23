@@ -16,6 +16,8 @@ customElements.define( 'aa-calendar-form', class extends HTMLElement {
     this.doDoneClick = this.doDoneClick.bind( this );
     this.doExportClick = this.doExportClick.bind( this );
     this.doNameChange = this.doNameChange.bind( this );
+    this.doPublicClick = this.doPublicClick.bind( this );
+    this.doShareClick = this.doShareClick.bind( this );    
 
     this.$cancel = this.querySelector( '#calendar_form_cancel' );
     this.$colors = this.querySelector( 'summary' );
@@ -27,6 +29,7 @@ customElements.define( 'aa-calendar-form', class extends HTMLElement {
     this.$list = this.querySelector( 'details ul' );
     this.$name = this.querySelector( '#calendar_form_name' );
     this.$public = this.querySelector( '#calendar_form_public' );
+    this.$share = this.querySelector( '#calendar_form_share' );    
     this.$template = document.querySelector( '#color_picker_renderer' );
     this.$title = this.querySelector( '#calendar_form_title' );
     this.$url = this.querySelector( '#calendar_url p:last-of-type' );
@@ -34,6 +37,16 @@ customElements.define( 'aa-calendar-form', class extends HTMLElement {
 
   focus() {
     this.$name.focus();
+  }
+
+  validate() {
+    let result = true;
+
+    if( !this.$name.hasAttribute( 'value' ) ) {
+      result = false;
+    }
+
+    return result;
   }
 
   async tiny( value ) {
@@ -88,6 +101,8 @@ customElements.define( 'aa-calendar-form', class extends HTMLElement {
         value: color
       }
     } ) );
+
+    this.$done.disabled = !this.validate();
   }
 
   doCopyClick() {
@@ -132,7 +147,19 @@ customElements.define( 'aa-calendar-form', class extends HTMLElement {
   }
 
   doNameChange( evt ) {
-    this.$done.disabled = evt.detail.value === null ? true : false;
+    this.$done.disabled = !this.validate();
+  }
+
+  doPublicClick() {
+    this.$done.disabled = !this.validate();    
+  }
+
+  doShareClick() {
+    this.dispatchEvent( new CustomEvent( 'aa-sign-up', {
+      bubbles: true,
+      cancelable: false,
+      composed: true
+    } ) );    
   }
   
   _upgrade( property ) {
@@ -150,6 +177,8 @@ customElements.define( 'aa-calendar-form', class extends HTMLElement {
     this.$done.addEventListener( this._touch, this.doDoneClick );
     this.$export.addEventListener( this._touch, this.doExportClick );
     this.$name.addEventListener( 'aa-change', this.doNameChange );
+    this.$share.addEventListener( this._touch, this.doShareClick );
+    this.$public.addEventListener( this._touch, this.doPublicClick );
     this._upgrade( 'colors' );    
     this._upgrade( 'data' );
   }
@@ -161,6 +190,8 @@ customElements.define( 'aa-calendar-form', class extends HTMLElement {
     this.$done.removeEventListener( this._touch, this.doDoneClick );    
     this.$export.removeEventListener( this._touch, this.doExportClick );    
     this.$name.removeEventListener( 'aa-change', this.doNameChange );
+    this.$share.removeEventListener( this._touch, this.doShareClick );
+    this.$public.removeEventListener( this._touch, this.doPublicClick );    
   }
 
   static get observedAttributes () {
