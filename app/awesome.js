@@ -660,6 +660,7 @@ browseCalendar( 'asc' )
   event_list.data = data;  
   const events = data.filter( ( value ) => value.startsAt.getFullYear() === year_store ? true : false );
   year_view.colors = COLORS;  
+  console.log( events );
   year_view.data = events;
   footer.setAttribute( 'count', events.length );  
   event_search.colors = COLORS;
@@ -896,7 +897,7 @@ function browseEvent( year = null, sort = null, active = true, reverse = false, 
     }
 
     for( let d = 0; d < data.length; d++ ) {
-      data[d].color = calendars.reduce( ( value, curr ) => data[d].calendarId === curr.id ? curr.color : value );
+      data[d].color = calendars.reduce( ( value, curr ) => data[d].calendarId === curr.id ? curr.color : value, null );
     }
 
     if( sort !== null ) {
