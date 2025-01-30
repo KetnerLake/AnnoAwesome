@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Plan your year. Track annual progress. Feel accomplished. Anno Awesome: The missing year view.">
+
+  <title>Anno Awesome</title>
+
+  <link href="/img/trident.svg" rel="icon" type="image/svg+xml" />
+  <!-- <link href="/app/style/awesome.css" rel="stylesheet" /> -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --background-color: #f4f4f4;
+      --button-border-radius: 4px;
+      --button-color: #0082ff;
+      --button-hover-color: #0082ff;      
+      --button-disabled-background-color: #dad9e0;                     
+      --button-disabled-color: #aaaaaa; 
+      --color: #272727;
+      --color-secondary: #868686;       
+      --divider: solid 1px #e5e5e5;
+      --divider-section: solid 1px #c7c7c7;
+      --font-family: 'IBM Plex Sans', sans-serif;
+      --font-size: 16px;
+      --font-style: normal;
+      --font-weight: 400;
+      --icon-color: 
+          invert( 31% ) 
+          sepia( 49% ) 
+          saturate( 3696% ) 
+          hue-rotate( 198deg ) 
+          brightness( 106% ) 
+          contrast( 103% ); 
+      --icon-disabled-color:
+          invert( 86% ) 
+          sepia( 7% ) 
+          saturate( 7% ) 
+          hue-rotate( 321deg ) 
+          brightness( 79% ) 
+          contrast( 100% );      
+      --icon-selected-color:
+          invert( 99% ) 
+          sepia( 33% ) 
+          saturate( 242% ) 
+          hue-rotate( 204deg ) 
+          brightness( 112% ) 
+          contrast( 91% );      
+      --section-background-color: #f2f2f9;
+    }
+
+    html {
+      height: 100%;
+    }
+
+    body {
+      background-color: #ffffff;
+      display: flex;
+      flex-direction: row;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    .divided {
+      border-bottom: var( --divider );
+    }
+
+    .hbox {
+      align-items: center;
+      display: flex;
+      flex-direction: row;
+    }
+
+    .vbox {
+      display: flex;
+      flex-direction: column;
+    }
+
+    aa-drawer:first-of-type {
+      border-right: var( --divider-section );
+      padding: 64px 0 0 0;
+    }
+
+    aa-drawer:last-of-type {
+      border-left: var( --divider-section );
+    }
+
+    aa-navigation {
+      left: 0;
+      position: absolute;
+      right: 0;
+      top: 16px;
+    }
+
+    aa-stack {
+      display: flex;
+      flex-basis: 0;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    aa-vbox {
+      flex-basis: 0;
+      flex-grow: 1;
+    }
+
+    aa-year {
+      flex-basis: 0;
+      flex-grow: 1;
+    }
+  </style>
+
+</head>
+<body>
+
+  <aa-drawer>
+    <aa-stack selected-index="1">      
+      <aa-calendar-details></aa-calendar-details>
+      <aa-event-list></aa-event-list>
+    </aa-stack>
+  </aa-drawer>
+  <aa-vbox>
+    <aa-header></aa-header>
+    <aa-year></aa-year>
+    <aa-footer></aa-footer>
+  </aa-vbox>
+  <aa-drawer hidden></aa-drawer>
+  <aa-navigation></aa-navigation>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>  
+  <script src="./aa.js" type="module"></script>  
+  <script type="module">
+    const calendars = [{
+      uuid: 'abc-123',
+      name: 'Calendar',
+      color: 'red',
+      active_at: 1234,
+      shared_at: null,
+      public_at: null
+    }, {
+      uuid: 'def-123',
+      name: 'Work',
+      color: 'green',
+      active_at: 1234,
+      shared_at: null,
+      public_at: null
+    }, {
+      uuid: 'ghi-123',
+      name: 'Shared',
+      color: 'blue',
+      active_at: null,
+      shared_at: 1234,
+      public_at: null
+    }, {
+      uuid: 'jkl-123',
+      name: 'Public',
+      color: 'orange',
+      active_at: null,
+      shared_at: null,
+      public_at: 1234
+    }];
+    const events = [{
+      uuid: 'xyz-123',
+      calendar_id: 'abc-123',
+      color: '#ff0000',
+      summary: 'Paige',
+      location: 'Denver',
+      starts_at: new Date( 2004, 5, 4 ),
+      ends_at: new Date( 2004, 5, 4 )
+    }, {
+      uuid: 'uvw-123',
+      calendar_id: 'abc-123',
+      color: '#ff0000',
+      summary: 'Marna',
+      location: 'Iowa',
+      starts_at: new Date( 1974, 10, 20 ),
+      ends_at: new Date( 1974, 10, 23 )
+    }, {
+      uuid: 'rst-123',
+      calendar_id: 'abc-123',
+      color: '#ff0000',
+      summary: 'Kevin',
+      location: null,
+      starts_at: new Date( 1973, 0, 6 ),
+      ends_at: new Date( 1973, 0, 6 )
+    }];
+
+    const calendar_details = document.querySelector( 'aa-calendar-details' );
+    calendar_details.addEventListener( 'aa-active', ( evt ) => {
+      console.log( evt );
+    } ); 
+    calendar_details.addEventListener( 'aa-add', ( evt ) => {
+      console.log( evt );
+    } );         
+    calendar_details.addEventListener( 'aa-color', ( evt ) => {
+      console.log( evt );
+    } );             
+    calendar_details.addEventListener( 'aa-info', ( evt ) => {
+      console.log( evt );
+    } );    
+    calendar_details.data = calendars;
+
+    const event_list = document.querySelector( 'aa-event-list' );
+    event_list.data = events;
+
+    const drawer_left = document.querySelector( 'aa-drawer:first-of-type' );
+    const footer = document.querySelector( 'aa-footer' );
+    const header = document.querySelector( 'aa-header' );
+    const navigation = document.querySelector( 'aa-navigation' );
+    navigation.addEventListener( 'aa-add', ( evt ) => {
+      console.log( evt );
+      header.disabled = !header.disabled;
+      // navigation.disabled = !navigation.disabled;
+      drawer_left.disabled = !drawer_left.disabled;
+      footer.disabled = !footer.disabled;
+    } );
+  </script>
+
+</body>
+</html> 

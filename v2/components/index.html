@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+  
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Plan your year. Track annual progress. Feel awesome about your accomplishments. Anno Awesome: The missing year view.">
+
+  <title>Anno Awesome</title>
+
+  <link href="/img/trident.svg" rel="icon" type="image/svg+xml" />
+  <!-- <link href="/app/style/awesome.css" rel="stylesheet" /> -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --background-color: #f4f4f4;
+      --button-border-radius: 4px;
+      --button-color: #0082ff;
+      --button-hover-color: #0082ff;      
+      --button-disabled-background-color: #dad9e0;                     
+      --button-disabled-color: #aaaaaa; 
+      --color: #272727;
+      --color-secondary: #868686;       
+      --divider: solid 1px #e5e5e5;
+      --divider-section: solid 1px #c7c7c7;
+      --font-family: 'IBM Plex Sans', sans-serif;
+      --font-size: 16px;
+      --font-style: normal;
+      --font-weight: 400;
+      --icon-color: 
+          invert( 31% ) 
+          sepia( 49% ) 
+          saturate( 3696% ) 
+          hue-rotate( 198deg ) 
+          brightness( 106% ) 
+          contrast( 103% ); 
+      --icon-disabled-color:
+          invert( 86% ) 
+          sepia( 7% ) 
+          saturate( 7% ) 
+          hue-rotate( 321deg ) 
+          brightness( 79% ) 
+          contrast( 100% );      
+      --icon-selected-color:
+          invert( 99% ) 
+          sepia( 33% ) 
+          saturate( 242% ) 
+          hue-rotate( 204deg ) 
+          brightness( 112% ) 
+          contrast( 91% );      
+    }
+
+    html {
+      height: 100%;
+    }
+
+    body {
+      background-color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    .hbox {
+      align-items: center;
+      display: flex;
+      flex-direction: row;
+    }
+
+    .vbox {
+      display: flex;
+      flex-direction: column;
+    }
+
+    #year {
+      --button-color: var( --color );
+      --font-size: 32px;
+      --font-weight: 600;
+    }
+
+    aa-checkbox:first-of-type {
+      --checkbox-color: #cc73e1;
+    }
+  </style>
+
+</head>
+<body>
+
+  <aa-button label="Add Calendar"></aa-button>
+  <aa-button id="year" label="2024"></aa-button>  
+  <aa-button disabled label="Add Calendar"></aa-button>    
+  <aa-button kind="danger" label="Delete Calendar"></aa-button>      
+  <aa-button kind="form" label="Add attachment..."></aa-button>    
+  <aa-icon-button src="../img/calendar.svg"></aa-icon-button>    
+  <aa-icon-button disabled src="../img/calendar.svg"></aa-icon-button>      
+  <aa-icon-button selected src="../img/calendar.svg"></aa-icon-button>      
+  <aa-icon-button disabled selected src="../img/calendar.svg"></aa-icon-button>        
+  <aa-group selected-index="0">
+    <aa-icon-button src="../img/calendar.svg"></aa-icon-button>
+    <aa-icon-button src="../img/calendar.svg"></aa-icon-button>    
+  </aa-group>
+  <aa-section label="My Awesome">
+    <aa-button label="Show All" slot="extra"></aa-button>
+    <div style="background-color: lightgray; height: 100px;"></div>
+    <p slot="notes">Hiding a shared or public calendar does not make it private.</p>
+  </aa-section>
+  <aa-checkbox checked></aa-checkbox>  
+  <aa-checkbox checked disabled label="Calendar"></aa-checkbox>    
+  <aa-checkbox checked label="Calendar">
+    <aa-icon-button src="../img/info-circle.svg"></aa-icon-button>
+  </aa-checkbox>
+  <aa-footer></aa-footer>
+  <aa-navigation></aa-navigation>
+  <aa-stack>
+    <aa-hbox>One</aa-hbox>
+    <aa-hbox>Two</aa-hbox>
+  </aa-stack>
+  <aa-header value="2023"></aa-header>
+
+  <script src="../aa.js" type="module"></script>  
+
+</body>
+</html> 
